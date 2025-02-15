@@ -17,7 +17,7 @@ class BarcoModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT * FROM barco order by title desc;";
+            $vSQL = "SELECT * FROM barco order by idbarco desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
             //Retornar la respuesta
