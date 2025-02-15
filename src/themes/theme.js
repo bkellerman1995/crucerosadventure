@@ -2,15 +2,23 @@ import { createTheme } from "@mui/material/styles";
 export const appTheme = createTheme({
   palette: {
     mode: "light",
+
+    //Color del footer
     primary: {
-      main: "#468B97",
+      main: "#16537e",
     },
+
+    //Color del texto del año
     secondary: {
-      main: "#1D5B79",
+      main: "#ffffff", 
     },
+
+    //Color del navbar
     primaryLight: {
-      main: "#EF6262",
-      contrastText: "#F3AA60",
+      main: "#16537e",
+
+      //Color del texto sobre el navbar
+      contrastText: "#ffffff",
     },
   },
 });
