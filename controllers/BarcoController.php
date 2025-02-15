@@ -1,5 +1,5 @@
 <?php
-//localhost:81/crucerosadventura/barco
+//localhost:81/crucerosadventure/barco
 class barco
 {
     //GET listar

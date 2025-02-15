@@ -8,7 +8,7 @@ export const appTheme = createTheme({
       main: "#16537e",
     },
 
-    //Color del texto del año
+    //Color del texto del año en el footer
     secondary: {
       main: "#ffffff", 
     },
