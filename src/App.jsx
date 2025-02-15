@@ -7,13 +7,12 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 
 export default function App() {
   return (
-    /*<CartProvider> */
+
       <ThemeProvider theme={appTheme}>
         <CssBaseline enableColorScheme />
         <Layout>
           <Outlet /> 
         </Layout>
       </ThemeProvider>
-   /*</CartProvider> */
   );
 }

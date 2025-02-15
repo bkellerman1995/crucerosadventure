@@ -1,10 +1,11 @@
-import React from 'react';
+import React from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "./App";
-import { Home } from "@mui/icons-material";
+import { Home } from "./components/Home/Home.jsx";
+import { PageNotFound } from "./components/Home/PageNotFound.jsx";
 const rutas = createBrowserRouter([
   {
     element: <App />,
@@ -12,6 +13,10 @@ const rutas = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "*",
+        element: <PageNotFound />,
       },
     ],
   },

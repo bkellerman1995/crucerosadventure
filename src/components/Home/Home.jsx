@@ -11,10 +11,10 @@ export function Home() {
         color="text.primary"
         gutterBottom
       >
-        Alquiler de Peliculas
+        CRuceros Adventure
       </Typography>
       <Typography variant="h5" align="center" color="text.secondary">
-        Descubre y alquila tus películas favoritas por días.
+        Reserva un viaje en crucero.
       </Typography>
     </Container>
   );
