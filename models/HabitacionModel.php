@@ -1,5 +1,5 @@
 <?php
-class BarcoModel
+class HabitacionModel
 {
     //Conectarse a la BD
     public $enlace;
@@ -17,9 +17,7 @@ class BarcoModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS canHabitaciones
-            FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco GROUP BY b.idbarco
-            order by b.idbarco desc;";
+            $vSQL = "SELECT idHabitacion, Nombre, minHuesped, maxHuesped FROM habitacion order by idHabitacion desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
             //Retornar la respuesta
