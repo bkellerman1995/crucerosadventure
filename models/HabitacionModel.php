@@ -17,7 +17,7 @@ class HabitacionModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT idHabitacion, Nombre, minHuesped, maxHuesped FROM habitacion order by idHabitacion desc;";
+            $vSQL = "SELECT * FROM habitacion order by idHabitacion desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
             //Retornar la respuesta
