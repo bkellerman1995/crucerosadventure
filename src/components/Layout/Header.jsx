@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -15,19 +15,8 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Tooltip from "@mui/material/Tooltip";
-// import { useCart } from "../../hook/useCart";
-// import { UserContext } from "../../contexts/UserContext";
 
 export default function Header() {
-//   const { cart, getCountItems } = useCart();
-//   //Obtener el usuario autenticado con el token y decodificarlo
-//   //Informacion del usuario logueado
-//   const { user,  decodeToken, autorize } =
-//     useContext(UserContext);
-//   const [userData, setUserData] = useState(decodeToken());
-//   useEffect(() => {
-//     setUserData(decodeToken());
-//   }, [user]);
   //Gestión menu usuario
   const [anchorElUser, setAnchorEl] = React.useState(null);
   //Gestión menu opciones
@@ -69,10 +58,10 @@ export default function Header() {
   ];
   //Lista enlaces menu principal
   const navItems = [
-    { name: "Peliculas", link: "/movie",roles:null },
-    { name: "Cátalogo de Peliculas", link: "/catalog-movies/", roles:null },
-    { name: "Filtrar Peliculas", link: "/movie/filter", roles:null },
-    { name: "Mantenimiento Peliculas", link: "/movie-table/", roles:['Administrador'] },
+    { name: "Habitaciones", link: "/habitacion" },
+    { name: "Barcos", link: "/barco" },
+    { name: "Cruceros", link: "/crucero" },
+    { name: "Reservas", link: "/reserva" },
   ];
   //Identificador menu principal
   const menuIdPrincipal = "menu-appbar";
@@ -81,35 +70,16 @@ export default function Header() {
     <Box sx={{ display: { xs: "none", sm: "block" } }}>
       {navItems &&
         navItems.map((item, index) => {
-        //   if(userData && item.roles ){
-        //     if(autorize({requiredRoles:item.roles})){
-        //       return (
-        //         <Button
-        //           key={index}
-        //           component={Link}
-        //           to={item.link}
-        //           color="secondary"
-        //         >
-        //           <Typography textAlign="center">{item.name}</Typography>
-        //         </Button>
-        //       );
-        //     }
-        //   }else{
-        //     if(item.roles==null){
-        //       return (
-        //         <Button
-        //           key={index}
-        //           component={Link}
-        //           to={item.link}
-        //           color="secondary"
-        //         >
-        //           <Typography textAlign="center">{item.name}</Typography>
-        //         </Button>
-        //       );
-        //     }
-            
-        //   }
-         
+          return (
+            <Button
+              key={index}
+              component={Link}
+              to={item.link}
+              color="secondary"
+            >
+              <Typography textAlign="center">{item.name}</Typography>
+            </Button>
+          );
         })}
     </Box>
   );
@@ -152,37 +122,21 @@ export default function Header() {
         open={Boolean(anchorElUser)}
         onClose={handleUserMenuClose}
       >
-        {/* {userData && (
-          <MenuItem>
-            <Typography variant="subtitle1" gutterBottom>
-              {userData?.email}
-            </Typography>
-          </MenuItem>
-        )} */}
-{/* 
-        {userItems.map((setting, index) => {
-           
-           if (setting.login && userData && Object.keys(userData).length > 0) {
+        <MenuItem>
+          <Typography variant="subtitle1" gutterBottom>
+            Email usuario
+          </Typography>
+        </MenuItem>
 
-            return (
-              <MenuItem key={index} component={Link} to={setting.link}>
-                <Typography sx={{ textAlign: 'center' }}>
-                  {setting.name}
-                </Typography>
-              </MenuItem>
-            );
-          }else if (!setting.login && Object.keys(userData).length === 0) {
-           
-            return (
-              <MenuItem key={index} component={Link} to={setting.link}>
-                <Typography sx={{ textAlign: 'center' }}>
-                  {setting.name}
-                </Typography>
-              </MenuItem>
-            );
-          }
-          
-        })} */}
+        {userItems.map((setting, index) => {
+          return (
+            <MenuItem key={index} component={Link} to={setting.link}>
+              <Typography sx={{ textAlign: "center" }}>
+                {setting.name}
+              </Typography>
+            </MenuItem>
+          );
+        })}
       </Menu>
     </Box>
   );
@@ -205,19 +159,14 @@ export default function Header() {
       open={isMobileOpcionesMenuOpen}
       onClose={handleOpcionesMenuClose}
     >
-      {/* <MenuItem>
+      <MenuItem>
         <IconButton size="large" color="inherit">
-          <Badge
-            badgeContent={getCountItems(cart)}
-            color="primary"
-            component={Link}
-            to="/rental/crear/"
-          >
+          <Badge badgeContent={4} color="primary">
             <ShoppingCartIcon />
           </Badge>
         </IconButton>
         <p>Compras</p>
-      </MenuItem> */}
+      </MenuItem>
       <MenuItem>
         <IconButton size="large" color="inherit">
           <Badge badgeContent={17} color="error">
@@ -282,16 +231,11 @@ export default function Header() {
           {menuPrincipal}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            {/* <IconButton size="large" color="inherit">
-              <Badge
-                badgeContent={getCountItems(cart)}
-                color="primary"
-                component={Link}
-                to="/rental/crear/"
-              >
+            <IconButton size="large" color="inherit">
+              <Badge badgeContent={4} color="primary">
                 <ShoppingCartIcon />
               </Badge>
-            </IconButton> */}
+            </IconButton>
             <IconButton size="large" color="inherit">
               <Badge badgeContent={17} color="primary">
                 <NotificationsIcon />

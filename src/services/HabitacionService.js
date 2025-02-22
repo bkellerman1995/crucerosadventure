@@ -5,14 +5,14 @@ import axios from 'axios';
 //console.log ('BASE_URL: ', BASE_URL);
 
 
-class BarcoService {
+class HabitacionService {
     //Definición para llamar al API y obtener el listado de los cruceros}
     
     //Lista de todas las habitaciones.
     //localhost:81/crucerosadventure/habitacion
-    getBarcos() {
-        return axios.get('http://localhost:81/crucerosadventure/barco');
+    getHabitaciones() {
+        return axios.get('http://localhost:81/crucerosadventure/habitacion');
     }
 }
 
-export default new BarcoService()
+export default new HabitacionService()
