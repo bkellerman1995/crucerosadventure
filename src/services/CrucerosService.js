@@ -14,7 +14,9 @@ class CruceroService {
         return axios.get('http://localhost:81/crucerosadventure/crucero');
     }
 
-    getMovieById(cruceroId){
+    //Obtener la informacion de un crucero por su id
+    //localhost:81/crucerosadventure/crucero/{id}
+    getCrucero(cruceroId){
         return axios.get('http://localhost:81/crucerosadventure/crucero/' + cruceroId);
       }
 

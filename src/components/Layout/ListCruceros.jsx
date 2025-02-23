@@ -1,11 +1,11 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { ListCardCruceros } from './ListCardCrucero';
-import CruceroService from '../../services/CruceroService';
+import { ListCardCruceros } from './ListCardCruceros';
+import CruceroService from '../../services/CrucerosService';
 
 export function ListCruceros() {
   //Resultado de consumo del API, respuesta
-  const [data, setData] = useState(null);
+  const [data, setData] = useState("");
   //Error del API
   const [error, setError] = useState('');
   //Booleano para establecer sí se ha recibido respuesta
@@ -27,7 +27,7 @@ export function ListCruceros() {
           setLoaded(false);
         }
       });
-  });
+  }, []);
   if(!loaded) return <p>Cargando..</p>
   if(error) return <p>Error: {error.message}</p>
   return <>{data && <ListCardCruceros data={data}/>}</>
