@@ -17,4 +17,20 @@ class barco
             handleException($e);
         }
     }
+
+    //GET Obtener 
+    public function get($id)
+    {
+        try {
+            $response = new Response();
+            //Instancia del modelo
+            $barco = new BarcoModel();
+            //Acción del modelo a ejecutar
+            $result = $barco->get($id);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

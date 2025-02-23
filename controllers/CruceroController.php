@@ -17,4 +17,20 @@ class crucero
             handleException($e);
         }
     }
+
+    //GET Obtener 
+    public function get($id)
+    {
+        try {
+            $response = new Response();
+            //Instancia del modelo
+            $cruceroModel = new CruceroModel();
+            //Acción del modelo a ejecutar
+            $result = $cruceroModel->get($id);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

@@ -29,5 +29,27 @@ class BarcoModel
             handleException($e);
         }
     }
+
+        /*Obtener */
+        public function get($id)
+        {
+            try {
+                //Consulta sql               
+                $vSQL = "SELECT * FROM barco where idbarco=$id";
+
+                // Ejecutar la consulta
+                $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+                if (!empty($vResultado)) {
+                    // Retornar el objeto
+                    return $vResultado[0];
+                    
+                }
+                return $vResultado;
+
+            } catch (Exception $e) {
+                handleException($e);
+            }
+        }
  
 }

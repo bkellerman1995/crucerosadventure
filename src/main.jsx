@@ -6,7 +6,7 @@ import "./index.css";
 import { Home } from "./components/Home/Home.jsx";
 import { ListHabitaciones } from "./components/Layout/ListHabitaciones.jsx";
 import { ListBarcos } from "./components/Layout/ListBarcos.jsx";
-//import { ListCruceros } from "./components/Layout/ListCruceros.jsx";
+import { ListCruceros } from "./components/Layout/ListCruceros.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PageNotFound } from "./components/Home/PageNotFound.jsx";
 const rutas = createBrowserRouter([
@@ -38,11 +38,11 @@ const rutas = createBrowserRouter([
         path: "/barco",
         element: <ListBarcos/>,
       },
-      // {
-      //   //Página Cruceros
-      //   path: "/crucero",
-      //   element: <ListCruceros/>,
-      // }
+      {
+        //Página Cruceros
+        path: "/crucero",
+        element: <ListCruceros/>,
+      }
 
       
 
