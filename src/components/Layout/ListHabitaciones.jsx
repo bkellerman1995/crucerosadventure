@@ -23,46 +23,71 @@ import HabitacionService from '../../services/HabitacionService';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-//Ordenar descendente
+// Función para extraer el número de un string (ejemplo: "Habitacion10" -> 10)
+function extractNumber(text) {
+  const match = text.match(/\d+/); // Busca números en el string
+  return match ? parseInt(match[0], 10) : 0; // Convierte a número o devuelve 0 si no hay número
+}
+
+// Función para comparar de forma descendente (mayor a menor)
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
+  const isNumericColumn = ['numero', 'maxHuesped', 'tamanno'].includes(orderBy);
+  
+  let aValue = a[orderBy];
+  let bValue = b[orderBy];
+
+  if (isNumericColumn) {
+    aValue = parseFloat(aValue) || 0;
+    bValue = parseFloat(bValue) || 0;
+  } else {
+    
+    // Si la columna es "Descripcion", extraemos el número
+    const aNum = extractNumber(aValue);
+    const bNum = extractNumber(bValue);
+
+    if (aNum !== bNum) {
+      return bNum - aNum; // Comparación numérica
+    }
+
+    // Si no hay números o son iguales, comparar alfabéticamente
+    aValue = aValue.toLowerCase();
+    bValue = bValue.toLowerCase();
   }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
+
+  if (bValue < aValue) return -1;
+  if (bValue > aValue) return 1;
   return 0;
 }
-//Comparar para ordenar
+
+// Función para definir el comparador de orden (ascendente o descendente)
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-//Ordenar
+// Función para ordenar de forma estable
 function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
+  return array
+    .map((el, index) => [el, index])
+    .sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1]; // Mantener estabilidad
+    })
+    .map((el) => el[0]);
 }
 
 //--- Encabezados de la tabla ---
 const headCells = [
   {
-    id: 'numero',
+    id: 'idHabitacion',
     numeric: true,
     disablePadding: true,
     label: 'Número',
   },
   {
-    id: 'nombre',
+    id: 'Nombre',
     numeric: false,
     disablePadding: false,
     label: 'Nombre',
@@ -209,15 +234,20 @@ export function ListHabitaciones() {
 
 
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('year');
+  const [orderBy, setOrderBy] = React.useState('idHabitacion');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    let newOrder = 'asc';
+  
+    if (orderBy === property) {
+      newOrder = order === 'asc' ? 'desc' : 'asc';
+    }
+  
+    setOrder(newOrder);
     setOrderBy(property);
   };
 

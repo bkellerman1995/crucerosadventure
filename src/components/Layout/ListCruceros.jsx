@@ -11,7 +11,7 @@ export function ListCruceros() {
   //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API y obtener la lista de peliculas de una tienda
+  //Llamar al API y obtener la lista de cruceros al cargar el componente
   useEffect(() => {
     CruceroService.getCruceros()
       .then((response) => {
