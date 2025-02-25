@@ -119,7 +119,7 @@ function TableHabitacionesHead(props) {
         <TableCell>
 
         </TableCell>
-        {headCells.map((headCell) => (
+          {headCells.map((headCell) => (
 
           <TableCell
             key={headCell.id}
@@ -160,7 +160,7 @@ function TableHabitacionesToolbar(props) {
   const { idSelected } = props;
   const navigate = useNavigate();
   const update = () => {
-    return navigate(`/movie/update/${idSelected}`);
+    return navigate(`/habitacion/update/${idSelected}`);
   };
   return (
     <Toolbar
