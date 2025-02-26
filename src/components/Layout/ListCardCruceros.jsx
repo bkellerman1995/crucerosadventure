@@ -32,16 +32,14 @@ export function ListCardCruceros({ data }) {
                   backgroundColor: (theme) => theme.palette.secondary.main,
                   color: (theme) => theme.palette.common.black,
                 }}
-                style={{ textAlign: "center" }}
-                title={item.nombre}
-                subheader={
-                  <span>
-                    <br></br>
-                    <b>Fecha de salida:</b> <br></br>
-                    {item.fechaSalida}
-                  </span>
-                }
+                style={{ textAlign: "center", fontWeight: "bold" }}
+                title= {item.nombre}
               />
+              <Typography variant="body2" color="text.secondary">
+                <span>
+                  <br></br>
+                </span>
+              </Typography>
 
               <CardMedia
                 sx={{ height: 250 }}
