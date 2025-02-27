@@ -9,6 +9,7 @@ import { ListBarcos } from "./components/Layout/ListBarcos.jsx";
 import { ListCruceros } from "./components/Layout/ListCruceros.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PageNotFound } from "./components/Home/PageNotFound.jsx";
+import { DetailHabitacion } from "./components/Layout/DetailHabitacion";
 const rutas = createBrowserRouter([
   {
     element: <App />,
@@ -31,6 +32,12 @@ const rutas = createBrowserRouter([
         //Página Habitaciones
         path: "/habitacion",
         element: <ListHabitaciones/>,
+      },
+
+      {
+        //Página Habitaciones by ID
+        path: "/habitacion/:id",
+        element: <DetailHabitacion/>,
       },
 
       {
