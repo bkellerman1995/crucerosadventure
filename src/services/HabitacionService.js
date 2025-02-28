@@ -10,7 +10,7 @@ class HabitacionService {
     
     //Lista de todas las habitaciones.
     //localhost:81/crucerosadventure/habitacion
-    getHabitacion() {
+    getHabitaciones() {
         return axios.get('http://localhost:81/crucerosadventure/habitacion');
     }
 
