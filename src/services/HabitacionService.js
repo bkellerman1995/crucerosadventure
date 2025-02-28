@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 //Esta declaracion lanza undefined
-// const BASE_URL = import.meta.env.VITE_BASE_URL + 'habitacion';
-//console.log ('BASE_URL: ', BASE_URL);
+const BASE_URL = import.meta.env.VITE_BASE_URL + 'habitacion';
+console.log ('BASE_URL: ', BASE_URL);
 
 
 class HabitacionService {
