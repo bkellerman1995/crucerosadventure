@@ -1,5 +1,5 @@
 <?php
-class HabitacionModel
+class CategoriaHabitacionModel
 {
     //Conectarse a la BD
     public $enlace;
@@ -9,7 +9,7 @@ class HabitacionModel
         $this->enlace = new MySqlConnect();
     }
     /**
-     * Listar habitaciones
+     * Listar Categorias de habitaciones
      * @param 
      * @return $vResultado - Lista de objetos
      */
@@ -17,7 +17,7 @@ class HabitacionModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT * FROM habitacion order by idHabitacion desc;";
+            $vSQL = "SELECT * FROM categoriahabitacion order by idcategoriaHabitacion desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
             //Retornar la respuesta
@@ -29,28 +29,21 @@ class HabitacionModel
     }
 
     /**
-     * Obtener una habitacion
-     * @param $id de la habitacion
-     * @return $vresultado - Objeto habitacion
+     * Obtener una categoria de habitacion
+     * @param $id de la categoria habitacion
+     * @return $vresultado - Objeto categoriahabitacion
      */
     //
     public function get($id)
     {
         try {
-            $barcoM=new BarcoModel();
-            $catHabitacionM=new CategoriaHabitacionModel();
-            $vSql = "SELECT * FROM habitacion
-                    where idHabitacion=$id;";
+            $vSql = "SELECT * FROM categoriahabitacion
+                    where idcategoriaHabitacion=$id;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
             if(!empty($vResultado)){
                 $vResultado=$vResultado[0];
-                //Barco
-                $vResultado->barco=$barcoM->get(($vResultado->id));
-                //CategoriaHabitacion
-                $catHabitacion=$catHabitacionM->get($vResultado->catHabitacion_id);
-                $vResultado->catHabitacion=$catHabitacion;
             }
 
             

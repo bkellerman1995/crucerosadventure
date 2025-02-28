@@ -1,6 +1,6 @@
 <?php
-//localhost:81/crucerosadventure/habitacion
-class habitacion
+//localhost:81/crucerosadventure/categoriahabitacion
+class categoriahabitacion
 {
     //GET listar
     public function index()
@@ -8,9 +8,9 @@ class habitacion
         try {
             $response = new Response();
             //Instancia modelo
-            $habitacionModel = new HabitacionModel();
+            $cathabitacionModel = new CategoriaHabitacionModel();
             //Método del modelo
-            $result = $habitacionModel->all();
+            $result = $cathabitacionModel->all();
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -24,9 +24,9 @@ class habitacion
         try {
             $response = new Response();
             //Instancia del modelo
-            $habitacion = new HabitacionModel();
+            $cathabitacion = new CategoriaHabitacionModel();
             //Acción del modelo a ejecutar
-            $result = $habitacion->get($id);
+            $result = $cathabitacion->get($id);
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
