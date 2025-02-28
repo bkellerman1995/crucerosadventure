@@ -26,7 +26,6 @@ class CruceroModel
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
 
             // Si hay resultados, recorrerlos y convertir el BLOB
-            // if (!empty($vResultado) && is_array($vResultado)) {
             if (!empty($vResultado) && is_array($vResultado)) {
                 foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
                     if (!empty($row->foto)) {
