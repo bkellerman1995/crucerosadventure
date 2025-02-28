@@ -3,7 +3,6 @@ class CruceroModel
 {
     //Conectarse a la BD
     public $enlace;
-
     public function __construct()
     {
         $this->enlace = new MySqlConnect();
@@ -19,6 +18,8 @@ class CruceroModel
 
             //Obtener el nombre del barco
             $barcoModel = new BarcoModel();
+
+           
             // Consulta SQL
             $vSQL = "SELECT * FROM crucero ORDER BY idCrucero DESC;";
 
