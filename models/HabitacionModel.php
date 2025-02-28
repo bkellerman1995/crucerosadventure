@@ -1,5 +1,8 @@
 <?php
+
+require_once 'CategoriaHabitacionModel.php';
 class HabitacionModel
+
 {
     //Conectarse a la BD
     public $enlace;
@@ -37,7 +40,7 @@ class HabitacionModel
     public function get($id)
     {
         try {
-            $barcoM=new BarcoModel();
+
             $catHabitacionM=new CategoriaHabitacionModel();
             $vSql = "SELECT * FROM habitacion
                     where idHabitacion=$id;";
@@ -46,11 +49,10 @@ class HabitacionModel
             $vResultado = $this->enlace->executeSQL($vSql);
             if(!empty($vResultado)){
                 $vResultado=$vResultado[0];
-                //Barco
-                $vResultado->barco=$barcoM->get(($vResultado->id));
+
                 //CategoriaHabitacion
-                $catHabitacion=$catHabitacionM->get($vResultado->catHabitacion_id);
-                $vResultado->catHabitacion=$catHabitacion;
+                $habitacion=$catHabitacionM->get($vResultado->idcategoriaHabitacion);
+                $vResultado->habitacion=$habitacion;
             }
 
             
