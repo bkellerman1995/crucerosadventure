@@ -20,6 +20,7 @@ class MySqlConnect {
 		$this->dbname = Config::get('DB_DBNAME');
 		//Instancia Log
 		$this->log = new Logger();
+		
 	}
 	/**
 	 * Establecer la conexión
