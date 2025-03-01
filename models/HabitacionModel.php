@@ -1,6 +1,6 @@
 <?php
 
-require_once 'CategoriaHabitacionModel.php';
+// require_once 'CategoriaHabitacionModel.php';
 class HabitacionModel
 
 {
