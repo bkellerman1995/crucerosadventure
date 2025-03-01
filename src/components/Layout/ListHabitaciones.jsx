@@ -24,6 +24,10 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
 
+ListHabitaciones.propTypes = {
+  data: PropTypes.array
+  // isShopping: PropTypes.bool.isRequired,
+};
 // Función para extraer el número de un string (ejemplo: "Habitacion10" -> 10)
 function extractNumber(text) {
   const match = text.match(/\d+/); // Busca números en el string
@@ -204,7 +208,7 @@ TableHabitacionesToolbar.propTypes = {
 //Componente tabla con hooks
 export function ListHabitaciones() {
   //Datos a cargar en la tabla
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(null);
 
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);

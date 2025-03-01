@@ -17,8 +17,9 @@ class HabitacionService {
     //Obtener la informacion de una habitacion por su id
     //localhost:81/crucerosadventure/crucero/{id}
     getHabitacionById(HabitacionesId){
-
-        return axios.get(BASE_URL + HabitacionesId);
+        console.log('BASE_URL HABITACONES: ', BASE_URL+ '/'+ HabitacionesId);
+        console.log('HabitacionesId: ', HabitacionesId);
+        return axios.get(BASE_URL + '/'+ HabitacionesId);
     }
 
     // createHabitacion(Habitacion) {

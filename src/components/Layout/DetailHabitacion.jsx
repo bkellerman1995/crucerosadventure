@@ -15,7 +15,7 @@ import HabitacionService from '../../services/HabitacionService';
 
 export function DetailHabitacion() {
   const routeParams = useParams();
-  console.log(routeParams);
+  console.log('parametro',routeParams);
 
   //Resultado de consumo del API, respuesta
   const [data, setData] = useState(null);
@@ -28,12 +28,12 @@ export function DetailHabitacion() {
     HabitacionService.getHabitacionById(routeParams.id)
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
+        console.log('datoshab detail',response.data);
         setError(response.error);
         setLoaded(true);
       })
       .catch((error) => {
-        console.log(error);
+        console.log('error',error);
         setError(error);
         throw new Error('Respuesta no válida del servidor');
       });
@@ -47,9 +47,9 @@ export function DetailHabitacion() {
         <Grid container spacing={2}>
           <Grid size={7}>
             <Typography variant="h4" component="h1" gutterBottom>
-              {data.title}
+              {data.Nombre}
             </Typography>
-            <Typography variant="subtitle1" component="h1" gutterBottom>
+            {/* <Typography variant="subtitle1" component="h1" gutterBottom>
               {data.year}
             </Typography>
             <Typography component="span" variant="subtitle1" display="block">
@@ -107,7 +107,7 @@ export function DetailHabitacion() {
                   </ListItemButton>
                 ))}
               </List>
-            </Typography>
+            </Typography> */}
           </Grid>
         </Grid>
       )}
