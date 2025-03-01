@@ -345,7 +345,7 @@ export function ListHabitaciones() {
 
                           <TableCell>
 
-                          <IconButton fill = "#00304E" component={Link} to={`/habitacion/${row.idHabitacion}`} aria-label="Detalle" sx={{ ml: "auto" }}></IconButton>
+                          <IconButton component={Link} to={`/habitacion/${row.idHabitacion}`} aria-label="Detalle" sx={{ ml: "auto", backgroundColor: "#00304E"}}></IconButton>
 
                           </TableCell>
                         </TableRow>
