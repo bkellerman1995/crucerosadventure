@@ -36,7 +36,7 @@ const rutas = createBrowserRouter([
 
       {
         //Página Habitaciones by ID
-        path: "/habitacion/:id",
+        path: "/habitacion/id",
         element: <DetailHabitacion/>,
       },
 
@@ -45,13 +45,25 @@ const rutas = createBrowserRouter([
         path: "/barco",
         element: <ListBarcos/>,
       },
+
+      {
+        //Página Barcos by ID
+        path: "/barco/:id",
+        //element: <DetailBarco/>,
+      },
+
       {
         //Página Cruceros
         path: "/crucero",
         element: <ListCruceros/>,
-      }
+      },
 
-      
+      {
+        //Página Cruceros by ID
+        path: "/crucero/:id",
+        //element: <DetailCrucero/>,
+      },
+
 
     ],
   },
