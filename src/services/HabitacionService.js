@@ -11,13 +11,14 @@ class HabitacionService {
     //Lista de todas las habitaciones.
     //localhost:81/crucerosadventure/habitacion
     getHabitaciones() {
-        return axios.get('http://localhost:81/crucerosadventure/habitacion');
+        return axios.get(BASE_URL);
     }
 
-    //Obtener pelicula
-    //localhost:81/crucerosadventure/habitacion/1
+    //Obtener la informacion de una habitacion por su id
+    //localhost:81/crucerosadventure/crucero/{id}
     getHabitacionById(HabitacionesId){
-        return axios.get('http://localhost:81/crucerosadventure/habitacion'+'/'+HabitacionesId);
+
+        return axios.get(BASE_URL + HabitacionesId);
     }
 
     // createHabitacion(Habitacion) {

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 //Esta declaracion lanza undefined
-//const BASE_URL = import.meta.env.VITE_BASE_URL + 'habitacion';
-//console.log ('BASE_URL: ', BASE_URL);
+const BASE_URL = import.meta.env.VITE_BASE_URL + 'crucero';
+console.log ('BASE_URL: ', BASE_URL);
 
 
 class CruceroService {
@@ -11,13 +11,14 @@ class CruceroService {
     //Lista de todos los cruceros.
     //localhost:81/crucerosadventure/crucero
     getCruceros() {
-        return axios.get('http://localhost:81/crucerosadventure/crucero');
+        return axios.get(BASE_URL);
     }
 
     //Obtener la informacion de un crucero por su id
     //localhost:81/crucerosadventure/crucero/{id}
     getCrucero(cruceroId){
-        return axios.get('http://localhost:81/crucerosadventure/crucero/' + cruceroId);
+        return axios.get(BASE_URL + cruceroId);
+
       }
 
 }
