@@ -1,27 +1,28 @@
 /* eslint-disable no-unused-vars */
 //https://mui.com/material-ui/react-table/#sorting-amp-selecting
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import { visuallyHidden } from '@mui/utils';
-import { useEffect } from 'react';
-import HabitacionService from '../../services/HabitacionService';
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import * as React from "react";
+import PropTypes from "prop-types";
+import { alpha } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import { visuallyHidden } from "@mui/utils";
+import { useEffect } from "react";
+import HabitacionService from "../../services/HabitacionService";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { IconButton } from "@mui/material";
 
 // Función para extraer el número de un string (ejemplo: "Habitacion10" -> 10)
 function extractNumber(text) {
@@ -31,8 +32,8 @@ function extractNumber(text) {
 
 // Función para comparar de forma descendente (mayor a menor)
 function descendingComparator(a, b, orderBy) {
-  const isNumericColumn = ['numero', 'maxHuesped', 'tamanno'].includes(orderBy);
-  
+  const isNumericColumn = ["numero", "maxHuesped", "tamanno"].includes(orderBy);
+
   let aValue = a[orderBy];
   let bValue = b[orderBy];
 
@@ -40,7 +41,6 @@ function descendingComparator(a, b, orderBy) {
     aValue = parseFloat(aValue) || 0;
     bValue = parseFloat(bValue) || 0;
   } else {
-    
     // Si la columna es "Descripcion", extraemos el número
     const aNum = extractNumber(aValue);
     const bNum = extractNumber(bValue);
@@ -61,7 +61,7 @@ function descendingComparator(a, b, orderBy) {
 
 // Función para definir el comparador de orden (ascendente o descendente)
 function getComparator(order, orderBy) {
-  return order === 'desc'
+  return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
@@ -81,28 +81,28 @@ function stableSort(array, comparator) {
 //--- Encabezados de la tabla ---
 const headCells = [
   {
-    id: 'idHabitacion',
+    id: "idHabitacion",
     numeric: true,
     disablePadding: true,
-    label: 'Número',
+    label: "Número",
   },
   {
-    id: 'Nombre',
+    id: "Nombre",
     numeric: false,
     disablePadding: false,
-    label: 'Nombre',
+    label: "Nombre",
   },
   {
-    id: 'maxHuesped',
+    id: "maxHuesped",
     numeric: true,
     disablePadding: false,
-    label: 'Máximo de huéspedes',
+    label: "Máximo de huéspedes",
   },
   {
-    id: 'tamanno',
+    id: "tamanno",
     numeric: true,
     disablePadding: false,
-    label: 'Tamaño',
+    label: "Tamaño",
   },
 ];
 
@@ -116,25 +116,22 @@ function TableHabitacionesHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell>
-
-        </TableCell>
-          {headCells.map((headCell) => (
-
+        <TableCell></TableCell>
+        {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
+              direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {order === "desc" ? "sorted descending" : "sorted ascending"}
                 </Box>
               ) : null}
             </TableSortLabel>
@@ -149,7 +146,7 @@ function TableHabitacionesHead(props) {
 TableHabitacionesHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
@@ -171,14 +168,14 @@ function TableHabitacionesToolbar(props) {
           bgcolor: (theme) =>
             alpha(
               theme.palette.primary.main,
-              theme.palette.action.activatedOpacity,
+              theme.palette.action.activatedOpacity
             ),
         }),
       }}
     >
       {numSelected > 0 ? (
         <Typography
-          sx={{ flex: '1 1 100%' }}
+          sx={{ flex: "1 1 100%" }}
           color="inherit"
           variant="subtitle1"
           component="div"
@@ -187,7 +184,7 @@ function TableHabitacionesToolbar(props) {
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%' }}
+          sx={{ flex: "1 1 100%" }}
           variant="h6"
           id="tableTitle"
           component="div"
@@ -206,15 +203,14 @@ TableHabitacionesToolbar.propTypes = {
 
 //Componente tabla con hooks
 export function ListHabitaciones() {
-  
   //Datos a cargar en la tabla
   const [data, setData] = useState([]);
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
-  
+
   //Obtener lista del API (useEffect)
-   useEffect(() => {
+  useEffect(() => {
     HabitacionService.getHabitaciones()
       .then((response) => {
         console.log(response);
@@ -227,26 +223,25 @@ export function ListHabitaciones() {
           setError(error);
           console.log(error);
           setLoaded(false);
-          throw new Error('Respuesta no válida del servidor');
+          throw new Error("Respuesta no válida del servidor");
         }
       });
   }, []);
 
-
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('idHabitacion');
+  const [order, setOrder] = React.useState("asc");
+  const [orderBy, setOrderBy] = React.useState("idHabitacion");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
-    let newOrder = 'asc';
-  
+    let newOrder = "asc";
+
     if (orderBy === property) {
-      newOrder = order === 'asc' ? 'desc' : 'asc';
+      newOrder = order === "asc" ? "desc" : "asc";
     }
-  
+
     setOrder(newOrder);
     setOrderBy(property);
   };
@@ -255,10 +250,10 @@ export function ListHabitaciones() {
   const handleClick = (event, name) => {
     let newSelected = [name];
     const selectedIndex = selected.indexOf(name);
-    
+
     if (selectedIndex === 0) {
       newSelected = [];
-    } 
+    }
     setSelected(newSelected);
   };
 
@@ -272,7 +267,7 @@ export function ListHabitaciones() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  
+
   //Cambiar densidad
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
@@ -284,15 +279,14 @@ export function ListHabitaciones() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
-
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
       {data && data.length > 0 && (
-        <Box sx={{ width: '100%' }}>
-          <Paper sx={{ width: '100%', mb: 2 }}>
+        <Box sx={{ width: "100%" }}>
+          <Paper sx={{ width: "100%", mb: 2 }}>
             <TableHabitacionesToolbar
               numSelected={selected.length}
               idSelected={Number(selected[0]) || 0}
@@ -301,7 +295,7 @@ export function ListHabitaciones() {
               <Table
                 sx={{ minWidth: 750 }}
                 aria-labelledby="tableTitle"
-                size={dense ? 'small' : 'medium'}
+                size={dense ? "small" : "medium"}
               >
                 <TableHabitacionesHead
                   numSelected={selected.length}
@@ -326,10 +320,9 @@ export function ListHabitaciones() {
                           tabIndex={-1}
                           key={row.id}
                           selected={isItemSelected}
-                          sx={{ cursor: 'pointer' }}
+                          sx={{ cursor: "pointer" }}
                         >
-
-                        {/* Contenido de la tabla */}
+                          {/* Contenido de la tabla */}
                           <TableCell
                             component="th"
                             id={labelId}
@@ -341,13 +334,23 @@ export function ListHabitaciones() {
                           <TableCell align="left">{row.idHabitacion}</TableCell>
                           <TableCell align="left">{row.Nombre}</TableCell>
                           <TableCell align="left">{row.maxHuesped}</TableCell>
+                          
 
                           {/*<sup> para los metros cuadrados</sup> */}
 
-                          <TableCell align="left">{row.tamanno} m<sup>2</sup></TableCell>
-                        {/* Contenido de la tabla */}
-                        
+                          <TableCell align="left">
+                            {row.tamanno} m<sup>2</sup>
+                          </TableCell>
+                          {/* Contenido de la tabla */}
+
+                          <TableCell>
+
+                          <IconButton fill = "#00304E" component={Link} to={`/habitacion/${row.idHabitacion}`} aria-label="Detalle" sx={{ ml: "auto" }}></IconButton>
+
+                          </TableCell>
                         </TableRow>
+
+                        
                       );
                     })}
                   {emptyRows > 0 && (
@@ -377,8 +380,7 @@ export function ListHabitaciones() {
                 `${from}-${to} de ${count} página(s)`
               }
             />
-             {/* Paginación */}
-
+            {/* Paginación */}
           </Paper>
 
           {/* Espaciado */}
