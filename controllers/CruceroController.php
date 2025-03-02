@@ -1,5 +1,5 @@
 <?php
-//localhost:81/crucerosadventure/barco
+//localhost:81/crucerosadventure/crucero
 class crucero
 {
     //GET listar
@@ -13,6 +13,7 @@ class crucero
             $result = $cruceroModel->all();
             //Dar respuesta
             $response->toJSON($result);
+
         } catch (Exception $e) {
             handleException($e);
         }
@@ -29,6 +30,7 @@ class crucero
             $result = $cruceroModel->get($id);
             //Dar respuesta
             $response->toJSON($result);
+            
         } catch (Exception $e) {
             handleException($e);
         }

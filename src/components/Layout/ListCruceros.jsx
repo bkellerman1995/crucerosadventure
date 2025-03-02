@@ -5,7 +5,7 @@ import CruceroService from '../../services/CrucerosService';
 
 export function ListCruceros() {
   //Resultado de consumo del API, respuesta
-  const [data, setData] = useState("");
+  const [data, setData] = useState(null);
   //Error del API
   const [error, setError] = useState('');
   //Booleano para establecer sí se ha recibido respuesta

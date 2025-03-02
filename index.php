@@ -25,6 +25,7 @@ require_once "models/PuertoModel.php";
 require_once "models/ItinerarioModel.php";
 require_once "models/CruceroModel.php";
 require_once "models/CategoriaHabitacionModel.php";
+require_once "models/PaisModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/BarcoController.php";

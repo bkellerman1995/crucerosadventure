@@ -26,7 +26,6 @@ import { IconButton } from "@mui/material";
 
 ListHabitaciones.propTypes = {
   data: PropTypes.array
-  // isShopping: PropTypes.bool.isRequired,
 };
 // Función para extraer el número de un string (ejemplo: "Habitacion10" -> 10)
 function extractNumber(text) {

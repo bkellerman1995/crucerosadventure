@@ -1,5 +1,7 @@
 <?php
-class PuertoModel
+
+// require_once 'CategoriaHabitacionModel.php';
+class PaisModel
 {
     //Conectarse a la BD
     public $enlace;
@@ -9,7 +11,7 @@ class PuertoModel
         $this->enlace = new MySqlConnect();
     }
     /**
-     * Listar barcos
+     * Listar paises
      * @param 
      * @return $vResultado - Lista de objetos
      */
@@ -17,7 +19,7 @@ class PuertoModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT * from puerto order by idPuerto desc;";
+            $vSQL = "SELECT * from pais order by idPais desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
             //Retornar la respuesta
@@ -26,34 +28,24 @@ class PuertoModel
         } catch (Exception $e) {
             handleException($e);
         }
-
-
     }
 
     public function get($id)
     {
         try {
-            
-            //Obtener el pais de cada puerto
-            $paisModel = new PaisModel();
-            $vSql = "SELECT * FROM puerto
-                    where idPuerto='$id';";
+            $vSql = "SELECT * FROM pais
+                    where idPais='$id';";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
             }
-
-            //Extrar el objeto pais relacionado a este puerto
-            $pais = $paisModel->get($vResultado->idPais);
-            $vResultado->pais = $pais;
-
-            //Retornar la respuesta
-            return $vResultado;
         } catch (Exception $e) {
             handleException($e);
         }
-    }
 
+        return $vResultado;
+    }   
+ 
 }
