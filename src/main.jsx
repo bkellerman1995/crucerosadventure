@@ -10,6 +10,7 @@ import { ListCruceros } from "./components/Layout/ListCruceros.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PageNotFound } from "./components/Home/PageNotFound.jsx";
 import { DetailHabitacion } from "./components/Layout/DetailHabitacion";
+import { DetailCrucero } from "./components/Layout/DetailCrucero";
 const rutas = createBrowserRouter([
   {
     element: <App />,
@@ -61,7 +62,7 @@ const rutas = createBrowserRouter([
       {
         //Página Cruceros by ID
         path: "/crucero/:id",
-        //element: <DetailCrucero/>,
+        element: <DetailCrucero/>,
       },
 
 

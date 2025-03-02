@@ -16,8 +16,8 @@ class CruceroService {
 
     //Obtener la informacion de un crucero por su id
     //localhost:81/crucerosadventure/crucero/{id}
-    getCrucero(cruceroId){
-        return axios.get(BASE_URL + cruceroId);
+    getCrucerobyId(cruceroId){
+        return axios.get(BASE_URL + '/' + cruceroId);
 
       }
 
