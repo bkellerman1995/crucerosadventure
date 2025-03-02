@@ -40,7 +40,9 @@ class HabitacionModel
     {
         try {
 
-            $catHabitacionM = new CategoriaHabitacionModel();
+            //Obtener la categoriaHabitacion
+            $catHabitacionModel = new CategoriaHabitacionModel();
+
             $vSql = "SELECT * FROM habitacion
                     where idHabitacion=$id;";
 
@@ -48,12 +50,11 @@ class HabitacionModel
             $vResultado = $this->enlace->executeSQL($vSql);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
-
-                //CategoriaHabitacion
-                $habitacion = $catHabitacionM->get($vResultado->idcategoriaHabitacion);
-                $vResultado->habitacion = $habitacion;
             }
 
+            //Extrar el objeto CategoriaHabitacion relacionado a esta habitacion
+            $cathabitacion = $catHabitacionModel->get($vResultado->idcategoriaHabitacion);
+            $vResultado->cathabitacion = $cathabitacion;
 
             //Retornar la respuesta
             return $vResultado;

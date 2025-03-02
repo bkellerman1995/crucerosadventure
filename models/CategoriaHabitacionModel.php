@@ -38,7 +38,7 @@ class CategoriaHabitacionModel
     {
         try {
             $vSql = "SELECT * FROM categoriahabitacion
-                    where idcategoriaHabitacion=$id;";
+                    where idcategoriaHabitacion='$id';";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
