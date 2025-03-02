@@ -90,8 +90,13 @@ class CruceroModel
 
             //Extraer las diferentes fechas en las que se oferta el crucero
             //junto con el precio de las habitaciones
-            $fechasPreciosHabitaciones = $this->getFechasPreciosHabitaciones($id);
+            $fechasPreciosHabitaciones = $this->getFechasPreciosHabitaciones($vResultado->idCrucero);
             $vResultado->fechasPreciosHabitaciones = $fechasPreciosHabitaciones;
+
+            //Extrar las habitaciones que estan ligadas al crucero (barco)
+            $habitacionModel = new HabitacionModel();
+            $habitacionesCrucero = $habitacionModel->getHabitacionesCrucero($vResultado->idBarco);
+            $vResultado->habitaciones = $habitacionesCrucero;
 
             //Retornar la respuesta
             return $vResultado;
@@ -104,8 +109,12 @@ class CruceroModel
     public function getFechasPreciosHabitaciones($id)
     {
         try {
+
+            //Obtener las habitaciones que estan ligadas al crucero (barco)
+            $habitacionModel = new HabitacionModel();
+
             //Obtener las fechas y precios de las habitaciones
-            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero='$id';";
+            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero='$id' order by idCruceroFecha desc;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -113,11 +122,10 @@ class CruceroModel
             // Si hay resultados, recorrerlos y extrear la información de cada
             // fecha relacionada al crucero
             if (!empty($vResultado) && is_array($vResultado)) {
-                
-            }
 
-            //Retornar la respuesta
-            return $vResultado;
+                //Retornar la respuesta
+                return $vResultado;
+            }
 
         } catch (Exception $e) {
             handleException($e);

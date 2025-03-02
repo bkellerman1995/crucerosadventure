@@ -11,9 +11,9 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Grid from "@mui/material/Grid2";
-import CrucerosService from "../../services/CrucerosService";
+import ReservaService from "../../services/ReservaService";
 
-export function DetailCrucero() {
+export function DetailReserva() {
   const routeParams = useParams();
 
   console.log(routeParams);
@@ -25,11 +25,11 @@ export function DetailCrucero() {
   //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    //Llamar al API y obtener una pelicula
-    CrucerosService.getCrucerobyId(routeParams.id)
+    //Llamar al API y obtener una reserva por su id
+    ReservaService.getReservaById(routeParams.id)
       .then((response) => {
         setData(response.data);
-        console.log("datosCruc detail", response.data);
+        console.log("datosReserva detail", response.data);
         setError(response.error);
         setLoaded(true);
       })
@@ -48,64 +48,65 @@ export function DetailCrucero() {
   return (
     <Container component="main" sx={{ mt: 8, mb: 2 }}>
       {data && (
-        <Grid container spacing={2}>
-          <Grid size={5}>
-            <Box
-              component="img"
+        <Grid size={7}>
+          <Typography variant="h3" component="h1" gutterBottom>
+            Detalles de la reserva
+          </Typography>
+          <Typography variant="h4" component="h1" gutterBottom>
+            {data.crucero}
+          </Typography>
+          <Typography component="span" variant="h5">
+            <Box>Puertos (salida y regreso):</Box>
+            <List
               sx={{
-                borderRadius: "4%",
-                maxWidth: "100%",
-                height: "auto",
+                width: "100%",
+                maxWidth: 360,
+                bgcolor: "background.paper",
               }}
-              alt="Detalle del crucero"
-              src={data.foto}
-            />
-          </Grid>
-          <Grid size={7}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              {data.nombre}
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              component="h1"
-              gutterBottom
-            ></Typography>
-            <Typography component="span" variant="subtitle1" display="block">
-              <Box fontWeight="bold" display="inline">
-                Cantidad de días:
-              </Box>{" "}
-              {data.cantDias}
-            </Typography>
-            <Typography component="span" variant="subtitle1" display="block">
-              <Box fontWeight="bold" display="inline">
-                Nombre del barco:
-              </Box>{" "}
-              {data.barco.descripcion}
-            </Typography>
-            <Typography component="span" variant="subtitle1">
-              <Box fontWeight="bold">Itinerario:</Box>
-              <List
-                sx={{
-                  width: "100%",
-                  maxWidth: 360,
-                  bgcolor: "background.paper",
-                }}
-              >
-                Puertos
-                {data.puertos.map((item) => (
-                  <ListItemButton key={item.puerto}>
-                    <ListItemIcon>
-                      <ArrowRightIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`${item.puerto.Nombre} - ${item.puerto.pais.descripcion}`}
-                      secondary={item.puerto.descripcion}
-                    />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Typography>
-            <Typography component="span" variant="subtitle1">
+            >
+              {data.puertos.map((item) => (
+                <ListItemButton key={item.idItinerario}>
+                  <ListItemIcon>
+                    <ArrowRightIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${item.puerto.Nombre} - ${item.puerto.pais.descripcion}`}
+                    secondary={item.puerto.descripcion}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </Typography>
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Fecha de salida:</b> {data.fechaInicio} <br></br>
+          </Typography>
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Fecha de llegada:</b> {data.fechaFinal.date} <br></br>
+          </Typography>
+          
+          <Typography component="span" variant="h5">
+            <Box>Puertos (salida y regreso):</Box>
+            <List
+              sx={{
+                width: "100%",
+                maxWidth: 360,
+                bgcolor: "background.paper",
+              }}
+            >
+              {data.puertos.map((item) => (
+                <ListItemButton key={item.idItinerario}>
+                  <ListItemIcon>
+                    <ArrowRightIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${item.puerto.Nombre} - ${item.puerto.pais.descripcion}`}
+                    secondary={item.puerto.descripcion}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </Typography>
+          {/* <Typography component="span" variant="subtitle1">
               <Box fontWeight="bold">Fechas de salida:</Box>
               <List
                 sx={{
@@ -117,16 +118,16 @@ export function DetailCrucero() {
                 {data.fechasPreciosHabitaciones.map((item) => (
                   <React.Fragment key={item.id}>
                     {/* Elemento principal: Fecha de salida */}
-                    <ListItemButton>
+          {/* <ListItemButton>
                       <ListItemIcon>
                         <StarIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary={`Fecha de salida: ${item.fechaSalida}`}
                       />
-                    </ListItemButton>
+                    </ListItemButton> */}
 
-                    {/* Sublista de habitaciones con su precio correspondiente */}
+          {/* Sublista de habitaciones con su precio correspondiente
                     <List component="div" disablePadding>
                       {data.habitaciones.map((habitacion) => {
                         // Buscar el precio correspondiente en fechasPreciosHabitaciones
@@ -144,12 +145,12 @@ export function DetailCrucero() {
                         );
                       })}
                     </List>
-                  </React.Fragment>
-                ))}
+                  </React.Fragment> */}
+          {/* ))}
               </List>
-            </Typography>
-          </Grid>
+            </Typography> */}
         </Grid>
+        // </Grid>
       )}
     </Container>
   );
