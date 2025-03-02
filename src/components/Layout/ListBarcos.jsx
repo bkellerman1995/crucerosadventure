@@ -22,6 +22,13 @@ import { useEffect } from 'react';
 import BarcoService from '../../services/BarcoService';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { IconButton } from "@mui/material";
+import { Visibility } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+
+
+
+
 
 //Ordenar descendente
 function descendingComparator(a, b, orderBy) {
@@ -304,6 +311,12 @@ export function ListBarcos() {
                           <TableCell align="left">{row.canHabitaciones}</TableCell>
                         {/* Contenido de la tabla */}
                         
+                        <TableCell>
+
+                          <IconButton component={Link} to={`/barco/${row.idBarco}`} aria-label="Detalle" sx={{ ml: "auto", backgroundColor: "#00304E"}}></IconButton>
+                          
+
+                          </TableCell>
                         </TableRow>
                       );
                     })}
