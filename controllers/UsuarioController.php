@@ -1,6 +1,6 @@
 <?php
-//localhost:81/crucerosadventure/barco
-class barco
+//localhost:81/crucerosadventure/Usuario
+class Usuario
 {
     //GET listar
     public function index()
@@ -8,7 +8,7 @@ class barco
         try {
             $response = new Response();
             //Instancia modelo
-            $barcoM = new BarcoModel();
+            $barcoM = new UsuarioModel();
             //Método del modelo
             $result = $barcoM->all();
             //Dar respuesta
@@ -24,7 +24,7 @@ class barco
         try {
             $response = new Response();
             //Instancia del modelo
-            $barco = new BarcoModel();
+            $barco = new UsuarioModel();
             //Acción del modelo a ejecutar
             $result = $barco->get($id);
             //Dar respuesta

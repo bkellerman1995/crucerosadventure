@@ -11,8 +11,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Grid from "@mui/material/Grid2";
-import HabitacionService from "../../services/HabitacionService";
-
+import BarcoService from "../../services/BarcoService";
 
 export function DetailBarco() {
   const routeParams = useParams();
@@ -27,7 +26,7 @@ export function DetailBarco() {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     //Llamar al API y obtener una Barco
-    HabitacionService.geBarcoById(routeParams.id)
+    BarcoService.geBarcoById(routeParams.id)
       .then((response) => {
         setData(response.data);
         console.log("datosbarco detail", response.data);
