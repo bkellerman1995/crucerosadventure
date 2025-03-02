@@ -6,7 +6,7 @@ console.log ('BASE_URL: ', BASE_URL);
 
 
 class BarcoService {
-  //Definición para llamar al API y obtener el listado de los cruceros}
+  //Definición para llamar al API y obtener el listado de los barco}
 
   //Lista de todas las habitaciones.
   //localhost:81/crucerosadventure/habitacion
