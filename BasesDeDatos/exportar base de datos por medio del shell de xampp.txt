@@ -1,0 +1,8 @@
+COMANDO PARA EXPORTAR BASE DE DATOS DESDE EL XAMPP (XAMPP TIENE QUE CORRER COMO ADMINISTRADOR)
+
+- Se da click en "Shell" dentro de Xamp y se corre este comando en la terminal:
+
+** cambiar la x en crucerosadventure_x.sql por el numero que sigue en la lista. 
+
+mysqldump -u root -p crucerosadventure --databases --hex-blob > C:\xampp\htdocs\crucerosadventure\BasesDeDatos\crucerosadventure_10.sql. 
+

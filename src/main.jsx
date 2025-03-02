@@ -7,10 +7,13 @@ import { Home } from "./components/Home/Home.jsx";
 import { ListHabitaciones } from "./components/Layout/ListHabitaciones.jsx";
 import { ListBarcos } from "./components/Layout/ListBarcos.jsx";
 import { ListCruceros } from "./components/Layout/ListCruceros.jsx";
+import { ListReservas } from "./components/Layout/ListReservas.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PageNotFound } from "./components/Home/PageNotFound.jsx";
 import { DetailHabitacion } from "./components/Layout/DetailHabitacion";
 import { DetailCrucero } from "./components/Layout/DetailCrucero";
+import { DetailReserva } from "./components/Layout/DetailReserva";
+
 const rutas = createBrowserRouter([
   {
     element: <App />,
@@ -63,6 +66,18 @@ const rutas = createBrowserRouter([
         //Página Cruceros by ID
         path: "/crucero/:id",
         element: <DetailCrucero/>,
+      },
+
+      {
+        //Página Reservas
+        path: "/reserva",
+        element: <ListReservas/>,
+      },
+
+      {
+        //Página Cruceros by ID
+        path: "/reserva/:id",
+        element: <DetailReserva/>,
       },
 
 
