@@ -74,7 +74,7 @@ export function DetailBarco() {
               {data.Descripcion}
             </Typography>
             <Typography component="span" variant="subtitle1">
-              <Box fontWeight="bold">Capacidad de la habitación:</Box>
+              <Box fontWeight="bold">Informacion del Barco:</Box>
               <List
                 sx={{
                   width: "100%",
@@ -87,13 +87,13 @@ export function DetailBarco() {
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Mínimo de huespedes: ${data.barcoID}`}
+                    primary={`Cantidad habitacion: ${data.cantHabitaciones}`}
                   />
                   <ListItemIcon>
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Máximo de huespedes: ${data.maxHuesped}`}
+                    primary={`Máximo de huespedes: ${data.capacidadHuesped}`}
                   />
                 </ListItemButton>
               </List>
@@ -102,13 +102,13 @@ export function DetailBarco() {
               <ListItemIcon>
                 <StarIcon />
               </ListItemIcon>
-              <ListItemText primary={`Tamaño de habitación: ${data.tamanno}`} />
+              <ListItemText primary={`Tamaño de habitación: ${data.descripcion}`} />
             </ListItemButton>
             <ListItemButton>
               <ListItemIcon>
                 <StarIcon />
               </ListItemIcon>
-              <ListItemText primary={`Tamaño de habitación: ${data.cathabitacion.descripcion}`} />
+          
             </ListItemButton>
           </Grid>
         </Grid>
