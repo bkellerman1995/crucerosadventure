@@ -87,7 +87,7 @@ export function DetailBarco() {
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Mínimo de huespedes: ${data.barcoid}`}
+                    primary={`Mínimo de huespedes: ${data.barcoID}`}
                   />
                   <ListItemIcon>
                     <ArrowRightIcon />
