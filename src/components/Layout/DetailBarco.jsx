@@ -26,7 +26,7 @@ export function DetailBarco() {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     //Llamar al API y obtener una Barco
-    BarcoService.geBarcoById(routeParams.id)
+    BarcoService.getBarcobyId(routeParams.id)
       .then((response) => {
         setData(response.data);
         console.log("datosbarco detail", response.data);
@@ -87,7 +87,7 @@ export function DetailBarco() {
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Mínimo de huespedes: ${data.minHuesped}`}
+                    primary={`Mínimo de huespedes: ${data.barcoid}`}
                   />
                   <ListItemIcon>
                     <ArrowRightIcon />
