@@ -63,6 +63,12 @@ function stableSort(array, comparator) {
 //--- Encabezados de la tabla ---
 const headCells = [
   {
+    id: 'idbarco',
+    numeric: true,
+    disablePadding: true,
+    label: 'Número',
+  },
+  {
     id: 'descripcion',
     numeric: false,
     disablePadding: true,
@@ -75,7 +81,7 @@ const headCells = [
     label: 'Máximo de huéspedes',
   },
   {
-    id: 'canHabitaciones',
+    id: 'cantHabitaciones',
     numeric: true,
     disablePadding: false,
     label: 'Cantidad de Habitaciones',
@@ -306,14 +312,15 @@ export function ListBarcos() {
                           >
                             {row.title}
                           </TableCell>
+                          <TableCell align="left">{row.idbarco}</TableCell>
                           <TableCell align="left">{row.descripcion}</TableCell>
                           <TableCell align="left">{row.capacidadHuesped}</TableCell>
-                          <TableCell align="left">{row.canHabitaciones}</TableCell>
+                          <TableCell align="left">{row.cantHabitaciones}</TableCell>
                         {/* Contenido de la tabla */}
                         
                         <TableCell>
 
-                          <IconButton component={Link} to={`/barco/${row.idBarco}`} aria-label="Detalle" sx={{ ml: "auto", backgroundColor: "#00304E"}}></IconButton>
+                          <IconButton component={Link} to={`/barco/${row.idbarco}`} aria-label="Detalle" sx={{ ml: "auto", backgroundColor: "#00304E"}}></IconButton>
                           
 
                           </TableCell>
