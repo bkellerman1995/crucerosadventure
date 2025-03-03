@@ -17,6 +17,8 @@ class BarcoService {
   //Obtener la informacion de un barco por su id
   //localhost:81/crucerosadventure/barco/{id}
   getBarco(barcoId) {
+    console.log('BASE_URL HABITACONES: ', BASE_URL+ '/'+ barcoId);
+    console.log('HabitacionesId: ', barcoId);
     return axios.get(BASE_URL + "/" + barcoId);
     
   }
