@@ -11,8 +11,10 @@ import { ListReservas } from "./components/Layout/ListReservas.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PageNotFound } from "./components/Home/PageNotFound.jsx";
 import { DetailHabitacion } from "./components/Layout/DetailHabitacion";
+import { DetailBarco } from "./components/Layout/DetailBarco";
 import { DetailCrucero } from "./components/Layout/DetailCrucero";
 import { DetailReserva } from "./components/Layout/DetailReserva";
+
 
 const rutas = createBrowserRouter([
   {
@@ -53,7 +55,7 @@ const rutas = createBrowserRouter([
       {
         //Página Barcos by ID
         path: "/barco/:id",
-        //element: <DetailBarco/>,
+        element: <DetailBarco/>,
       },
 
       {
