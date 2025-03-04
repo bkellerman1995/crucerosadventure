@@ -6,7 +6,6 @@ import List from "@mui/material/List";
 import ListItemText from "@mui/material/ListItemText";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import StarIcon from "@mui/icons-material/Star";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -24,6 +23,7 @@ export function DetailReserva() {
   const [error, setError] = useState("");
   //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
     //Llamar al API y obtener una reserva por su id
     ReservaService.getReservaById(routeParams.id)
@@ -49,13 +49,13 @@ export function DetailReserva() {
     <Container component="main" sx={{ mt: 8, mb: 2 }}>
       {data && (
         <Grid size={7}>
-          <Typography variant="h3" component="h1" gutterBottom>
+          <Typography variant="h4" component="h1" gutterBottom>
             Detalles de la reserva
           </Typography>
-          <Typography variant="h4" component="h1" gutterBottom>
-            {data.crucero}
+          <Typography variant="h5" component="h1" gutterBottom>
+            {data.nombreCrucero}
           </Typography>
-          <Typography component="span" variant="h5">
+          <Typography component="span" variant="h6">
             <Box>Puertos (salida y regreso):</Box>
             <List
               sx={{
@@ -64,7 +64,7 @@ export function DetailReserva() {
                 bgcolor: "background.paper",
               }}
             >
-              {data.puertos.map((item) => (
+              {data.itinerarioPuertos.map((item) => (
                 <ListItemButton key={item.idItinerario}>
                   <ListItemIcon>
                     <ArrowRightIcon />
@@ -83,9 +83,10 @@ export function DetailReserva() {
           <Typography component="span" variant="subtitle1" gutterBottom>
             <b>Fecha de llegada:</b> {data.fechaFinal.date} <br></br>
           </Typography>
-          
-          <Typography component="span" variant="h5">
-            <Box>Puertos (salida y regreso):</Box>
+          <br></br>
+
+          <Typography component="span" variant="h6">
+            <Box>Habitaciones reservadas:</Box>
             <List
               sx={{
                 width: "100%",
@@ -93,19 +94,25 @@ export function DetailReserva() {
                 bgcolor: "background.paper",
               }}
             >
-              {data.puertos.map((item) => (
-                <ListItemButton key={item.idItinerario}>
-                  <ListItemIcon>
-                    <ArrowRightIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`${item.puerto.Nombre} - ${item.puerto.pais.descripcion}`}
-                    secondary={item.puerto.descripcion}
-                  />
-                </ListItemButton>
+              {data.habitaciones.map((item) => (
+                <React.Fragment key={item.id}>
+                  <ListItemButton key={item.idHabitacion}>
+                    <ListItemIcon>
+                      <ArrowRightIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={item.Descripcion} />
+                    <ListItemText secondary={`Cantidad de huéspedes: ${item.cantHuespedes}`} />
+                  </ListItemButton>
+
+                </React.Fragment>
               ))}
             </List>
           </Typography>
+          <br></br>
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Total a pagar:</b> {`Total por habitaciones: $${data.totalHabitaciones}`} <br></br>
+          </Typography>
+
           {/* <Typography component="span" variant="subtitle1">
               <Box fontWeight="bold">Fechas de salida:</Box>
               <List

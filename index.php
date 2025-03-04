@@ -27,6 +27,7 @@ require_once "models/CruceroModel.php";
 require_once "models/CategoriaHabitacionModel.php";
 require_once "models/PaisModel.php";
 require_once "models/ReservaModel.php";
+require_once "models/CruceroFechaModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/BarcoController.php";

@@ -79,11 +79,14 @@ class ReservaModel
     {
         try {
 
-            //Obtener el nombre del crucero
+            //Obtener el crucero
             $cruceroModel = new CruceroModel();
 
             //Obtener el itinerario
             $itinerarioModel = new ItinerarioModel();
+
+            //Obtener informacion de habitacion por fecha
+            $cruceroFechaModel = new CruceroFechaModel();
 
             $vSql = "SELECT * FROM reserva WHERE idReserva='$id';";
 
@@ -95,23 +98,49 @@ class ReservaModel
 
             //Extraer el nombre del crucero de la reserva
             $crucero = $cruceroModel->get($vResultado->idCrucero);
-            $vResultado->crucero = $crucero->nombre;
+            $vResultado->nombreCrucero = $crucero->nombre;
 
             //Extraer la información de los puertos
             // del itinerario
             $puertos = $itinerarioModel->getPuertosItinerario($crucero->idItinerario);
-            $vResultado->puertos = $puertos;
+            $vResultado->itinerarioPuertos = $puertos;
 
             //Extraer la fecha de inicio del crucero
+            //y cambiarle el formato a d-m-Y
             $fechaInicio = new DateTime($vResultado->fechaInicio);
             $fechaInicio->format('d-m-Y');
-            //Calcular la fecha final del crucero
-            //Cambiar el valor de la fecha inicial (viene como string)
-            //a datetime
+
+            //Calcular la fecha final del crucero (fechaInicio + cantDias)
+            //cambiar el formato de la fecaFinal a d-m-Y
             $dias = $crucero->cantDias;
             $fechaFinal = $fechaInicio->modify("+$dias days");
             $fechaFinal->format('d-m-Y');
             $vResultado->fechaFinal = $fechaFinal;
+
+            //Extraer el detalle de las habitaciones reservadas
+            $habitaciones = $cruceroModel->get($vResultado->idCrucero)->habitaciones;
+            $vResultado->habitaciones = $habitaciones;
+
+            //variable totalHabitaciones para acumular el total a pagar por habitaciones
+            $totalHabitaciones = 0;
+            //Calcular el total a pagar por todas las habitaciones de la reserva
+            foreach ($vResultado->habitaciones as &$habitacion) { // Referencia para modificar el objeto
+                $vSql = "SELECT precioHabitacion from crucero_fecha WHERE idCrucero='$vResultado->idCrucero' and fechaSalida = '$vResultado->fechaInicio' order by idCruceroFecha desc;";
+                $resultado = $this->enlace->executeSQL($vSql);
+
+                // Verificar que la consulta devolvió resultados válidos
+                $precioPagar = (!empty($resultado) && isset($resultado[0]->precioHabitacion)) ? $resultado[0]->precioHabitacion : 0;
+
+                // Asignar el valor correctamente
+                $habitacion->precio = $precioPagar;
+
+                //Sumar al total de pagar para las habitaciones
+                $totalHabitaciones += $precioPagar;
+
+
+            }
+
+            $vResultado->totalHabitaciones = $totalHabitaciones;
 
             //Retornar la respuesta
             return $vResultado;
