@@ -55,7 +55,7 @@ export function DetailBarco() {
                 height: "auto",
               }}
               alt="Imagen de la Barco"
-              src={"../../uploads/habitacion1.jpg"}
+              src={"../../uploads/Barco1.jpg"}
             />
           </Grid>
           <Grid size={7}>
@@ -69,7 +69,7 @@ export function DetailBarco() {
             ></Typography>
             <Typography component="span" variant="subtitle1" display="block">
               <Box fontWeight="bold" display="inline">
-                Descripcion:
+                {/* Descripcion: */}
               </Box>{" "}
               {data.Descripcion}
             </Typography>
@@ -102,14 +102,9 @@ export function DetailBarco() {
               <ListItemIcon>
                 <StarIcon />
               </ListItemIcon>
-              <ListItemText primary={`Tamaño de habitación: ${data.descripcion}`} />
+              <ListItemText primary={`Nombre del Barco: ${data.descripcion}`} />
             </ListItemButton>
-            <ListItemButton>
-              <ListItemIcon>
-                <StarIcon />
-              </ListItemIcon>
-          
-            </ListItemButton>
+        
           </Grid>
         </Grid>
       )}
