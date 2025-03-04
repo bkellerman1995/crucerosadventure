@@ -93,10 +93,38 @@ class CruceroModel
             $fechasPreciosHabitaciones = $this->getFechasPreciosHabitaciones($vResultado->idCrucero);
             $vResultado->fechasPreciosHabitaciones = $fechasPreciosHabitaciones;
 
-            //Extrar las habitaciones que estan ligadas al crucero (barco)
+            //Extraer las habitaciones que estan ligadas al crucero (barco)
             $habitacionModel = new HabitacionModel();
             $habitacionesCrucero = $habitacionModel->getHabitacionesCrucero($vResultado->idBarco);
             $vResultado->habitaciones = $habitacionesCrucero;
+
+            //Recorrer la lista de habitaciones ($vResultado->habitaciones) para asignarle la
+            //cantidad de huespedes que tiene cada habitacion. Por medio de un ciclo for 
+            //se calcula la cantidad de huespedes por habitacion:
+            //"SELECT COUNT(idHuesped) AS cantHuesped FROM huesped WHERE idHabitacion = $habitacion->idHabitacion;";
+            //Y con esto se le asigna el valor que retorna cada iteración
+            //de la consulta a la propiedad cantHuespedes de cada habitacion
+            //En el JSON se veria asi:
+            //    "habitaciones": [
+            // {
+            //     "idHabitacion": "1",
+            //      --- VALORES TRUNCADOS ---
+            //     "cantHuespedes": "6"
+            // },
+            // {
+            //     "idHabitacion": "2",
+            //      --- VALORES TRUNCADOS ---
+            //     "cantHuespedes": "3"
+            foreach ($vResultado->habitaciones as &$habitacion) { // Referencia para modificar el objeto
+                $vSql = "SELECT COUNT(idHuesped) AS cantHuesped FROM huesped WHERE idHabitacion = $habitacion->idHabitacion;";
+                $resultado = $this->enlace->executeSQL($vSql);
+
+                // Verificar que la consulta devolvió resultados válidos
+                $cantHuespedes = (!empty($resultado) && isset($resultado[0]->cantHuesped)) ? $resultado[0]->cantHuesped : 0;
+
+                // Asignar el valor correctamente
+                $habitacion->cantHuespedes = $cantHuespedes;
+            }
 
             //Retornar la respuesta
             return $vResultado;
@@ -109,9 +137,6 @@ class CruceroModel
     public function getFechasPreciosHabitaciones($id)
     {
         try {
-
-            //Obtener las habitaciones que estan ligadas al crucero (barco)
-            $habitacionModel = new HabitacionModel();
 
             //Obtener las fechas y precios de las habitaciones
             $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero='$id' order by idCruceroFecha desc;";
@@ -131,5 +156,6 @@ class CruceroModel
             handleException($e);
         }
     }
+    
 
 }

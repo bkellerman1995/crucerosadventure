@@ -63,6 +63,8 @@ class HabitacionModel
         }
     }
 
+    //Obtener las habitaciones de un crucero 
+    //por medio del id del barco
     public function getHabitacionesCrucero($id)
     {
         try {
@@ -90,12 +92,26 @@ class HabitacionModel
         }
     }
 
+    //Obtener la cantidad de huespedes por habitacion 
+    //por medio del id del barco
     public function getHuespedesHabitacion($id)
     {
         try {
 
-            $vSql = "SELECT * FROM huesped
-                    where idHabitacion='$id' order by idhuesped desc;";
+            $vSql = "SELECT 
+                        hab.idHabitacion,
+                        hab.Nombre,          
+                        COUNT(hues.idHuesped) AS cantHuesped
+                    FROM 
+                        habitacion hab 
+                    LEFT JOIN   
+                        huesped hues ON hab.idHabitacion = hues.idHabitacion
+                    WHERE 
+                        hab.idbarco = '$id'
+                    GROUP BY 
+                        hab.idHabitacion, hab.Nombre
+                    ORDER BY 
+                        hab.idHabitacion DESC;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
