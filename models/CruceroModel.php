@@ -156,6 +156,32 @@ class CruceroModel
             handleException($e);
         }
     }
-    
 
+    /*Obtener complementos por crucero*/
+    public function getComplementosPorCrucero($id)
+    {
+        try {
+            //Consulta sql               
+            $vSQL = "SELECT * FROM crucerosadventure.crucero_complemento where idCrucero = '$id' order by 
+            idComplemento DESC;";
+
+            // Ejecutar la consulta
+            $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+            //Retornar el array de complementos.
+                foreach ($vResultado as &$complemento) { // Usar referencia para modificar el array directamente
+                        $vSql = "SELECT * from complemento WHERE idComplemento='$complemento->idComplemento' order by idComplemento desc;";
+                        $resultado = $this->enlace->executeSQL($vSql);
+
+                // Verificar que la consulta devolvió resultados válidos
+                $complemento = (!empty($resultado) && isset($resultado[0])) ? $resultado[0] : null;
+
+            }
+
+            return $vResultado;
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

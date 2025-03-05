@@ -24,6 +24,18 @@ export function DetailReserva() {
   //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
 
+  //variable para almacenar el total a pagar solo por los complementos
+  let totalComplementos = 0;
+
+  //variable para almacenar el impuesto (IVA)
+  const impuesto = 0.13;
+
+  //variable para almacenar tarifas de servicios
+  const tarifaServicio = 100;
+
+  //variable para almacenar la fecha de pago (si la reserva está pendiente de pago)
+  let fechaPago = new Date();
+
   useEffect(() => {
     //Llamar al API y obtener una reserva por su id
     ReservaService.getReservaById(routeParams.id)
@@ -101,64 +113,146 @@ export function DetailReserva() {
                       <ArrowRightIcon />
                     </ListItemIcon>
                     <ListItemText primary={item.Descripcion} />
-                    <ListItemText secondary={`Cantidad de huéspedes: ${item.cantHuespedes}`} />
+                    <ListItemText
+                      secondary={`Cantidad de huéspedes: ${item.cantHuespedes}`}
+                    />
                   </ListItemButton>
-
                 </React.Fragment>
               ))}
             </List>
           </Typography>
           <br></br>
+
           <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Total a pagar:</b> {`Total por habitaciones: $${data.totalHabitaciones}`} <br></br>
+            <b>Total por habitaciones:</b> {`$${data.totalHabitaciones}`}{" "}
+            <br></br>
+          </Typography>
+          <br></br>
+
+          {/* Rubros por complementos */}
+          <Typography component="span" variant="h6">
+            <Box>Complementos:</Box>
+            <List
+              sx={{
+                width: "100%",
+                maxWidth: 360,
+                bgcolor: "background.paper",
+              }}
+            >
+              {data.complementos.map(
+                (item) =>
+                  (
+                    //ir sumando en totalComplementos el precio
+                    //del item (complmemento) por la cantidad
+                    //en cada iteración de data.complementos,map
+                    (totalComplementos += item.precio * item.cantidad),
+                    (
+                      <React.Fragment key={item.id}>
+                        <ListItemButton key={item.idComplemento}>
+                          <ListItemIcon>
+                            <ArrowRightIcon />
+                          </ListItemIcon>
+                          <ListItemText primary={item.Descripcion} />
+                          <ListItemText
+                            sx={{ textAlign: "left", ml: 0 }}
+                            secondary={
+                              <>
+                                <Typography variant="body1">
+                                  {item.descripcion}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  {`Cantidad: ${item.cantidad}`}
+                                </Typography>
+                                <br></br>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  {`Total: $${item.precio * item.cantidad}`}
+                                </Typography>
+                              </>
+                            }
+                          />
+                        </ListItemButton>
+                      </React.Fragment>
+                    )
+                  )
+              )}
+            </List>
+          </Typography>
+          <br></br>
+
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Subtotal:</b> {`$${data.totalHabitaciones + totalComplementos}`}{" "}
+            <br></br>
+          </Typography>
+          <br></br>
+
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Impuesto (IVA):</b> {`${impuesto * 100}%`} <br></br>
           </Typography>
 
-          {/* <Typography component="span" variant="subtitle1">
-              <Box fontWeight="bold">Fechas de salida:</Box>
-              <List
-                sx={{
-                  width: "100%",
-                  maxWidth: 360,
-                  bgcolor: "background.paper",
-                }}
-              >
-                {data.fechasPreciosHabitaciones.map((item) => (
-                  <React.Fragment key={item.id}>
-                    {/* Elemento principal: Fecha de salida */}
-          {/* <ListItemButton>
-                      <ListItemIcon>
-                        <StarIcon />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={`Fecha de salida: ${item.fechaSalida}`}
-                      />
-                    </ListItemButton> */}
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Tarifa de servicio:</b> {`$${tarifaServicio}`} <br></br>
+          </Typography>
+          <br></br>
 
-          {/* Sublista de habitaciones con su precio correspondiente
-                    <List component="div" disablePadding>
-                      {data.habitaciones.map((habitacion) => {
-                        // Buscar el precio correspondiente en fechasPreciosHabitaciones
-                        const precioHabitacion = item.precioHabitacion;
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Precio Total: </b>
+            {`$${
+              data.totalHabitaciones +
+              totalComplementos +
+              tarifaServicio +
+              (data.totalHabitaciones + totalComplementos + tarifaServicio) *
+                impuesto
+            }`}{" "}
+            <br></br>
+          </Typography>
 
-                        return (
-                          <ListItemButton key={habitacion.id} sx={{ pl: 10 }}>
-                            <ListItemIcon>
-                              <ArrowRightIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                              secondary={`${habitacion.Nombre} - Precio: $${precioHabitacion}`}
-                            />
-                          </ListItemButton>
-                        );
-                      })}
-                    </List>
-                  </React.Fragment> */}
-          {/* ))}
-              </List>
-            </Typography> */}
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            <b>Estado de pago: </b>
+            {/* Operador ternario para desplegar el estado de pago de la reserva en detalle de reserva */}
+            {data.estadoPago === "Pendiente"
+              ? "Pendiente"
+              : "Pagada en totalidad"}{" "}
+            <br></br>
+            <br></br>
+          </Typography>
+
+          <Typography component="span" variant="subtitle1" gutterBottom>
+            {/* Operador ternario para desplegar el total a pagar si está pendiente */}
+            {data.estadoPago === "Pendiente" ? (
+              //Setear la fecha de pago en 3 dias
+              fechaPago.setDate(fechaPago.getDate() + 3),
+              <>
+                <b>Pendiente de pago: </b>
+                {`$${
+                  data.totalHabitaciones +
+                  totalComplementos +
+                  tarifaServicio + (fechaPago.getDate() * 50) +
+                  (data.totalHabitaciones +
+                    totalComplementos +
+                    tarifaServicio + (fechaPago.getDate() * 50)) *
+                    impuesto
+                }`}
+                <br></br>
+                {console.log('fecha de pago',fechaPago.toISOString().split("T")[0])}
+                <b>Fecha limite de pago:</b> {fechaPago.toISOString().split("T")[0]}{" "}
+              </>
+            ) : (
+              ""
+            )}
+            <br></br>
+            <br></br>
+          </Typography>
+          
         </Grid>
         // </Grid>
       )}
     </Container>
   );
+
 }
