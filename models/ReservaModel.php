@@ -136,12 +136,13 @@ class ReservaModel
 
                 //Sumar al total de pagar para las habitaciones
                 $totalHabitaciones += $precioPagar;
-
-
             }
-
+            //Asignar el total a pagar por las habitaciones
             $vResultado->totalHabitaciones = $totalHabitaciones;
 
+            //Extraer la información de los complementos del crucero
+            $complementos = $cruceroModel->getComplementosPorCrucero($vResultado->idCrucero);
+            $vResultado->complementos = $complementos;
             //Retornar la respuesta
             return $vResultado;
         } catch (Exception $e) {

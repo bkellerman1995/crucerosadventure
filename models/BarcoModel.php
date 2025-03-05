@@ -35,7 +35,10 @@ class BarcoModel
         {
             try {
                 //Consulta sql               
-                $vSQL = "SELECT * FROM barco where idbarco=$id";
+                $vSQL = "SELECT b.idbarco,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones
+                FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.idbarco = $id
+                GROUP BY b.idbarco
+                order by b.idbarco desc;";
 
                 // Ejecutar la consulta
                 $vResultado = $this->enlace->ExecuteSQL($vSQL);
