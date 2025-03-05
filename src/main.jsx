@@ -16,7 +16,6 @@ import { DetailCrucero } from "./components/Layout/DetailCrucero";
 import { DetailReserva } from "./components/Layout/DetailReserva";
 // import "bootstrap/dist/css/bootstrap.min.css";
 
-
 const rutas = createBrowserRouter([
   {
     element: <App />,

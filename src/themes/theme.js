@@ -1,6 +1,4 @@
 import { createTheme } from "@mui/material/styles";
-// import "bootstrap/dist/css/bootstrap.min.css";
-
 export const appTheme = createTheme({
   palette: {
     mode: "light",
