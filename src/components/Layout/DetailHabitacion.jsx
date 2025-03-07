@@ -87,13 +87,13 @@ export function DetailHabitacion() {
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Mínimo de huespedes: ${data.minHuesped}`}
+                    primary={`Mínimo de huéspedes: ${data.minHuesped}`}
                   />
                   <ListItemIcon>
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Máximo de huespedes: ${data.maxHuesped}`}
+                    primary={`Máximo de huéspedes: ${data.maxHuesped}`}
                   />
                 </ListItemButton>
               </List>
@@ -102,13 +102,21 @@ export function DetailHabitacion() {
               <ListItemIcon>
                 <StarIcon />
               </ListItemIcon>
-              <ListItemText primary={`Tamaño de habitación: ${data.tamanno}`} />
+              <ListItemText
+                primary={
+                  <>
+                    Tamaño de habitación: {data.tamanno} m<sup>2</sup>
+                  </>
+                }
+              />
             </ListItemButton>
             <ListItemButton>
               <ListItemIcon>
                 <StarIcon />
               </ListItemIcon>
-              <ListItemText primary={`Tamaño de habitación: ${data.cathabitacion.descripcion}`} />
+              <ListItemText
+                primary={`Categoría de habitación: ${data.cathabitacion.descripcion}`}
+              />
             </ListItemButton>
           </Grid>
         </Grid>

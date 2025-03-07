@@ -87,13 +87,13 @@ export function DetailBarco() {
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Cantidad habitacion: ${data.cantHabitaciones}`}
+                    primary={`Cantidad de habitaciones: ${data.cantHabitaciones}`}
                   />
                   <ListItemIcon>
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Máximo de huespedes: ${data.capacidadHuesped}`}
+                    primary={`Máximo de huéspedes: ${data.capacidadHuesped}`}
                   />
                 </ListItemButton>
               </List>
