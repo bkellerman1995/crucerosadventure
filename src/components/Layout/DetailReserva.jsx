@@ -90,10 +90,14 @@ export function DetailReserva() {
             </List>
           </Typography>
           <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Fecha de salida:</b> {data.fechaInicio} <br></br>
+            <b>Fecha de salida:</b>{" "}
+            {new Date(data.fechaInicio).toLocaleDateString("en-GB")}
+            <br></br>
           </Typography>
           <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Fecha de llegada:</b> {data.fechaFinal.date} <br></br>
+            <b>Fecha de llegada:</b>{" "}
+            {new Date(data.fechaFinal.date).toLocaleDateString("en-GB")}
+            <br></br>
           </Typography>
           <br></br>
 
@@ -157,7 +161,10 @@ export function DetailReserva() {
                             sx={{ textAlign: "left", ml: 0 }}
                             secondary={
                               <>
-                                <Typography variant="body1">
+                                <Typography
+                                  variant="body1"
+                                  sx={{ textAlign: "left" }}
+                                >
                                   {item.descripcion}
                                 </Typography>
                                 <Typography
@@ -169,6 +176,7 @@ export function DetailReserva() {
                                 <br></br>
                                 <Typography
                                   variant="caption"
+                                  sx={{ textAlign: "left" }}
                                   color="text.secondary"
                                 >
                                   {`Total: $${item.precio * item.cantidad}`}
@@ -224,31 +232,36 @@ export function DetailReserva() {
 
           <Typography component="span" variant="subtitle1" gutterBottom>
             {/* Operador ternario para desplegar el total a pagar si está pendiente */}
-            {data.estadoPago === "Pendiente" ? (
-              //Setear la fecha de pago en 3 dias
-              fechaPago.setDate(fechaPago.getDate() + 3),
-              <>
-                <b>Pendiente de pago: </b>
-                {`$${
-                  data.totalHabitaciones +
-                  totalComplementos +
-                  tarifaServicio + (fechaPago.getDate() * 50) +
-                  (data.totalHabitaciones +
-                    totalComplementos +
-                    tarifaServicio + (fechaPago.getDate() * 50)) *
-                    impuesto
-                }`}
-                <br></br>
-                {console.log('fecha de pago',fechaPago.toISOString().split("T")[0])}
-                <b>Fecha limite de pago:</b> {fechaPago.toISOString().split("T")[0]}{" "}
-              </>
-            ) : (
-              ""
-            )}
+            {data.estadoPago === "Pendiente"
+              ? //Setear la fecha de pago en 3 dias
+                (fechaPago.setDate(fechaPago.getDate() + 3),
+                (
+                  <>
+                    <b>Pendiente de pago: </b>
+                    {`$${
+                      data.totalHabitaciones +
+                      totalComplementos +
+                      tarifaServicio +
+                      fechaPago.getDate() * 50 +
+                      (data.totalHabitaciones +
+                        totalComplementos +
+                        tarifaServicio +
+                        fechaPago.getDate() * 50) *
+                        impuesto
+                    }`}
+                    <br></br>
+                    {console.log(
+                      "fecha de pago",
+                      fechaPago.toISOString().split("T")[0]
+                    )}
+                    <b>Fecha limite de pago:</b>{" "}
+                    {new Date(fechaPago).toLocaleDateString("en-GB")}
+                  </>
+                ))
+              : ""}
             <br></br>
             <br></br>
           </Typography>
-          
         </Grid>
         // </Grid>
       )}

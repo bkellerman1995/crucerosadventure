@@ -17,7 +17,7 @@ class BarcoModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT b.idbarco,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones
+            $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones
             FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco GROUP BY b.idbarco
             order by b.idbarco desc;";
             //Ejecutar la consulta
@@ -30,12 +30,12 @@ class BarcoModel
         }
     }
 
-        /*Obtener */
+        /*Obtener barco*/
         public function get($id)
         {
             try {
                 //Consulta sql               
-                $vSQL = "SELECT b.idbarco,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones
+                $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones
                 FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.idbarco = $id
                 GROUP BY b.idbarco
                 order by b.idbarco desc;";
@@ -43,12 +43,39 @@ class BarcoModel
                 // Ejecutar la consulta
                 $vResultado = $this->enlace->ExecuteSQL($vSQL);
 
-                if (!empty($vResultado)) {
-                    // Retornar el objeto
-                    return $vResultado[0];
+            if (!empty($vResultado)) {
+                $vResultado = $vResultado[0];
+
+                //Extrar la lista de habitaciones del barco
+                $habitaciones = $this->getHabitacionesById($vResultado->idbarco);
+                $vResultado->habitaciones = $habitaciones;
+                // Retornar el objeto
+                return $vResultado;
                     
                 }
                 return $vResultado;
+
+            } catch (Exception $e) {
+                handleException($e);
+            }
+        }
+
+        /*Obtener habitaciones ligadas al barco*/
+        public function getHabitacionesById($id)
+        {
+            try {
+                //Consulta sql               
+                $vSQL = "SELECT * from habitacion where idbarco = $id order by idHabitacion desc";
+
+                // Ejecutar la consulta
+                $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+                if (!empty($vResultado) && is_array($vResultado)) {
+                    // Retornar el objeto
+                    return $vResultado;
+                    
+                }
+
 
             } catch (Exception $e) {
                 handleException($e);

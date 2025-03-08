@@ -336,7 +336,11 @@ export function ListReservas() {
                           </TableCell>
                           <TableCell align="left">{row.idReserva}</TableCell>
                           <TableCell align="left">{row.crucero}</TableCell>
-                          <TableCell align="left">{row.fechaInicio}</TableCell>
+                          <TableCell align="left">
+                            {new Date(row.fechaInicio).toLocaleDateString(
+                              "en-GB"
+                            )}
+                          </TableCell>
                           <TableCell align="left">
                             {new Date(row.fechaFinal.date).toLocaleDateString(
                               "en-GB"
