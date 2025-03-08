@@ -16,6 +16,7 @@ export function Home() {
       <Typography variant="h5" align="center" color="text.secondary">
         Reserva un viaje en crucero.
       </Typography>
+      <img src="../uploads/LogoCrucerosAdventure.png" />
     </Container>
   );
 }

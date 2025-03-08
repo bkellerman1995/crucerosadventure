@@ -47,13 +47,12 @@ class ReservaModel
 
                         //Extraer la fecha de inicio del crucero
                         $fechaInicio = new DateTime($row->fechaInicio);
-                        $fechaInicio->format('d-m-Y');
+                        $fechaInicio->modify("+0 days");
                         //Calcular la fecha final del crucero
                         //Cambiar el valor de la fecha inicial (viene como string)
                         //a datetime
                         $dias = $crucero->cantDias;
                         $fechaFinal = $fechaInicio->modify("+$dias days");
-                        $fechaFinal->format('d-m-Y');
                         $row->fechaFinal = $fechaFinal;
 
                     }

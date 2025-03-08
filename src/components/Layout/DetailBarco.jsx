@@ -54,7 +54,7 @@ export function DetailBarco() {
                 maxWidth: "100%",
                 height: "auto",
               }}
-              alt="Imagen de la Barco"
+              alt="Imagen del barco"
               src={"../../uploads/Barco1.jpg"}
             />
           </Grid>
@@ -74,7 +74,24 @@ export function DetailBarco() {
               {data.Descripcion}
             </Typography>
             <Typography component="span" variant="subtitle1">
-              <Box fontWeight="bold">Informacion del Barco:</Box>
+              <Box fontWeight="bold">Información del barco:</Box>
+
+              {/* Nombre del barco */}
+              <ListItemButton>
+                <ListItemIcon>
+                  <StarIcon />
+                </ListItemIcon>
+                <ListItemText primary={`Nombre: ${data.nombre}`} />
+              </ListItemButton>
+
+              {/* Descripción del barco */}
+              <ListItemButton>
+                <ListItemIcon>
+                  <StarIcon />
+                </ListItemIcon>
+                <ListItemText primary={`Descripción: ${data.descripcion}`} />
+              </ListItemButton>
+
               <List
                 sx={{
                   width: "100%",
@@ -87,24 +104,34 @@ export function DetailBarco() {
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Cantidad de habitaciones: ${data.cantHabitaciones}`}
-                  />
-                  <ListItemIcon>
-                    <ArrowRightIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`Máximo de huéspedes: ${data.capacidadHuesped}`}
+                    primary={`Capacidad de huéspedes: ${data.capacidadHuesped}`}
                   />
                 </ListItemButton>
               </List>
+
+              <List
+                sx={{
+                  width: "100%",
+                  maxWidth: 360,
+                  fontweight: "bold",
+                }}
+              >
+                <b>Habitaciones</b>
+                {data.habitaciones.map((item) => (
+                  <ListItemButton key={item.idHabitacion}>
+                    <ListItemIcon>
+                      <ArrowRightIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`${item.nombre}`} />
+                  </ListItemButton>
+                ))}
+              </List>
+
+              <Typography component="span" variant="subtitle1" display="block">
+                <b>Cantidad de habitaciones disponibles: </b>{data.cantHabitaciones}
+              </Typography>
+
             </Typography>
-            <ListItemButton>
-              <ListItemIcon>
-                <StarIcon />
-              </ListItemIcon>
-              <ListItemText primary={`Nombre del Barco: ${data.descripcion}`} />
-            </ListItemButton>
-        
           </Grid>
         </Grid>
       )}
