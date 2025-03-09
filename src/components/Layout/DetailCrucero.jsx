@@ -98,7 +98,7 @@ export function DetailCrucero() {
                       <ArrowRightIcon />
                     </ListItemIcon>
                     <ListItemText
-                      primary={`${item.puerto.Nombre} - ${item.puerto.pais.descripcion}`}
+                      primary={`${item.puerto.nombre} - ${item.puerto.pais.descripcion}`}
                       secondary={item.puerto.descripcion}
                     />
                   </ListItemButton>
@@ -138,7 +138,7 @@ export function DetailCrucero() {
                               <ArrowRightIcon />
                             </ListItemIcon>
                             <ListItemText
-                              secondary={`${habitacion.Nombre} - Precio: $${precioHabitacion}`}
+                              secondary={`${habitacion.nombre} - Precio: $${precioHabitacion}`}
                             />
                           </ListItemButton>
                         );

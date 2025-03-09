@@ -192,7 +192,7 @@ function TableHabitacionesToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Lista de habitaciones
+          Lista de reservas
         </Typography>
       )}
     </Toolbar>
