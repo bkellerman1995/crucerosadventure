@@ -90,7 +90,7 @@ const headCells = [
     label: "Número",
   },
   {
-    id: "Nombre",
+    id: "nombre",
     numeric: false,
     disablePadding: false,
     label: "Nombre",
@@ -335,9 +335,8 @@ export function ListHabitaciones() {
                             {row.title}
                           </TableCell>
                           <TableCell align="left">{row.idHabitacion}</TableCell>
-                          <TableCell align="left">{row.Nombre}</TableCell>
+                          <TableCell align="left">{row.nombre}</TableCell>
                           <TableCell align="left">{row.maxHuesped}</TableCell>
-                          
 
                           {/*<sup> para los metros cuadrados</sup> */}
 
@@ -347,14 +346,14 @@ export function ListHabitaciones() {
                           {/* Contenido de la tabla */}
 
                           <TableCell>
-
-                          <IconButton component={Link} to={`/habitacion/${row.idHabitacion}`} aria-label="Detalle" sx={{ ml: "auto", backgroundColor: "#00304E"}}></IconButton>
-                          
-
+                            <IconButton
+                              component={Link}
+                              to={`/habitacion/${row.idHabitacion}`}
+                              aria-label="Detalle"
+                              sx={{ ml: "auto", backgroundColor: "#00304E" }}
+                            ></IconButton>
                           </TableCell>
                         </TableRow>
-
-                        
                       );
                     })}
                   {emptyRows > 0 && (
