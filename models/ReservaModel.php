@@ -16,7 +16,9 @@ class ReservaModel
     {
         try {
 
-            //Obtener el nombre del crucero
+            //Obtener el crucero por fecha especifica
+            $cruceroFechaModel = new cruceroFechaModel();
+
             $cruceroModel = new CruceroModel();
 
             //Obtener el itinerario
@@ -28,31 +30,40 @@ class ReservaModel
             // Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
 
-            // Si hay resultados, recorrerlos y extrar los
-            //valores de
+            // Si hay resultados, recorrerlos y extraer los
+            //valores
 
             if (!empty($vResultado) && is_array($vResultado)) {
                 foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
 
-                    if (!empty($row->idCrucero) && !empty($row->idCrucero)) {
+                    if (!empty($row->idCruceroFecha) && !empty($row->idCruceroFecha)) {
 
-                        //Extraer el nombre del crucero de la reserva
-                        $crucero = $cruceroModel->get($row->idCrucero);
+                        //Extraer el crucero basado en la fecha de la reserva ()
+                        $cruceroFecha = $cruceroFechaModel->getCruceroFecha($row->idCruceroFecha);
+                        $crucero = $cruceroModel -> get($cruceroFecha->idCrucero);
                         $row->crucero = $crucero->nombre;
+
+                        //Extraer la fecha de inicio del crucero (tabla crucero_fecha)
+                        $fechaInicio = new DateTime($cruceroFecha->fechaSalida);
+                        $fechaInicio->format('d/m/Y');
+
+                        // $fechaInicio->modify("+0 days");
+                        $row->fechaInicio = $fechaInicio;
 
                         //Extraer la información de los puertos
                         // del itinerario
                         $puertos = $itinerarioModel->getPuertosItinerario($crucero->idItinerario);
                         $row->puertos = $puertos;
 
-                        //Extraer la fecha de inicio del crucero
-                        $fechaInicio = new DateTime($row->fechaInicio);
-                        $fechaInicio->modify("+0 days");
+                        
                         //Calcular la fecha final del crucero
                         //Cambiar el valor de la fecha inicial (viene como string)
                         //a datetime
                         $dias = $crucero->cantDias;
-                        $fechaFinal = $fechaInicio->modify("+$dias days");
+                        //clonar la fecha de inicio ya que el modify afecta las
+                        //dos variables (fechaFinal y fechaInicio) por lo que ambas
+                        //fechaInicio se modifica de igual manera.
+                        $fechaFinal = (clone $fechaInicio)->modify("+$dias days");
                         $row->fechaFinal = $fechaFinal;
 
                     }

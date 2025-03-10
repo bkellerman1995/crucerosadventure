@@ -337,13 +337,15 @@ export function ListReservas() {
                           <TableCell align="left">{row.idReserva}</TableCell>
                           <TableCell align="left">{row.crucero}</TableCell>
                           <TableCell align="left">
+                            {console.log("Fecha Inicio:", row.fechaInicio)}
                             {new Date(row.fechaInicio).toLocaleDateString(
-                              "en-GB"
+                              "es-ES"
                             )}
                           </TableCell>
                           <TableCell align="left">
-                            {new Date(row.fechaFinal.date).toLocaleDateString(
-                              "en-GB"
+                            {console.log("Fecha Final:", row.fechaFinal)}
+                            {new Date(row.fechaFinal).toLocaleDateString(
+                              "es-ES"
                             )}
                           </TableCell>
                           {/* Contenido de la tabla */}
