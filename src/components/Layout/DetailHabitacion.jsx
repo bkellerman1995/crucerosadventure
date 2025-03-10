@@ -115,7 +115,7 @@ export function DetailHabitacion() {
                 <StarIcon />
               </ListItemIcon>
               <ListItemText
-                primary={`Categoría de habitación: ${data.cathabitacion.descripcion}`}
+                primary={`Categoría de habitación: ${data.cathabitacion.nombre}`}
               />
             </ListItemButton>
           </Grid>
