@@ -19,6 +19,7 @@ class ReservaModel
             //Obtener el crucero por fecha especifica
             $cruceroFechaModel = new cruceroFechaModel();
 
+            //Obtener el crucero
             $cruceroModel = new CruceroModel();
 
             //Obtener el itinerario
@@ -43,12 +44,12 @@ class ReservaModel
                         $crucero = $cruceroModel -> get($cruceroFecha->idCrucero);
                         $row->crucero = $crucero->nombre;
 
-                        //Extraer la fecha de inicio del crucero (tabla crucero_fecha)
+                        //Extraer la fecha de inicio del crucero
+                        //y cambiarle el formato a Y-m-d
                         $fechaInicio = new DateTime($cruceroFecha->fechaSalida);
-                        $fechaInicio->format('d/m/Y');
-
-                        // $fechaInicio->modify("+0 days");
-                        $row->fechaInicio = $fechaInicio;
+                        $fechaInicioFormateada = $fechaInicio->modify("+1 day");
+                        $fechaInicioFormateada = $fechaInicio->format('Y-m-d');
+                        $row->fechaInicio = $fechaInicioFormateada;
 
                         //Extraer la información de los puertos
                         // del itinerario
@@ -64,7 +65,8 @@ class ReservaModel
                         //dos variables (fechaFinal y fechaInicio) por lo que ambas
                         //fechaInicio se modifica de igual manera.
                         $fechaFinal = (clone $fechaInicio)->modify("+$dias days");
-                        $row->fechaFinal = $fechaFinal;
+                        $fechaFinalFormateada = $fechaFinal->format('Y-m-d');
+                        $row->fechaFinal = $fechaFinalFormateada;
 
                     }
                 }
@@ -89,6 +91,10 @@ class ReservaModel
     {
         try {
 
+
+            //Obtener el crucero por fecha especifica
+            $cruceroFechaModel = new cruceroFechaModel();
+            
             //Obtener el crucero
             $cruceroModel = new CruceroModel();
 
@@ -106,8 +112,9 @@ class ReservaModel
                 $vResultado = $vResultado[0];
             }
 
-            //Extraer el nombre del crucero de la reserva
-            $crucero = $cruceroModel->get($vResultado->idCrucero);
+            //Extraer el crucero basado en la fecha de la reserva ()
+            $cruceroFecha = $cruceroFechaModel->getCruceroFecha($vResultado->idCruceroFecha);
+            $crucero = $cruceroModel->get($cruceroFecha->idCrucero);
             $vResultado->nombreCrucero = $crucero->nombre;
 
             //Extraer la información de los puertos
@@ -116,9 +123,11 @@ class ReservaModel
             $vResultado->itinerarioPuertos = $puertos;
 
             //Extraer la fecha de inicio del crucero
-            //y cambiarle el formato a d-m-Y
-            $fechaInicio = new DateTime($vResultado->fechaInicio);
-            $fechaInicio->format('d-m-Y');
+            //y cambiarle el formato a Y-m-d
+            $fechaInicio = new DateTime($cruceroFecha->fechaSalida);
+            $fechaInicioFormateada = $fechaInicio -> modify ("+1 day");
+            $fechaInicioFormateada = $fechaInicio->format('Y-m-d');
+            $vResultado->fechaInicio = $fechaInicioFormateada;
 
             //Calcular la fecha final del crucero (fechaInicio + cantDias)
             //cambiar el formato de la fecaFinal a d-m-Y
@@ -128,14 +137,14 @@ class ReservaModel
             $vResultado->fechaFinal = $fechaFinal;
 
             //Extraer el detalle de las habitaciones reservadas
-            $habitaciones = $cruceroModel->get($vResultado->idCrucero)->habitaciones;
+            $habitaciones = $cruceroModel->get($cruceroFecha->idCrucero)->habitaciones;
             $vResultado->habitaciones = $habitaciones;
 
             //variable totalHabitaciones para acumular el total a pagar por habitaciones
             $totalHabitaciones = 0;
             //Calcular el total a pagar por todas las habitaciones de la reserva
             foreach ($vResultado->habitaciones as &$habitacion) { // Referencia para modificar el objeto
-                $vSql = "SELECT precioHabitacion from crucero_fecha WHERE idCrucero='$vResultado->idCrucero' and fechaSalida = '$vResultado->fechaInicio' order by idCruceroFecha desc;";
+                $vSql = "SELECT precioHabitacion from crucero_fecha WHERE idCrucero='$cruceroFecha->idCrucero' and fechaSalida = '$vResultado->fechaInicio' order by idCruceroFecha desc;";
                 $resultado = $this->enlace->executeSQL($vSql);
 
                 // Verificar que la consulta devolvió resultados válidos
@@ -151,7 +160,7 @@ class ReservaModel
             $vResultado->totalHabitaciones = $totalHabitaciones;
 
             //Extraer la información de los complementos del crucero
-            $complementos = $cruceroModel->getComplementosPorCrucero($vResultado->idCrucero);
+            $complementos = $cruceroModel->getComplementosPorCrucero($cruceroFecha->idCrucero);
             $vResultado->complementos = $complementos;
             //Retornar la respuesta
             return $vResultado;
