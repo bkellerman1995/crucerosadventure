@@ -69,7 +69,7 @@ const headCells = [
     label: 'Número',
   },
   {
-    id: 'descripcion',
+    id: 'nombre',
     numeric: false,
     disablePadding: true,
     label: 'Nombre',
@@ -313,7 +313,7 @@ export function ListBarcos() {
                             {row.title}
                           </TableCell>
                           <TableCell align="left">{row.idbarco}</TableCell>
-                          <TableCell align="left">{row.descripcion}</TableCell>
+                          <TableCell align="left">{row.nombre}</TableCell>
                           <TableCell align="left">{row.capacidadHuesped}</TableCell>
                           <TableCell align="left">{row.cantHabitaciones}</TableCell>
                         {/* Contenido de la tabla */}

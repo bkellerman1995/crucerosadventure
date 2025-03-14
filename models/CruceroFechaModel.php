@@ -35,11 +35,11 @@ class cruceroFechaModel
      * @return $vresultado - Objeto crucero
      */
     //
-    public function getPrecioHabitacionByCruceroYFecha($id,$fecha)
+    public function getCruceroFecha ($idCruceroFecha)
     {
         try {
 
-            $vSql = "SELECT * FROM crucero WHERE idCrucero='$id' and fechaSalida='$fecha';";
+            $vSql = "SELECT * FROM crucero_fecha WHERE idCruceroFecha='$idCruceroFecha'";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -47,7 +47,28 @@ class cruceroFechaModel
                 $vResultado = $vResultado[0];
             }
 
-            //Retornar la respuesta
+            //Retornar la respuesta (id del Crucero)
+            return $vResultado;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+
+    }
+
+    public function getFechaDeCruceroFecha($idCruceroFecha)
+    {
+        try {
+
+            $vSql = "SELECT fechaSalida FROM crucero_fecha WHERE idCruceroFecha='$idCruceroFecha'";
+
+            //Ejecutar la consulta sql
+            $vResultado = $this->enlace->executeSQL($vSql);
+            if (!empty($vResultado)) {
+                $vResultado = new DateTime ($vResultado[0]);
+            
+            }
+
+            //Retornar la respuesta (id del Crucero)
             return $vResultado;
         } catch (Exception $e) {
             handleException($e);
