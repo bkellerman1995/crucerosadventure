@@ -83,18 +83,20 @@ function stableSort(array, comparator) {
 
 //--- Encabezados de la tabla ---
 const headCells = [
-  {
-    id: "idHabitacion",
-    numeric: true,
-    disablePadding: true,
-    label: "Número",
-  },
+  
   {
     id: "nombre",
     numeric: false,
     disablePadding: false,
     label: "Nombre",
   },
+  {
+    id: "categoriaHabitacion",
+    numeric: false,
+    disablePadding: true,
+    label: "Categoría",
+  },
+
   {
     id: "maxHuesped",
     numeric: true,
@@ -334,8 +336,8 @@ export function ListHabitaciones() {
                           >
                             {row.title}
                           </TableCell>
-                          <TableCell align="left">{row.idHabitacion}</TableCell>
                           <TableCell align="left">{row.nombre}</TableCell>
+                          <TableCell align="left">{row.categoriaHabitacion}</TableCell>
                           <TableCell align="left">{row.maxHuesped}</TableCell>
 
                           {/*<sup> para los metros cuadrados</sup> */}
