@@ -82,7 +82,7 @@ export function DetailReserva() {
                     <ArrowRightIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`${item.puerto.Nombre} - ${item.puerto.pais.descripcion}`}
+                    primary={`${item.puerto.nombre} - ${item.puerto.pais.descripcion}`}
                     secondary={item.puerto.descripcion}
                   />
                 </ListItemButton>

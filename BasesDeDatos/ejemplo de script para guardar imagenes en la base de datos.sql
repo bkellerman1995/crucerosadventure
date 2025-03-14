@@ -10,3 +10,6 @@ UPDATE crucero
 SET Foto = LOAD_FILE('C:\\xampp\\htdocs\\crucerosadventure\\uploads\\panama.jpg')
 WHERE nombre LIKE '%panamá%';
 
+UPDATE habitacion
+SET foto = LOAD_FILE('C:\\xampp\\htdocs\\crucerosadventure\\uploads\\Habitaciones\\economica.jpg')
+WHERE idcategoriaHabitacion = 5;
