@@ -17,11 +17,22 @@ class BarcoModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones
-            FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco GROUP BY b.idbarco
+            $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones,
+            b.foto FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco GROUP BY b.idbarco
             order by b.idbarco desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+            if (!empty($vResultado) && is_array($vResultado)) {
+                foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
+                    
+                    //Codificar lfoto en formato base64
+                    if (!empty($row->foto)) {
+                        $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
+                    }
+                }
+            }
+
             //Retornar la respuesta
 
             return $vResultado;
@@ -34,9 +45,10 @@ class BarcoModel
         public function get($id)
         {
             try {
+                
                 //Consulta sql               
-                $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones
-                FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.idbarco = $id
+                $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones,
+                b.foto FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.idbarco = $id
                 GROUP BY b.idbarco
                 order by b.idbarco desc;";
 
@@ -46,14 +58,18 @@ class BarcoModel
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
 
+                //Codificar lfoto en formato base64
+                if (!empty($vResultado->foto)) {
+                    $vResultado->foto = "data:image/jpeg;base64," . base64_encode($vResultado->foto);
+                }
+
                 //Extrar la lista de habitaciones del barco
-                $habitaciones = $this->getHabitacionesById($vResultado->idbarco);
+                $habitaciones = $this->getHabitacionesByIdBarco($vResultado->idbarco);
                 $vResultado->habitaciones = $habitaciones;
                 // Retornar el objeto
                 return $vResultado;
                     
                 }
-                return $vResultado;
 
             } catch (Exception $e) {
                 handleException($e);
@@ -61,7 +77,7 @@ class BarcoModel
         }
 
         /*Obtener habitaciones ligadas al barco*/
-        public function getHabitacionesById($id)
+        public function getHabitacionesByIdBarco($id)
         {
             try {
                 //Consulta sql               
@@ -71,11 +87,17 @@ class BarcoModel
                 $vResultado = $this->enlace->ExecuteSQL($vSQL);
 
                 if (!empty($vResultado) && is_array($vResultado)) {
-                    // Retornar el objeto
-                    return $vResultado;
-                    
+                    foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
+                        
+                        //Codificar lfoto en formato base64
+                        if (!empty($row->foto)) {
+                            $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
+                        }
+                    }
                 }
+            //Retornar la respuesta
 
+            return $vResultado;
 
             } catch (Exception $e) {
                 handleException($e);

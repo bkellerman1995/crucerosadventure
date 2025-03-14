@@ -50,7 +50,7 @@ export function ListCardCruceros({ data }) {
               <CardContent>
                 <Typography variant="body2" color="text.secondary">
                   <span>
-                    <b>Barco: </b> {item.barco.descripcion}
+                    <b>Barco: </b> {item.barco.nombre}
                   </span>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">

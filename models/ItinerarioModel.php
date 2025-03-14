@@ -33,7 +33,7 @@ class ItinerarioModel
         try {
 
             $vSql = "SELECT * FROM itinerario
-                    where idItinerario='$id';";
+                    where idItinerario=$id;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -58,7 +58,7 @@ class ItinerarioModel
             $puertoModel = new PuertoModel();
 
             $vSql = "SELECT * FROM itinerario_puerto
-                    where idItinerario='$id';";
+                    where idItinerario=$id;";
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
 

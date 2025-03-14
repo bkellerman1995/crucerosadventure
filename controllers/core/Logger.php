@@ -2,6 +2,7 @@
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+
 class Logger implements LoggerInterface
 {
     private $logpath;

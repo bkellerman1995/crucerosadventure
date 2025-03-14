@@ -29,7 +29,7 @@ export function DetailCrucero() {
     CrucerosService.getCrucerobyId(routeParams.id)
       .then((response) => {
         setData(response.data);
-        console.log("datosCruc detail", response.data);
+        console.log("detalle crucero", response.data);
         setError(response.error);
         setLoaded(true);
       })
