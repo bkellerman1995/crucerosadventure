@@ -55,7 +55,7 @@ export function DetailBarco() {
                 height: "auto",
               }}
               alt="Imagen del barco"
-              src={"../../uploads/Barco1.jpg"}
+              src={data.foto}
             />
           </Grid>
           <Grid size={7}>
@@ -71,7 +71,6 @@ export function DetailBarco() {
               <Box fontWeight="bold" display="inline">
                 {/* Descripcion: */}
               </Box>{" "}
-              {data.Descripcion}
             </Typography>
             <Typography component="span" variant="subtitle1">
               <Box fontWeight="bold">Información del barco:</Box>

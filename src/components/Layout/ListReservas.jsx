@@ -24,6 +24,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
 
+
 ListReservas.propTypes = {
   data: PropTypes.array,
 };
@@ -97,13 +98,13 @@ const headCells = [
   },
   {
     id: "fechaInicio",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "Fecha de Inicio",
   },
   {
     id: "fechaFinal",
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: "Fecha de regreso",
   },
@@ -314,6 +315,7 @@ export function ListReservas() {
                       const isItemSelected = isSelected(row.id);
                       const labelId = `enhanced-table-checkbox-${index}`;
 
+                      
                       return (
                         <TableRow
                           hover
@@ -337,13 +339,15 @@ export function ListReservas() {
                           <TableCell align="left">{row.idReserva}</TableCell>
                           <TableCell align="left">{row.crucero}</TableCell>
                           <TableCell align="left">
+
                             {new Date(row.fechaInicio).toLocaleDateString(
-                              "en-GB"
+                              "es-CR"
                             )}
                           </TableCell>
                           <TableCell align="left">
-                            {new Date(row.fechaFinal.date).toLocaleDateString(
-                              "en-GB"
+
+                            {new Date(row.fechaFinal).toLocaleDateString(
+                              "es-CR"
                             )}
                           </TableCell>
                           {/* Contenido de la tabla */}

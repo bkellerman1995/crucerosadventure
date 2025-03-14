@@ -55,12 +55,12 @@ export function DetailHabitacion() {
                 height: "auto",
               }}
               alt="Imagen de la habitacion"
-              src={"../../uploads/habitacion1.jpg"}
+              src={data.foto}
             />
           </Grid>
           <Grid size={7}>
             <Typography variant="h4" component="h1" gutterBottom>
-              {data.Nombre}
+              {data.nombre}
             </Typography>
             <Typography
               variant="subtitle2"
@@ -69,9 +69,11 @@ export function DetailHabitacion() {
             ></Typography>
             <Typography component="span" variant="subtitle1" display="block">
               <Box fontWeight="bold" display="inline">
-                Descripcion:
+                Descripción:
               </Box>{" "}
-              {data.Descripcion}
+              {data.descripcion}
+              <br></br>
+              <br></br>
             </Typography>
             <Typography component="span" variant="subtitle1">
               <Box fontWeight="bold">Capacidad de la habitación:</Box>
@@ -115,7 +117,7 @@ export function DetailHabitacion() {
                 <StarIcon />
               </ListItemIcon>
               <ListItemText
-                primary={`Categoría de habitación: ${data.cathabitacion.descripcion}`}
+                primary={`Categoría de habitación: ${data.cathabitacion.nombre}`}
               />
             </ListItemButton>
           </Grid>

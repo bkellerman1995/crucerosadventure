@@ -18,11 +18,34 @@ class HabitacionModel
     public function all()
     {
         try {
-            //Consulta SQL
-            $vSQL = "SELECT * FROM habitacion order by idHabitacion desc;";
+            
+            //Obtener la categoriaHabitacion
+            $catHabitacionModel = new CategoriaHabitacionModel();
+
+            //Procedimiento almacenado ObtenerHabitaciones
+            $vSQL = "CALL ObtenerHabitaciones()";
+            
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
             //Retornar la respuesta
+
+            // Si hay resultados, recorrer la lista 
+            // de resultados y extraar la 
+            // categoria de la habitación (Nombre)
+            if (!empty($vResultado) && is_array($vResultado)) {
+                foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
+                    
+                    //Codificar lfoto en formato base64
+                    if (!empty($row->foto)) {
+                        $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
+                    }
+
+                    if (!empty($row->idcategoriaHabitacion)) {
+                        $row->categoriaHabitacion = $catHabitacionModel->get($row->idcategoriaHabitacion)->nombre;
+                    }
+
+                }
+            }
 
             return $vResultado;
         } catch (Exception $e) {
@@ -43,13 +66,18 @@ class HabitacionModel
             //Obtener la categoriaHabitacion
             $catHabitacionModel = new CategoriaHabitacionModel();
 
-            $vSql = "SELECT * FROM habitacion
-                    where idHabitacion=$id;";
+            // $vSql = "SELECT * FROM habitacion where idHabitacion='$id'";
+            
+            $vSql = "CALL ObtenerHabitacionPorID($id)";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
+
+               // Convertir el BLOB en base64 si tiene contenido
+                $vResultado->foto = "data:image/jpeg;base64," . base64_encode($vResultado->foto);
+
             }
 
             //Extrar el objeto CategoriaHabitacion relacionado a esta habitacion
@@ -81,7 +109,18 @@ class HabitacionModel
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
             if (!empty($vResultado) && is_array($vResultado)) {
+                foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
+                    
+                    //Codificar lfoto en formato base64
+                    if (!empty($row->foto)) {
+                        $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
+                    }
 
+                    // if (!empty($row->idcategoriaHabitacion)) {
+                    //     $row->categoriaHabitacion = $catHabitacionModel->get($row->idcategoriaHabitacion)->nombre;
+                    // }
+
+                }
                 //Retornar la respuesta
                 return $vResultado;
             }
