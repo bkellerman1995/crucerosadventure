@@ -62,6 +62,7 @@ export default function Header() {
     { name: "Barcos", link: "/barco" },
     { name: "Cruceros", link: "/crucero" },
     { name: "Reservas", link: "/reserva" },
+    { name: "Admin", link: "/admin" },
   ];
   //Identificador menu principal
   const menuIdPrincipal = "menu-appbar";
