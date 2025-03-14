@@ -82,6 +82,12 @@ const rutas = createBrowserRouter([
         element: <DetailReserva/>,
       },
 
+      {
+        //Página AdminView
+        path: "/admin",
+        element: <AdminView/>,
+      },
+
 
     ],
   },
