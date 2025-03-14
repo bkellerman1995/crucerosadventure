@@ -70,7 +70,6 @@ class BarcoModel
                 return $vResultado;
                     
                 }
-                return $vResultado;
 
             } catch (Exception $e) {
                 handleException($e);
