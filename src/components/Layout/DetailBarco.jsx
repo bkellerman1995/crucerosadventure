@@ -10,130 +10,118 @@ import StarIcon from "@mui/icons-material/Star";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import Divider from "@mui/material/Divider";
 import BarcoService from "../../services/BarcoService";
 
 export function DetailBarco() {
-  const routeParams = useParams();
+  const { id } = useParams();
 
-  console.log("parametro", routeParams);
-
-  //Resultado de consumo del API, respuesta
+  // Estado para el API
   const [data, setData] = useState(null);
-  //Error del API
   const [error, setError] = useState("");
-  //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
-    //Llamar al API y obtener una Barco
-    BarcoService.getBarcobyId(routeParams.id)
+    BarcoService.getBarcobyId(id)
       .then((response) => {
         setData(response.data);
-        console.log("datosbarco detail", response.data);
-        setError(response.error);
         setLoaded(true);
       })
       .catch((error) => {
-        console.log("error", error);
         setError(error);
-        throw new Error("Respuesta no válida del servidor");
+        setLoaded(true);
       });
-  }, [routeParams.id]);
+  }, [id]);
 
-  if (!loaded) return <p>Cargando...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (!loaded) return <Typography>Cargando...</Typography>;
+  if (error) return <Typography>Error: {error.message}</Typography>;
+
   return (
-    <Container component="main" sx={{ mt: 8, mb: 2 }}>
-      {data && (
-        <Grid container spacing={2}>
-          <Grid size={5}>
-            <Box
-              component="img"
-              sx={{
-                borderRadius: "4%",
-                maxWidth: "100%",
-                height: "auto",
-              }}
-              alt="Imagen del barco"
-              src={data.foto}
-            />
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Paper
+        elevation={4}
+        sx={{
+          p: 3,
+          borderRadius: 2,
+          background: "linear-gradient(to right, #f0f8ff, #e6f7ff)",
+        }}
+      >
+        <Grid container spacing={4}>
+          {/* Sección de imagen */}
+          <Grid item xs={12} md={5}>
+            <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
+              <CardMedia
+                component="img"
+                image={data.foto}
+                alt="Imagen del barco"
+                sx={{ height: "100%", objectFit: "cover" }}
+              />
+            </Card>
           </Grid>
-          <Grid size={7}>
-            <Typography variant="h4" component="h1" gutterBottom>
+
+          {/* Sección de detalles */}
+          <Grid item xs={12} md={7}>
+            <Typography
+              variant="h4"
+              component="h1"
+              gutterBottom
+              sx={{ fontWeight: "bold", color: "#00304E" }}
+            >
               {data.Nombre}
             </Typography>
-            <Typography
-              variant="subtitle2"
-              component="h2"
-              gutterBottom
-            ></Typography>
-            <Typography component="span" variant="subtitle1" display="block">
-              <Box fontWeight="bold" display="inline">
-                {/* Descripcion: */}
-              </Box>{" "}
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {data.descripcion}
             </Typography>
-            <Typography component="span" variant="subtitle1">
-              <Box fontWeight="bold">Información del barco:</Box>
 
-              {/* Nombre del barco */}
-              <ListItemButton>
-                <ListItemIcon>
-                  <StarIcon />
-                </ListItemIcon>
-                <ListItemText primary={`Nombre: ${data.nombre}`} />
-              </ListItemButton>
-
-              {/* Descripción del barco */}
-              <ListItemButton>
-                <ListItemIcon>
-                  <StarIcon />
-                </ListItemIcon>
-                <ListItemText primary={`Descripción: ${data.descripcion}`} />
-              </ListItemButton>
-
-              <List
-                sx={{
-                  width: "100%",
-                  maxWidth: 360,
-                  bgcolor: "#e5e5e5",
-                }}
-              >
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                Información del Barco:
+              </Typography>
+              <List>
                 <ListItemButton>
                   <ListItemIcon>
-                    <ArrowRightIcon />
+                    <StarIcon color="primary" />
                   </ListItemIcon>
-                  <ListItemText
-                    primary={`Capacidad de huéspedes: ${data.capacidadHuesped}`}
-                  />
+                  <ListItemText primary={`Nombre: ${data.nombre}`} />
+                </ListItemButton>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <StarIcon color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary={`Capacidad de Huéspedes: ${data.capacidadHuesped}`} />
                 </ListItemButton>
               </List>
+            </Box>
 
-              <List
-                sx={{
-                  width: "100%",
-                  maxWidth: 360,
-                  fontweight: "bold",
-                }}
-              >
-                <b>Habitaciones</b>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                Habitaciones:
+              </Typography>
+              <List>
                 {data.habitaciones.map((item) => (
                   <ListItemButton key={item.idHabitacion}>
                     <ListItemIcon>
                       <ArrowRightIcon />
                     </ListItemIcon>
-                    <ListItemText primary={`${item.nombre}`} />
+                    <ListItemText primary={item.nombre} />
                   </ListItemButton>
                 ))}
               </List>
+            </Box>
 
-              <Typography component="span" variant="subtitle1" display="block">
-                <b>Cantidad de habitaciones disponibles: </b>{data.cantHabitaciones}
-              </Typography>
-
+            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+              Cantidad de Habitaciones Disponibles: {data.cantHabitaciones}
             </Typography>
           </Grid>
         </Grid>
-      )}
+      </Paper>
     </Container>
   );
 }
