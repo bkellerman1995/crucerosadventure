@@ -58,20 +58,15 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function DashboardLayoutBranding(props) {
-  const { window } = props;
-
+function DashboardLayoutBranding({ window }) {
   const router = useDemoRouter('/dashboard');
-
-  // Remove this const when copying and pasting into your project.
-  const demoWindow = window !== undefined ? window() : undefined;
+  const demoWindow = window ? window() : undefined;
 
   return (
-    // preview-start
     <AppProvider
       navigation={NAVIGATION}
       branding={{
-        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />, 
         title: 'MUI',
         homeUrl: '/toolpad/core/introduction',
       }}
@@ -83,16 +78,15 @@ function DashboardLayoutBranding(props) {
         <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
-    // preview-end
   );
 }
 
 DashboardLayoutBranding.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
   window: PropTypes.func,
 };
 
-export default DashboardLayoutBranding;
+export function AdminView() {
+  return <DashboardLayoutBranding />;
+}
+
+export default AdminView;
