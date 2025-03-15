@@ -8,7 +8,7 @@ export function Footer() {
     <Toolbar
       sx={{
         px: 2,
-        position: "fixed",
+        position: "static",
         bottom: 0,
         width: "100%",
         height: "4.5rem",

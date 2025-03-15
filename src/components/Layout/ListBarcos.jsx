@@ -26,10 +26,6 @@ import { IconButton } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 
 
-
-
-
-
 //Ordenar descendente
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {

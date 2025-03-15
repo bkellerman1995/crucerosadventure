@@ -1,0 +1,17 @@
+.dashboardLinks{
+    color: rgb(15, 14, 14) !important;
+    text-decoration: none !important;
+  }
+  
+  .cardHeader {
+    background-Color: #16537e !important;
+    color: white !important;
+  }
+
+  html, body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  
