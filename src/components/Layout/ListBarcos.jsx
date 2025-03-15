@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-//https://mui.com/material-ui/react-table/#sorting-amp-selecting
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
@@ -18,15 +17,18 @@ import Paper from '@mui/material/Paper';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { visuallyHidden } from '@mui/utils';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import BarcoService from '../../services/BarcoService';
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { IconButton } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 
 
+<<<<<<< HEAD
 //Ordenar descendente
+=======
+// Ordenar descendente
+>>>>>>> ddb343cfd2157405efd73991352af0d2a6d7e0c0
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -36,14 +38,15 @@ function descendingComparator(a, b, orderBy) {
   }
   return 0;
 }
-//Comparar para ordenar
+
+// Comparar para ordenar
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-//Ordenar
+// Ordenar
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -56,7 +59,7 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-//--- Encabezados de la tabla ---
+// Encabezados de la tabla
 const headCells = [
   {
     id: 'idbarco',
@@ -84,7 +87,7 @@ const headCells = [
   },
 ];
 
-//Encabezado tabla
+// Encabezado tabla
 function TableHabitacionesHead(props) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
@@ -120,7 +123,6 @@ function TableHabitacionesHead(props) {
   );
 }
 
-//Propiedades Encabezado tabla
 TableHabitacionesHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
@@ -129,10 +131,9 @@ TableHabitacionesHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-//Barra de opciones
+// Barra de opciones
 function TableHabitacionesToolbar(props) {
-  const { numSelected } = props;
-  const { idSelected } = props;
+  const { numSelected, idSelected } = props;
   const navigate = useNavigate();
   const update = () => {
     return navigate(`/barco/update/${idSelected}`);
@@ -158,7 +159,7 @@ function TableHabitacionesToolbar(props) {
           variant="subtitle1"
           component="div"
         >
-          {numSelected} selected
+          {numSelected} seleccionado(s)
         </Typography>
       ) : (
         <Typography
@@ -167,29 +168,27 @@ function TableHabitacionesToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Lista de barcos
+          Lista de Barcos
         </Typography>
       )}
     </Toolbar>
   );
 }
-//Propieades Barra de opciones
+
 TableHabitacionesToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
   idSelected: PropTypes.number.isRequired,
 };
 
-//Componente tabla con hooks
+// Componente tabla con hooks
 export function ListBarcos() {
-  
-  //Datos a cargar en la tabla
+  // Datos a cargar en la tabla
   const [data, setData] = useState([]);
-
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
   
-  //Obtener lista del API (useEffect)
-   useEffect(() => {
+  // Obtener lista del API
+  useEffect(() => {
     BarcoService.getBarcos()
       .then((response) => {
         console.log(response);
@@ -207,7 +206,6 @@ export function ListBarcos() {
       });
   }, []);
 
-
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('year');
   const [selected, setSelected] = React.useState([]);
@@ -221,146 +219,133 @@ export function ListBarcos() {
     setOrderBy(property);
   };
 
-  //Seleccionar solo un elemento de la tabla
+  // Seleccionar solo un elemento de la tabla
   const handleClick = (event, name) => {
     let newSelected = [name];
     const selectedIndex = selected.indexOf(name);
-    
     if (selectedIndex === 0) {
       newSelected = [];
     } 
     setSelected(newSelected);
   };
 
-  //Cambiar de página
+  // Cambiar de página
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  //Cambiar cantidad de filas por página
+  // Cambiar cantidad de filas por página
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
   
-  //Cambiar densidad
+  // Cambiar densidad
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  // Evita un salto de diseño al llegar a la última página con datos vacíos.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
-
+  // Evitar salto de diseño al llegar a la última página
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <>
-      {data && data.length > 0 && (
-        <Box sx={{ width: '100%' }}>
-          <Paper sx={{ width: '100%', mb: 2 }}>
-            <TableHabitacionesToolbar
+    <Box sx={{ width: '100%' }}>
+      <Paper sx={{ width: '100%', mb: 2, borderRadius: 2, overflow: 'hidden' }}>
+        <TableHabitacionesToolbar
+          numSelected={selected.length}
+          idSelected={Number(selected[0]) || 0}
+        />
+        <TableContainer>
+          <Table
+            sx={{ minWidth: 750 }}
+            aria-labelledby="tableTitle"
+            size={dense ? 'small' : 'medium'}
+          >
+            <TableHabitacionesHead
               numSelected={selected.length}
-              idSelected={Number(selected[0]) || 0}
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+              rowCount={data.length}
             />
-            <TableContainer>
-              <Table
-                sx={{ minWidth: 750 }}
-                aria-labelledby="tableTitle"
-                size={dense ? 'small' : 'medium'}
-              >
-                <TableHabitacionesHead
-                  numSelected={selected.length}
-                  order={order}
-                  orderBy={orderBy}
-                  onRequestSort={handleRequestSort}
-                  rowCount={data.length}
-                />
-                <TableBody>
-                  {stableSort(data, getComparator(order, orderBy))
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, index) => {
-                      const isItemSelected = isSelected(row.id);
-                      const labelId = `enhanced-table-checkbox-${index}`;
+            <TableBody>
+              {stableSort(data, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => {
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                      return (
-                        <TableRow
-                          hover
-                          onClick={(event) => handleClick(event, row.id)}
-                          role="checkbox"
-                          aria-checked={isItemSelected}
-                          tabIndex={-1}
-                          key={row.id}
-                          selected={isItemSelected}
-                          sx={{ cursor: 'pointer' }}
-                        >
-
-                        {/* Contenido de la tabla */}
-                          <TableCell
-                            component="th"
-                            id={labelId}
-                            scope="data"
-                            padding="none"
-                          >
-                            {row.title}
-                          </TableCell>
-                          <TableCell align="left">{row.idbarco}</TableCell>
-                          <TableCell align="left">{row.nombre}</TableCell>
-                          <TableCell align="left">{row.capacidadHuesped}</TableCell>
-                          <TableCell align="left">{row.cantHabitaciones}</TableCell>
-                        {/* Contenido de la tabla */}
-                        
-                        <TableCell>
-
-                          <IconButton component={Link} to={`/barco/${row.idbarco}`} aria-label="Detalle" sx={{ ml: "auto", backgroundColor: "#00304E"}}></IconButton>
-                          
-
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  {emptyRows > 0 && (
+                  return (
                     <TableRow
-                      style={{
-                        height: (dense ? 33 : 53) * emptyRows,
-                      }}
+                      hover
+                      onClick={(event) => handleClick(event, row.id)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell colSpan={6} />
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="data"
+                        padding="none"
+                      >
+                        {row.title}
+                      </TableCell>
+                      <TableCell align="left">{row.idbarco}</TableCell>
+                      <TableCell align="left">{row.nombre}</TableCell>
+                      <TableCell align="left">{row.capacidadHuesped}</TableCell>
+                      <TableCell align="left">{row.cantHabitaciones}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          component={Link}
+                          to={`/barco/${row.idbarco}`}
+                          aria-label="Detalle"
+                          sx={{ ml: "auto", backgroundColor: "#00304E" }}
+                        >
+                          <Visibility sx={{ color: "white" }} />
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  );
+                })}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-            {/* Paginación */}
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={data.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Filas por página"
-              labelDisplayedRows={({ from, to, count }) =>
-                `${from}-${to} de ${count} página(s)`
-              }
-            />
-             {/* Paginación */}
+        {/* Paginación */}
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={data.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Filas por página"
+          labelDisplayedRows={({ from, to, count }) =>
+            `${from}-${to} de ${count} página(s)`
+          }
+        />
+      </Paper>
 
-          </Paper>
-
-          {/* Espaciado */}
-          <FormControlLabel
-            control={<Switch checked={dense} onChange={handleChangeDense} />}
-            label="Espaciado"
-          />
-        </Box>
-      )}
-    </>
+      {/* Control de espaciado */}
+      <FormControlLabel
+        control={<Switch checked={dense} onChange={handleChangeDense} />}
+        label="Espaciado"
+      />
+    </Box>
   );
 }
