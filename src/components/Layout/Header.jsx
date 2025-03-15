@@ -58,11 +58,12 @@ export default function Header() {
   ];
   //Lista enlaces menu principal
   const navItems = [
+    { name: "Admin", link: "/admin" },
     { name: "Habitaciones", link: "/habitacion" },
     { name: "Barcos", link: "/barco" },
     { name: "Cruceros", link: "/crucero" },
-    { name: "Reservas", link: "/reserva" },
-    { name: "Admin", link: "/admin" },
+    { name: "Reservas", link: "/reserva" }
+
   ];
   //Identificador menu principal
   const menuIdPrincipal = "menu-appbar";

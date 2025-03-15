@@ -4,14 +4,10 @@ export const appTheme = createTheme({
     mode: "light",
 
     //Color del footer
-    primary: {
-      main: "#16537e",
-    },
+    primary: { main: "#16537e" },
 
     //Color del texto del año en el footer
-    secondary: {
-      main: "#ffffff", 
-    },
+    secondary: { main: "#ffffff" },
 
     //Color del navbar
     primaryLight: {

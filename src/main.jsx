@@ -20,7 +20,7 @@ import { AdminView } from "./components/Layout/AdminView";
 const rutas = createBrowserRouter([
   {
     element: <App />,
-    
+
     //Paginas hijas a desplegar en el navegador
     children: [
       {
@@ -38,58 +38,62 @@ const rutas = createBrowserRouter([
       {
         //Página Habitaciones
         path: "/habitacion",
-        element: <ListHabitaciones/>,
+        element: <ListHabitaciones />,
       },
 
       {
         //Página Habitaciones by ID
         path: "/habitacion/:id",
-        element: <DetailHabitacion/>,
+        element: <DetailHabitacion />,
       },
 
       {
         //Página Barcos
         path: "/barco",
-        element: <ListBarcos/>,
+        element: <ListBarcos />,
       },
 
       {
         //Página Barcos by ID
         path: "/barco/:id",
-        element: <DetailBarco/>,
+        element: <DetailBarco />,
       },
 
       {
         //Página Cruceros
         path: "/crucero",
-        element: <ListCruceros/>,
+        element: <ListCruceros />,
       },
 
       {
         //Página Cruceros by ID
         path: "/crucero/:id",
-        element: <DetailCrucero/>,
+        element: <DetailCrucero />,
       },
 
       {
         //Página Reservas
         path: "/reserva",
-        element: <ListReservas/>,
+        element: <ListReservas />,
       },
 
       {
         //Página Cruceros by ID
         path: "/reserva/:id",
-        element: <DetailReserva/>,
+        element: <DetailReserva />,
       },
 
       {
         //Página AdminView
         path: "/admin",
-        element: <AdminView/>,
+        element: <AdminView />,
+        children: [
+          { path: "habitacion", element: <ListHabitaciones /> },
+          { path: "barco", element: <ListBarcos /> },
+          { path: "crucero", element: <ListCruceros /> },
+          // { path: "reserva", element: <ListReservas /> },
+        ],
       },
-
-
     ],
   },
 ]);

@@ -26,11 +26,9 @@ export function ListCardCruceros({ data }) {
         data.map((item) => (
           <Grid size={4} key={item.idCrucero}>
             <Card>
-              <CardHeader
+              <CardHeader className="cardHeader"
                 sx={{
                   p: 0,
-                  backgroundColor: (theme) => theme.palette.secondary.main,
-                  color: (theme) => theme.palette.common.black,
                 }}
                 style={{ textAlign: "center", fontWeight: "bold" }}
                 title= {item.nombre}
