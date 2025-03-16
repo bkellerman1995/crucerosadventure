@@ -4,5 +4,5 @@ COMANDO PARA EXPORTAR BASE DE DATOS DESDE EL XAMPP (XAMPP TIENE QUE CORRER COMO 
 
 ** cambiar la x en crucerosadventure_x.sql por el numero que sigue en la lista. 
 
-mysqldump -u root -p crucerosadventure --databases --hex-blob --routines > C:\xampp\htdocs\crucerosadventure\BasesDeDatos\crucerosadventure.sql
+mysqldump -u root -p crucerosadventure --databases --hex-blob > C:\xampp\htdocs\crucerosadventure\BasesDeDatos\crucerosadventure_10.sql
 
