@@ -26,12 +26,11 @@ export function ListCardCruceros({ data }) {
         data.map((item) => (
           <Grid size={4} key={item.idCrucero}>
             <Card>
-              <CardHeader className="cardHeader"
-                sx={{
-                  p: 0,
-                }}
+              <CardHeader
+                className="cardHeader"
+                sx={{ p: 0 }}
                 style={{ textAlign: "center", fontWeight: "bold" }}
-                title= {item.nombre}
+                title={item.nombre}
               />
               <Typography variant="body2" color="text.secondary">
                 <span>
@@ -71,6 +70,14 @@ export function ListCardCruceros({ data }) {
                   aria-label="Detalle"
                   sx={{ ml: "auto" }}
                 >
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    align="left"
+                    style={{ textAlign: "left", fontWeight: "bold" }}
+                  >
+                    Próxima fecha de salida: 
+                  </Typography>
                   <Info />
                 </IconButton>
               </CardActions>
