@@ -1,0 +1,17 @@
+Tabla Puerto - crucero 
+
+Hora llegada y salida del barco a ese puerto 
+
+IdPuerto - idCrucero
+
+IdItinerario relacionada con Puerto - crucero. 
+
+Itinerario deberia estar asociada a puerto crucero
+
+-----------------------------
+Habitacion disponible 
+
+Barco - habitacion -> Tabla para relacionar la habitacion con barco 
+
+En la tabla reserva hace referencia a la tabla barco - habitacion para que cuando se cree la reserva se asocie la habitacion y quede no disponible. 
+

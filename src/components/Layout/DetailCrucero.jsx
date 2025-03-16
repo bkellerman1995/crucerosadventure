@@ -80,9 +80,10 @@ export function DetailCrucero() {
               <Box fontWeight="bold" display="inline">
                 Nombre del barco:
               </Box>{" "}
-              {data.barco.descripcion}
+              {data.barco.nombre}
             </Typography>
-            <Typography component="span" variant="subtitle1">
+            <br></br>
+            <Typography variant="h5" component="h4" gutterBottom>
               <Box fontWeight="bold">Itinerario:</Box>
               <List
                 sx={{
