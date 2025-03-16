@@ -56,34 +56,44 @@ export default function Header() {
     { name: "Registrarse", link: "/user/create", login: false },
     { name: "Logout", link: "/user/logout", login: true },
   ];
-  //Lista enlaces menu principal
-  const navItems = [
-    { name: "Admin", link: "/admin" },
-    { name: "Habitaciones", link: "/habitacion" },
-    { name: "Barcos", link: "/barco" },
-    { name: "Cruceros", link: "/crucero" },
-    { name: "Reservas", link: "/reserva" }
+ // Lista enlaces menu principal
+const navItems = [
+  { name: "Home", image: "../../uploads/LogoTransparente.png", link: "/" },
+  { name: "Admin", link: "/admin" },
+  { name: "Habitaciones", link: "/habitacion" },
+  { name: "Barcos", link: "/barco" },
+  { name: "Cruceros", link: "/crucero" },
+  { name: "Reservas", link: "/reserva" }
+];
 
-  ];
-  //Identificador menu principal
-  const menuIdPrincipal = "menu-appbar";
-  //Menu Principal
-  const menuPrincipal = (
-    <Box sx={{ display: { xs: "none", sm: "block" } }}>
-      {navItems &&
-        navItems.map((item, index) => {
-          return (
-            <Button
-              key={index}
-              component={Link}
-              to={item.link}
-              color="secondary"
-            >
+// Identificador menu principal
+const menuIdPrincipal = "menu-appbar";
+
+// Menu Principal
+const menuPrincipal = (
+  <Box sx={{ display: { xs: "none", sm: "block" } }}>
+    {navItems &&
+      navItems.map((item, index) => {
+        return (
+          <Button
+            key={index}
+            component={Link}
+            to={item.link}
+            color="secondary"
+          >
+            {item.name === "Home" ? (
+              <img
+                src={item.image}
+                alt="Logo"
+                style={{ width: '80px', height: '80px' }} // Ajusta el tamaño según sea necesario
+              />
+            ) : (
               <Typography textAlign="center">{item.name}</Typography>
-            </Button>
-          );
-        })}
-    </Box>
+            )}
+          </Button>
+        );
+      })}
+  </Box>
   );
   //Menu Principal responsivo
   const menuPrincipalMobile = navItems.map((page, index) => (
