@@ -15,19 +15,19 @@ const NAVIGATION = [
     segment: "habitaciones",
     title: "Habitaciones",
     icon: <MdOutlineBedroomParent />,
-    link: <Link to="/admin/habitacion"className="dashboardLinks">Habitaciones</Link>,
+    link: "/admin/habitacion", // Solo la ruta
   },
   {
     segment: "barcos",
     title: "Barcos",
     icon: <PiBoatFill />,
-    link: <Link to="/admin/barco"className="dashboardLinks">Barcos</Link>,
+    link: "/admin/barco", // Solo la ruta
   },
   {
     segment: "crucero",
     title: "Cruceros",
     icon: <SiMentorcruise />,
-    link: <Link to="/admin/crucero"className="dashboardLinks">Cruceros</Link>,
+    link: "/admin/crucero", // Solo la ruta
   },
 ];
 
@@ -36,21 +36,38 @@ function DashboardLayoutBranding() {
   return (
     <AppProvider
       navigation={NAVIGATION.map((item) => ({
-        title: item.link, // Aquí se usa el Link en lugar de solo el texto
+        title: (
+          <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+            <Link
+              to={item.link}
+              className="dashboardLinks"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+                color: "inherit",
+                width: "100%",
+                padding: "8px",
+              }}
+            >
+              <span style={{ marginLeft: "8px" }}>{item.title}</span>
+            </Link>
+          </Box>
+        ),
         icon: item.icon,
       }))}
       branding={{
         logo: (
-          <img
-            src="../../uploads/LogoCrucerosAdventure.png"
-            alt="Administración"
-          />
+          <></>
         ),
         title: "Consola de administración",
         homeUrl: "/admin", // Ruta de inicio del panel
       }}
     >
-      <DashboardLayout sx={{ width: "100%", overflowX: "hidden" }}>
+      <DashboardLayout
+        sx={{ width: "100%", overflowX: "hidden" }}
+        showThemeToggle={false}
+      >
         <Box
           sx={{
             flexGrow: 1,
