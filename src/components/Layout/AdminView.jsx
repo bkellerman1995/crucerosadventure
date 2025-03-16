@@ -73,14 +73,13 @@ function DashboardLayoutBranding() {
                 color: "inherit",
                 width: "100%",
                 paddingLeft: "30px",
-                paddingRight: "40px",
+                paddingRight: "30px",
                 paddingTop: "12px",
                 paddingBottom: "12px",
-                marginLeft: "-12px",
-                marginRight: "-15px",
+                marginLeft: "-25px",
+                // marginRight: "40px",
               }}
             >
-              {item.icon}
               <span style={{ paddingRight: "0px" }}>{item.icon}</span>
             </Link>
           // </Box>
