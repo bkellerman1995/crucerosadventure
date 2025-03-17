@@ -12,7 +12,7 @@ import IconButton from "@mui/material/IconButton";
 import { Link } from "react-router-dom";
 import { Info } from "@mui/icons-material";
 import PropTypes from "prop-types";
-import Button from '@mui/material/Button';
+import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 
@@ -21,8 +21,6 @@ ListCardCruceros.propTypes = {
 };
 
 export function ListCardCruceros({ data }) {
-
-  
   return (
     <>
       <Box
@@ -36,10 +34,9 @@ export function ListCardCruceros({ data }) {
         </Typography>
         <Tooltip title="Crear">
           <Button
-            style={{ marginRight: "15px" }}
+            style={{ marginRight: "15px", backgroundColor: "#16537e" }}
             component={Link}
-            to="/crucero/crear/"
-            color="success"
+            to="/admin/crucero/crear"
             variant="contained"
             endIcon={<AddIcon />}
           >
@@ -93,24 +90,29 @@ export function ListCardCruceros({ data }) {
                     color: (theme) => theme.palette.common.white,
                   }}
                 >
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    style={{
-                      fontWeight: "bold",
-                    }}
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={2}
                   >
-                    Próxima salida:
-                  </Typography>
-                  <IconButton
-                    component={Link}
-                    to={`/crucero/${item.idCrucero}`}
-                    aria-label="Detalle"
-                    sx={{ marginLeft:"175px" }}
-                  >
-                    <Info />
-                  </IconButton>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      style={{
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Próxima salida:
+                    </Typography>
+                    <IconButton
+                      component={Link}
+                      to={`/crucero/${item.idCrucero}`}
+                      aria-label="Detalle"
+                      sx={{ marginLeft: "175px" }}
+                    >
+                      <Info />
+                    </IconButton>
                   </Box>
                 </CardActions>
               </Card>

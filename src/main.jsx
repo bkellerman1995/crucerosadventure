@@ -16,6 +16,7 @@ import { DetailCrucero } from "./components/Layout/DetailCrucero";
 import { DetailReserva } from "./components/Layout/DetailReserva";
 import { AdminView } from "./components/Layout/AdminView";
 import { CreateBarco } from "./components/Layout/CreateBarco";
+import { CreateCrucero } from "./components/Layout/CreateCrucero";
 // import "bootstrap/dist/css/bootstrap.min.css";
 
 const rutas = createBrowserRouter([
@@ -90,7 +91,6 @@ const rutas = createBrowserRouter([
         element: <CreateBarco />,
       },
 
-
       {
         //Página AdminView
         path: "/admin",
@@ -98,9 +98,11 @@ const rutas = createBrowserRouter([
         children: [
           { path: "habitacion", element: <ListHabitaciones /> },
           { path: "barco", element: <ListBarcos /> },
+          //Página create Crucero
+          { path: "barco/crear", element: <CreateCrucero /> },
           { path: "crucero", element: <ListCruceros /> },
-          { path: "createBarco", element: <CreateBarco /> },
-          // { path: "reserva", element: <ListReservas /> },
+          //Página create Crucero
+          { path: "crucero/crear", element: <CreateCrucero /> },
         ],
       },
     ],
