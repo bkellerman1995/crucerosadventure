@@ -39,7 +39,7 @@ function DashboardLayoutBranding() {
     <AppProvider
       navigation={NAVIGATION.map((item) => ({
         title: (
-          <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+          // <Box sx={{ display: "flex", alignItems: "center", width: "100%", marginLeft:"12px"}}>
             <Link
               to={item.link}
               className="dashboardLinks"
@@ -49,14 +49,43 @@ function DashboardLayoutBranding() {
                 textDecoration: "none",
                 color: "inherit",
                 width: "100%",
-                padding: "8px",
+                paddingLeft: "25px",
+                paddingRight: "23px",
+                paddingTop: "12px",
+                paddingBottom: "12px",
+                marginLeft: "12px",
+                marginRight: "25px",
+
               }}
             >
-              <span style={{ marginLeft: "8px" }}>{item.title}</span>
+              {item.title}
+              {/* <span style={{ paddingRight: "10px" }}>{item.title}</span> */}
             </Link>
-          </Box>
+          // </Box>
         ),
-        icon: item.icon,
+        icon: (
+          // <Box sx={{ display: "flex", alignItems: "center", width: "100%",marginLeft:"-12px" }}>
+            <Link
+              to={item.link}
+              className="dashboardLinks"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+                color: "inherit",
+                width: "100%",
+                paddingLeft: "30px",
+                paddingRight: "30px",
+                paddingTop: "12px",
+                paddingBottom: "12px",
+                marginLeft: "-25px",
+                // marginRight: "40px",
+              }}
+            >
+              <span style={{ paddingRight: "0px" }}>{item.icon}</span>
+            </Link>
+          // </Box>
+        ),
       }))}
       branding={{
         logo: (
