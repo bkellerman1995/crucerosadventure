@@ -33,4 +33,39 @@ class barco
             handleException($e);
         }
     }
+    public function create()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $barco = new BarcoModel();
+            //Acción del modelo a ejecutar
+            $result = $barco->create($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //PUT actualizar
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $barco = new BarcoModel();
+            //Acción del modelo a ejecutar
+            $result = $barco->update($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

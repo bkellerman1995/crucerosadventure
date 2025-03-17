@@ -104,4 +104,51 @@ class BarcoModel
             }
         }
  
+        /**
+     * Crear Barco
+     * @param $objeto Barco  a insertar
+     * @return $this->get($idbarco) - Objeto Barco
+     */
+    //
+    public function create($objeto)
+    {
+        try {
+            // Consulta SQL para insertar un barco
+            $sql = "INSERT INTO barco (nombre, descripcion, capacidadHuesped, foto, estado) " .
+                   "VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->foto', '$objeto->estado')";
+            
+            // Ejecutar la consulta y obtener el ID del barco insertado
+            $idBarco = $this->enlace->executeSQL_DML_last($sql);
+            
+            // Retornar el barco creado
+            return $this->get($idBarco);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    /**
+     * Actualizar Barco
+     * @param $objeto pelicula a barco
+     * @return $this->get($idBarco) - Objeto Barco
+     */
+    //
+    public function update($objeto)
+    {
+        try {
+            // Consulta SQL para actualizar un barco
+            $sql = "UPDATE barco SET nombre='$objeto->nombre'," .
+                   "descripcion='$objeto->descripcion', capacidadHuesped=$objeto->capacidadHuesped, " .
+                   "foto='$objeto->foto', estado='$objeto->estado' " .
+                   "WHERE idbarco=$objeto->idbarco";
+            
+            // Ejecutar la consulta
+            $cResults = $this->enlace->executeSQL_DML($sql);
+            
+            // Retornar barco actualizado
+            return $this->get($objeto->idbarco);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }
+
