@@ -21,7 +21,8 @@ const NAVIGATION = [
     segment: "barcos",
     title: "Barcos",
     icon: <PiBoatFill />,
-    link: "/admin/barco", // Solo la ruta
+    link: "/admin/barco",
+   
   },
   {
     segment: "crucero",
@@ -29,6 +30,7 @@ const NAVIGATION = [
     icon: <SiMentorcruise />,
     link: "/admin/crucero", // Solo la ruta
   },
+
 ];
 
 
