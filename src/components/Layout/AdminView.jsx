@@ -91,7 +91,7 @@ function DashboardLayoutBranding() {
         logo: (
           <></>
         ),
-        title: "Consola de administración",
+        title: "Vista de administrador",
         homeUrl: "/admin", // Ruta de inicio del panel
       }}
     >
