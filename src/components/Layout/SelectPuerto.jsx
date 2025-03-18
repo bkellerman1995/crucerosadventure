@@ -37,6 +37,8 @@ export function SelectPuerto({ field, data }) {
     }),
   };
 
+  console.log (data);
+
   return (
     <>
       <>
@@ -49,7 +51,7 @@ export function SelectPuerto({ field, data }) {
             label: (
               <div style={{ display: "flex", justifyContent: "space-between",alignItems: "center" }}>
                 {puerto.nombre} / País: {puerto.pais.descripcion}
-                {/* <img
+                <img
                   src={puerto.foto} // Aquí va la imagen en Base64
                   alt={puerto.nombre}
                   style={{
@@ -57,7 +59,7 @@ export function SelectPuerto({ field, data }) {
                     height: 30,
                     borderRadius: "50%",
                   }}
-                /> */}
+                />
               </div>
             ),
             value: puerto.id,

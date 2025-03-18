@@ -56,8 +56,30 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
           borderRadius: 2,
           boxShadow: 24,
           p: 4,
+
         }}
       >
+        {/* Botón de Cerrar en la Esquina Superior Derecha */}
+        <Button
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            top: "5px",
+            right: "5px",
+            minWidth: "30px",
+            height: "30px",
+            backgroundColor: "#16537e",
+            color: "white",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            "&:hover": { backgroundColor: "darkred" },
+            zIndex: 1000, // Asegura que el botón esté por encima de otros elementos
+          }}
+        >
+          ✕
+        </Button>
+
+        {/* Título */}
         <Typography variant="h4" component="h2">
           <b>Gestionar Puertos</b>
         </Typography>
@@ -87,7 +109,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                   {" "}
                   {/*  Ancho fijo evita desajustes */}
                   <FormControl fullWidth>
-                    {control && (
+                    { loadedPuerto && control && (
                       <Controller
                         name={`puerto-${index}`}
                         control={control}
@@ -99,7 +121,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                   </FormControl>
                 </Grid>
                 {/* Botón Agregar Descripción */}
-                <Grid item sx={{ flexShrink: 0,ml:30}}>
+                <Grid item sx={{ flexShrink: 0, ml: 30 }}>
                   <Button
                     variant="contained"
                     fullWidth
@@ -129,15 +151,15 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
             backgroundColor: "#16537e",
             color: "white",
             "&:hover": { backgroundColor: "#133d5a" },
-            width: "200px",  // Reduce el ancho del botón
-            height: "40px",  // Reduce la altura para hacerlo más compacto
-            fontSize: "0.9rem",  // Hace el texto más pequeño para mejor proporción
-            mx: "auto",  // Centra el botón en la pantalla
-            display: "block",  // Asegura que el botón no se expanda innecesariamente
+            width: "200px", // Reduce el ancho del botón
+            height: "40px", // Reduce la altura para hacerlo más compacto
+            fontSize: "0.9rem", // Hace el texto más pequeño para mejor proporción
+            mx: "auto", // Centra el botón en la pantalla
+            display: "block", // Asegura que el botón no se expanda innecesariamente
           }}
           fullWidth
         >
-          Cerrar
+          Confirmar
         </Button>
       </Box>
     </Modal>
@@ -147,6 +169,8 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
 // Validación de las props con PropTypes
 ModalGestionPuertos.propTypes = {
   open: PropTypes.bool.isRequired, // 'open' debe ser un booleano obligatorio
-  handleClose: PropTypes.func.isRequired, // 'handleClose' debe ser una función obligatoria
+  handleClose: PropTypes.func.isRequired,// 'handleClose' debe ser una función obligatoria
+  cantDias: PropTypes.number.isRequired,
+  control: PropTypes.object.isRequired, 
 };
 
