@@ -13,7 +13,6 @@ import BarcoService from "../../services/BarcoService";
 import CrucerosService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import { SelectBarco } from "./SelectBarco";
-import { SelectCantDias } from "./SelectCantDias";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
 
 
@@ -72,6 +71,9 @@ export function CreateCrucero() {
     },
     resolver: yupResolver(cruceroSchema),
   });
+
+  // Estado para almacenar el valor de cantidad de días
+  const [cantDias, setCantDias] = useState(7); // Valor mínimo predeterminado
 
   // Estado para controlar la apertura del modal
   const [openModal, setOpenModal] = useState(false);
@@ -190,23 +192,35 @@ export function CreateCrucero() {
             <br></br>
 
             {/* Cantidad de días */}
-            <Grid size={4} sm={6}>
+            <Grid size={4} sm={6} spacing={2}>
               <Typography variant="subtitle1">
                 <b>Cantidad de días</b>
               </Typography>
               <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-                <SelectCantDias
-                  placeholder="Seleccione"
-                  options={[
-                    { label: "7", value: 7 },
-                    { label: "8", value: 7 },
-                    { label: "9", value: 7 },
-                    { label: "10", value: 7 },
-                    { label: "11", value: 7 },
-                    { label: "12", value: 7 },
-                    { label: "13", value: 7 },
-                    { label: "14", value: 14 },
-                  ]}
+                <Controller
+                  name="cantDias"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Seleccione un valor"
+                      type="number"
+                      variant="outlined"
+                      inputProps={{
+                        min: 7,
+                        max: 14,
+                        step: 1,
+                      }}
+                      onChange={(e) => {
+                        let value = parseInt(e.target.value, 10);
+                        if (isNaN(value) || value < 7) value = 7;
+                        else if (value > 14) value = 14;
+                        setCantDias(value); // ACTUALIZA el estado cantDias con el valor seleccionado
+                        field.onChange(value); // ACTUALIZA el valor en react-hook-form
+                      }}
+                      value={cantDias} // SE ASIGNA EL VALOR ACTUAL
+                    />
+                  )}
                 />
               </FormControl>
             </Grid>
@@ -270,10 +284,13 @@ export function CreateCrucero() {
                   </Button>
                 </Grid>
 
-                {/* Modal importado desde otro archivo */}
+                {/* Modal importado para Geston de puertos */}
                 <ModalGestionPuertos
                   open={openModal}
                   handleClose={() => setOpenModal(false)}
+                  //pasar la cantidad de dias
+                  cantDias={cantDias}
+                  control={control}
                 />
 
                 <Grid item>
