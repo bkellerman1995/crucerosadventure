@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import { useForm, Controller } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import Button from "/node_modules/.vite/deps/@mui_material_Button.js?v=57074f40";
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +54,7 @@ export function CreateBarco() {
                 duration: 4000,
                 position: 'top-center'
               });
-              return navigate('/barco-table');
+              return navigate("/admin/crucero");
             }
           })
           .catch((error) => {

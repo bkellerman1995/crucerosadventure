@@ -22,7 +22,8 @@ import BarcoService from '../../services/BarcoService';
 import { useNavigate, Link } from 'react-router-dom';
 import { IconButton } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
-
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add"
 
 // Ordenar descendente
 function descendingComparator(a, b, orderBy) {
@@ -83,6 +84,7 @@ const headCells = [
   },
 ];
 
+
 // Encabezado tabla
 function TableHabitacionesHead(props) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -91,6 +93,8 @@ function TableHabitacionesHead(props) {
   };
 
   return (
+    
+    
     <TableHead>
       <TableRow>
         <TableCell></TableCell>
@@ -169,7 +173,17 @@ function TableHabitacionesToolbar(props) {
         
         
       )}
+      <Button
+    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+    component={Link}
+    to="/admin/barco/crear"
+    variant="contained"
+    endIcon={<AddIcon />}
+>
+  Crear
+</Button>
     </Toolbar>
+    
   );
 }
 
