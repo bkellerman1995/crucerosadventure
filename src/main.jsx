@@ -97,9 +97,10 @@ const rutas = createBrowserRouter([
         element: <AdminView />,
         children: [
           { path: "habitacion", element: <ListHabitaciones /> },
+          
           { path: "barco", element: <ListBarcos /> },
-          //Página create Crucero
-          { path: "barco/crear", element: <CreateCrucero /> },
+          { path: "barco/crear", element: <CreateBarco /> },
+
           { path: "crucero", element: <ListCruceros /> },
           //Página create Crucero
           { path: "crucero/crear", element: <CreateCrucero /> },

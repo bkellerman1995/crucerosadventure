@@ -25,7 +25,7 @@ export function DetailCrucero() {
   //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    //Llamar al API y obtener una pelicula
+    //Llamar al API y obtener una crucero
     CrucerosService.getCrucerobyId(routeParams.id)
       .then((response) => {
         setData(response.data);
