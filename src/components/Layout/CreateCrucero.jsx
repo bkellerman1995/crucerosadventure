@@ -1,19 +1,21 @@
-import React from 'react';
-import { useEffect,useState } from 'react';
-import FormControl from '@mui/material/FormControl';
-import Grid from '@mui/material/Grid2';
-import Typography from '@mui/material/Typography';
-import { useForm, Controller } from 'react-hook-form';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useNavigate } from 'react-router-dom';
-import BarcoService from '../../services/BarcoService';
-import CrucerosService from '../../services/CrucerosService';
-import toast from 'react-hot-toast';
-import Select from 'react-select';
-import {SelectBarco} from './SelectBarco';
+import React from "react";
+import { useEffect, useState } from "react";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid2";
+import Typography from "@mui/material/Typography";
+import { useForm, Controller } from "react-hook-form";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom";
+import BarcoService from "../../services/BarcoService";
+import CrucerosService from "../../services/CrucerosService";
+import toast from "react-hot-toast";
+import { SelectBarco } from "./SelectBarco";
+import { SelectCantDias } from "./SelectCantDias";
+import { ModalGestionPuertos } from './ModalGestionPuertos';
+
 
 export function CreateCrucero() {
   const navigate = useNavigate();
@@ -33,7 +35,6 @@ export function CreateCrucero() {
       .positive("Debe ser un número positivo")
       .min(7, "La cantidad de días debe ser al menos 7")
       .max(14, "La cantidad de días no debe ser mayor a 14"),
-
 
     // foto: yup.required("La foto es requerida"),
     foto: yup
@@ -55,8 +56,8 @@ export function CreateCrucero() {
         value && value[0] ? value[0].size <= 2 * 1024 * 1024 : false
       ),
   });
-  
 
+  //Función para manejar el form
   const {
     control,
     handleSubmit,
@@ -67,13 +68,13 @@ export function CreateCrucero() {
       descripcion: "",
       capacidadHuesped: "",
       estado: "",
-      foto:''
+      foto: "",
     },
     resolver: yupResolver(cruceroSchema),
   });
 
-  const [error, setError] = useState("");
-  const onError = (errors, e) => console.log(errors, e);
+  // Estado para controlar la apertura del modal
+  const [openModal, setOpenModal] = useState(false);
 
   //Hooks gestión de imagen
   const [file, setFile] = useState(null);
@@ -86,6 +87,11 @@ export function CreateCrucero() {
       setFile(e.target.files[0], e.target.files[0].name);
     }
   }
+
+  //Hooks de control de errores
+  const [error, setError] = useState("");
+  const onError = (errors, e) => console.log(errors, e);
+
   if (error) return <p>Error: {error.message}</p>;
 
   //Hooks Lista de barcos
@@ -105,7 +111,7 @@ export function CreateCrucero() {
           console.log(error);
           setError(error);
           setLoadedBarco(false);
-          throw new Error('Respuesta no válida del servidor');
+          throw new Error("Respuesta no válida del servidor");
         }
       });
   }, []);
@@ -140,8 +146,8 @@ export function CreateCrucero() {
       console.error(error);
     }
   };
-  
-  //Cargar el grid del componente. 
+
+  //Cargar el grid del componente.
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
@@ -152,6 +158,7 @@ export function CreateCrucero() {
             </Typography>
           </Grid>
 
+          {/* Datos del crucero (lado izquierdo) */}
           <Grid size={6} sm={6}>
             {/*Nombre */}
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
@@ -188,7 +195,7 @@ export function CreateCrucero() {
                 <b>Cantidad de días</b>
               </Typography>
               <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-                <Select
+                <SelectCantDias
                   placeholder="Seleccione"
                   options={[
                     { label: "7", value: 7 },
@@ -236,19 +243,86 @@ export function CreateCrucero() {
             </Grid>
           </Grid>
 
-          <Grid
-            size={6}
-            sm={6}
-            style={{ backgroundColor: "#16537e", borderRadius: "16px" }}
-            padding="10px"
-          >
-            {/*Itinerario */}
+          {/*Datos del crucero (lado derecho) */}
 
-            <Typography variant="h5" gutterBottom color="white">
-              <b>Itinerario</b>
-            </Typography>
+          <Grid container direction="column" spacing={2}>
+            <Grid
+              item
+              xs={12}
+              style={{
+                backgroundColor: "#16537e",
+                borderRadius: "16px",
+                padding: "10px",
+              }}
+            >
+              <Typography variant="h5" gutterBottom color="white">
+                <b>Itinerario (puertos y actividades)</b>
+              </Typography>
 
-            <br></br>
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    style={{ backgroundColor: "#50C878" }}
+                    onClick={() => setOpenModal(true)}
+                  >
+                    Gestionar puertos
+                  </Button>
+                </Grid>
+
+                {/* Modal importado desde otro archivo */}
+                <ModalGestionPuertos
+                  open={openModal}
+                  handleClose={() => setOpenModal(false)}
+                />
+
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    style={{ backgroundColor: "#B5485E" }}
+                    onClick={() => setOpenModal(true)}
+                  >
+                    Mostrar puertos
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              style={{
+                backgroundColor: "#16537e",
+                borderRadius: "16px",
+                padding: "10px",
+              }}
+            >
+              <Typography variant="h5" gutterBottom color="white">
+                <b>Fechas y precios de habitaciones</b>
+              </Typography>
+
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    style={{ backgroundColor: "#50C878" }}
+                    onClick={() => setOpenModal(true)}
+                  >
+                    Gestionar fechas
+                  </Button>
+                </Grid>
+
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    style={{ backgroundColor: "#B5485E" }}
+                    onClick={() => setOpenModal(true)}
+                  >
+                    Mostrar fechas
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </form>

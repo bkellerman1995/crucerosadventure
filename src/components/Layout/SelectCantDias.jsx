@@ -2,11 +2,11 @@ import React from "react";
 import Select from "react-select";
 import PropTypes from "prop-types";
 
-SelectBarco.propTypes = {
+SelectCantDias.propTypes = {
   data: PropTypes.array,
   field: PropTypes.object,
 };
-export function SelectBarco({ field, data }) {
+export function SelectCantDias() {
 
   const customStyles = {
     option: (provided, state) => ({
@@ -41,28 +41,18 @@ export function SelectBarco({ field, data }) {
     <>
       <>
         <Select
-          defaultValue=""
-          value={field.value}
-          displayEmpty
+          placeholder="Seleccione"
           styles={customStyles}
-          options={data.map((barco) => ({
-            label: (
-              <div style={{ display: "flex", justifyContent: "space-between",alignItems: "center" }}>
-                {barco.nombre} / Capacidad: {barco.capacidadHuesped} pasajeros
-                <img
-                  src={barco.foto} // Aquí va la imagen en Base64
-                  alt={barco.nombre}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
-                  }}
-                />
-              </div>
-            ),
-            value: barco.id,
-          }))}
-          placeholder="Seleccione un barco"
+          options={[
+            { label: "7", value: 7 },
+            { label: "8", value: 7 },
+            { label: "9", value: 7 },
+            { label: "10", value: 7 },
+            { label: "11", value: 7 },
+            { label: "12", value: 7 },
+            { label: "13", value: 7 },
+            { label: "14", value: 14 },
+          ]}
         />
       </>
     </>
