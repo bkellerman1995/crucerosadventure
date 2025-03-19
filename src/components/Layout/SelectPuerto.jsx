@@ -3,70 +3,53 @@ import Select from "react-select";
 import PropTypes from "prop-types";
 
 SelectPuerto.propTypes = {
-  data: PropTypes.array,
-  field: PropTypes.object,
+  data: PropTypes.array.isRequired,
+  field: PropTypes.object.isRequired,
+  onChange: PropTypes.func,
 };
-export function SelectPuerto({ field, data }) {
 
+export function SelectPuerto({ field, data, onChange }) {
   const customStyles = {
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isFocused
-        ? "#ADD8E6" // Color cuando se hace hover
-        : state.isSelected
-        ? "white" // Color cuando está seleccionado (blanco)
-        : "white", // Color normal
-  
-      color: state.isSelected ? "black" : "black", // Asegura que el texto sea visible
-      cursor: "pointer", // Cambia el cursor al pasar el mouse
-      transition: "background-color 0.2s ease-in-out", // Suaviza la transición de color
+      backgroundColor: state.isFocused ? "#ADD8E6" : state.isSelected ? "white" : "white",
+      color: state.isSelected ? "black" : "black",
+      cursor: "pointer",
+      transition: "background-color 0.2s ease-in-out",
     }),
-  
     control: (provided) => ({
       ...provided,
       borderColor: "gray",
       boxShadow: "none",
       "&:hover": {
-        borderColor: "#16537e", // Cambia el borde cuando pasas el mouse
+        borderColor: "#16537e",
       },
     }),
-  
     menu: (provided) => ({
       ...provided,
-      zIndex: 9999, // Asegura que el menú esté visible sobre otros elementos
+      zIndex: 9999,
     }),
   };
 
-  console.log (data);
-
+  const options = data.map((puerto) => ({
+    label: `${puerto.nombre} / País: ${puerto.pais.descripcion}`,
+    value: puerto.idPuerto,  // Aseguramos que sea `idPuerto`
+    obj: puerto, // Guardamos el objeto completo
+  }));
+  
+  const selectedOption = options.find((opt) => opt.value === field.value) || null;
+  
   return (
-    <>
-      <>
-        <Select
-          defaultValue=""
-          value={field.value}
-          displayEmpty
-          styles={customStyles}
-          options={data.map((puerto) => ({
-            label: (
-              <div style={{ display: "flex", justifyContent: "space-between",alignItems: "center" }}>
-                {puerto.nombre} / País: {puerto.pais.descripcion}
-                <img
-                  src={puerto.foto} // Aquí va la imagen en Base64
-                  alt={puerto.nombre}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
-                  }}
-                />
-              </div>
-            ),
-            value: puerto.id,
-          }))}
-          placeholder="Seleccione un puerto"
-        />
-      </>
-    </>
+    <Select
+      styles={customStyles}
+      options={options}
+      placeholder="Seleccione un puerto"
+      value={selectedOption} // Mantiene la opción seleccionada
+      onChange={(selectedOption) => {
+        console.log("Puerto seleccionado:", selectedOption);
+        field.onChange(selectedOption.value); // Guarda solo el ID en react-hook-form
+        if (onChange) onChange(selectedOption.obj); // Guarda el objeto completo en selectedPuerto
+      }}
+    />
   );
 }

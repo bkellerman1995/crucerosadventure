@@ -10,7 +10,6 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import BarcoService from "../../services/BarcoService";
-import PuertoService from "../../services/PuertoService";
 import CrucerosService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import { SelectBarco } from "./SelectBarco";
@@ -210,14 +209,9 @@ export function CreateCrucero() {
                       label="Seleccione un valor"
                       type="number"
                       variant="outlined"
-                      inputProps={{
-                        min: 1,
-                        max: 14,
-                        step: 1,
-                      }}
                       onChange={(e) => {
                         let value = parseInt(e.target.value, 10);
-                        if (isNaN(value) || value < 7) value = 7;
+                        if (isNaN(value) || value < 1) value = 1;
                         else if (value > 14) value = 14;
                         setCantDias(value); // ACTUALIZA el estado cantDias con el valor seleccionado
                         field.onChange(value); // ACTUALIZA el valor en react-hook-form

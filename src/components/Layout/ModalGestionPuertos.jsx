@@ -3,43 +3,46 @@ import { useEffect, useState } from "react";
 import { Modal, Box, Typography, Button, } from '@mui/material';
 import Grid from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
-// import TextField from "@mui/material/TextField";
 import PuertoService from "../../services/PuertoService";
 import {SelectPuerto} from "./SelectPuerto";
 import {Controller } from "react-hook-form";
+import { ModalDescripcion } from "./ModalDescripcion";
 
 import PropTypes from 'prop-types';
 
 export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
-  
+  //Hooks Lista de puertos
+  const [dataPuerto, setDataPuerto] = useState({});
+  const [loadedPuerto, setLoadedPuerto] = useState(false);
 
-    //Hooks Lista de puertos
-    const [dataPuerto, setDataPuerto] = useState({});
-    const [loadedPuerto, setLoadedPuerto] = useState(false);
-  
-    //Hooks de control de errores
-    const [error, setError] = useState("");
+  //Hooks de control de errores
+  const [error, setError] = useState("");
 
-    if (error) return <p>Error: {error.message}</p>;
-  
-    useEffect(() => {
-      PuertoService.getPuertos()
-        .then((response) => {
-          console.log(response);
-          setDataPuerto(response.data);
-          setLoadedPuerto(true);
-        })
-        .catch((error) => {
-          if (error instanceof SyntaxError) {
-            console.log(error);
-            setError(error);
-            setLoadedPuerto(false);
-            throw new Error("Respuesta no válida del servidor");
-          }
-        });
-    }, []);
-  
-  
+  // Hook para abrir el modal de descripción
+  const [openModalDesc, setOpenModalDesc] = useState(false);
+  const [selectedPuerto, setSelectedPuerto] = useState({});
+  const [selectedDiaIndex, setSelectedDiaIndex] = useState(null);
+
+  if (error) return <p>Error: {error.message}</p>;
+
+  // Hook para cargar la lista de puertos
+  useEffect(() => {
+    PuertoService.getPuertos()
+      .then((response) => {
+        console.log(response);
+        setDataPuerto(response.data);
+        setLoadedPuerto(true);
+      })
+      .catch((error) => {
+        if (error instanceof SyntaxError) {
+          console.log(error);
+          setError(error);
+          setLoadedPuerto(false);
+          throw new Error("Respuesta no válida del servidor");
+        }
+      });
+  }, []);
+
   return (
     <Modal open={open} onClose={handleClose}>
       <Box
@@ -56,7 +59,6 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
           borderRadius: 2,
           boxShadow: 24,
           p: 4,
-
         }}
       >
         {/* Botón de Cerrar en la Esquina Superior Derecha */}
@@ -85,7 +87,6 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
         </Typography>
         <br></br>
 
-        {/* Generar dinámicamente entradas para cada día */}
         {/* Contenedor en Grid con 2 columnas y alineación correcta */}
         <Grid container spacing={2}>
           {[...Array(cantDias)].map((_, index) => (
@@ -101,6 +102,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                     Día {index + 1}
                   </Typography>
                 </Grid>
+
                 {/* SelectPuerto */}
                 <Grid
                   item
@@ -109,17 +111,44 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                   {" "}
                   {/*  Ancho fijo evita desajustes */}
                   <FormControl fullWidth>
-                    { loadedPuerto && control && (
+                    {control && (
                       <Controller
                         name={`puerto-${index}`}
                         control={control}
                         render={({ field }) => (
-                          <SelectPuerto field={field} data={dataPuerto} />
+                          <SelectPuerto
+                            field={field}
+                            data={dataPuerto}
+                            onChange={(selectedValue) => {
+                              console.log(
+                                `Puerto seleccionado para el Día ${index + 1}:`,
+                                selectedValue
+                              );
+
+                              field.onChange(selectedValue.idPuerto); // Guarda solo el ID en react-hook-form
+
+                              setSelectedPuerto((prevState) => {
+                                const newState = {
+                                  ...prevState,
+                                  [index]: {
+                                    idPuerto: selectedValue.idPuerto,
+                                    ...selectedValue,
+                                  },
+                                };
+                                console.log(
+                                  "Nuevo estado de selectedPuerto:",
+                                  newState
+                                );
+                                return newState;
+                              });
+                            }}
+                          />
                         )}
                       />
                     )}
                   </FormControl>
                 </Grid>
+
                 {/* Botón Agregar Descripción */}
                 <Grid item sx={{ flexShrink: 0, ml: 30 }}>
                   <Button
@@ -133,6 +162,31 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                       minWidth: "180px",
                       height: "40px",
                     }}
+                    onClick={() => {
+                      console.log(
+                        "Estado actual de selectedPuerto:",
+                        selectedPuerto
+                      );
+                      console.log(
+                        `Intentando abrir modal para el Día ${index + 1}, Puerto:`,
+                        selectedPuerto[index]
+                      );
+
+                      if (
+                        !selectedPuerto[index] ||
+                        !selectedPuerto[index].idPuerto
+                      ) {
+                        console.error("No se seleccionó ningún puerto.");
+                        return;
+                      }
+
+                      setSelectedDiaIndex(index + 1);
+                      setOpenModalDesc(true);
+                      setSelectedPuerto({
+                        nombre: selectedPuerto[index]?.nombre,
+                        pais: selectedPuerto[index]?.pais?.descripcion,
+                      });
+                    }}
                   >
                     Agregar descripción
                   </Button>
@@ -141,6 +195,15 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
             </Grid>
           ))}
         </Grid>
+
+        {/* Modal para Agregar Descripción */}
+        <ModalDescripcion
+          open={openModalDesc}
+          handleClose={() => setOpenModalDesc(false)}
+          nombrePuerto={selectedPuerto?.nombre}
+          paisPuerto={selectedPuerto?.pais}
+          diaIndex={selectedDiaIndex}
+        />
 
         {/* Botón para cerrar el modal */}
         <Button
