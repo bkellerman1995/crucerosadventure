@@ -1,27 +1,57 @@
-import React from 'react';
-import { useEffect, useState } from "react";
-import { Modal, Box, Typography, Button, } from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { Modal, Box, Typography, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
+import dayjs from "dayjs";
 import PuertoService from "../../services/PuertoService";
-import {SelectPuerto} from "./SelectPuerto";
-import {Controller } from "react-hook-form";
+import { SelectPuerto } from "./SelectPuerto";
+import { Controller } from "react-hook-form";
 import { ModalDescripcion } from "./ModalDescripcion";
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
-  //Hooks Lista de puertos
+export function ModalGestionPuertos({ open, handleClose, cantDias, control, fechaSeleccionada }) {
+  // Hooks Lista de puertos
   const [dataPuerto, setDataPuerto] = useState({});
   const [loadedPuerto, setLoadedPuerto] = useState(false);
-
-  //Hooks de control de errores
+  // Hooks de control de errores
   const [error, setError] = useState("");
 
   // Hook para abrir el modal de descripción
   const [openModalDesc, setOpenModalDesc] = useState(false);
   const [selectedPuerto, setSelectedPuerto] = useState({});
   const [selectedDiaIndex, setSelectedDiaIndex] = useState(null);
+  // Estado para errores en el UI
+  const [errorMessage, setErrorMessage] = useState({});
+
+  //Función para manejar 
+
+  // Función para cerrar el modal y resetear valores del select
+  const handleModalClose = () => {
+    setSelectedPuerto({});
+    setSelectedDiaIndex(null);
+
+    if (control && control.setValue) {
+      for (let i = 0; i < cantDias; i++) {
+        control.setValue(`puerto-${i}`, null);
+      }
+    }
+
+    handleClose();
+  };
+
+  // Función para resetear el select cuando se cierra el modal Descripcion
+  const resetSelect = (index) => {
+    setSelectedPuerto((prevState) => {
+      const newState = { ...prevState };
+      delete newState[index]; // Elimina el puerto seleccionado del estado
+      return newState;
+    });
+
+    if (control && control.setValue) {
+      control.setValue(`puerto-${index}`, null);
+    }
+  };
 
   if (error) return <p>Error: {error.message}</p>;
 
@@ -51,10 +81,10 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "70vw", // Expandir modal
+          width: "70vw",
           maxWidth: "900px",
-          maxHeight: "80vh", //Limitar la altura del modal
-          overflowY: "auto", //
+          maxHeight: "80vh",
+          overflowY: "auto",
           bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 24,
@@ -63,7 +93,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
       >
         {/* Botón de Cerrar en la Esquina Superior Derecha */}
         <Button
-          onClick={handleClose}
+          onClick={handleModalClose}
           sx={{
             position: "absolute",
             top: "5px",
@@ -75,7 +105,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
             fontSize: "1rem",
             fontWeight: "bold",
             "&:hover": { backgroundColor: "darkred" },
-            zIndex: 1000, // Asegura que el botón esté por encima de otros elementos
+            zIndex: 1000,
           }}
         >
           ✕
@@ -85,122 +115,117 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
         <Typography variant="h4" component="h2">
           <b>Gestionar Puertos</b>
         </Typography>
-        <br></br>
+        <br />
 
         {/* Contenedor en Grid con 2 columnas y alineación correcta */}
         <Grid container spacing={2}>
-          {[...Array(cantDias)].map((_, index) => (
-            <Grid item xs={12} key={index}>
-              <Grid
-                container
-                alignItems="center"
-                sx={{ display: "flex", justifyContent: "space-between" }}
-              >
-                {/* Título del Día */}
-                <Grid item sx={{ minWidth: "80px" }}>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Día {index + 1}
-                  </Typography>
-                </Grid>
+          {[...Array(cantDias)].map((_, index) => {
 
-                {/* SelectPuerto */}
-                <Grid
-                  item
-                  sx={{ flexGrow: 1, minWidth: "300px", maxWidth: "450px" }}
-                >
-                  {" "}
-                  {/*  Ancho fijo evita desajustes */}
-                  <FormControl fullWidth>
-                    {control && (
-                      <Controller
-                        name={`puerto-${index}`}
-                        control={control}
-                        render={({ field }) => (
-                          <SelectPuerto
-                            field={field}
-                            data={dataPuerto}
-                            onChange={(selectedValue) => {
-                              console.log(
-                                `Puerto seleccionado para el Día ${index + 1}:`,
-                                selectedValue
-                              );
+            //constante para guardar la fecha en formato "dd/mm/yyyy"
+            const fechaActual = fechaSeleccionada
+              ? dayjs(fechaSeleccionada).add(index, "day").format("DD/MM/YYYY")
+              : "Sin fecha";
 
-                              field.onChange(selectedValue.idPuerto); // Guarda solo el ID en react-hook-form
+            return (
+              <Grid item xs={12} key={index}>
+                <Grid container alignItems="center" sx={{ display: "flex", justifyContent: "space-between" }}>
+                  {/* Título del Día con Fecha */}
+                  <Grid item sx={{ display: "flex", alignItems: "center", minWidth: "120px", marginRight: "10px"}}>
+                    <Typography variant="subtitle1" fontWeight="bold" sx={{ whiteSpace: "nowrap", marginRight: "-40px"}}>
+                      Día {index + 1} - {fechaActual}
+                    </Typography>
+                  </Grid>
 
-                              setSelectedPuerto((prevState) => {
-                                const newState = {
-                                  ...prevState,
-                                  [index]: {
-                                    idPuerto: selectedValue.idPuerto,
-                                    ...selectedValue,
-                                  },
-                                };
-                                console.log(
-                                  "Nuevo estado de selectedPuerto:",
-                                  newState
-                                );
-                                return newState;
-                              });
-                            }}
-                          />
-                        )}
-                      />
-                    )}
-                  </FormControl>
-                </Grid>
+                  {/* SelectPuerto */}
+                  <Grid item sx={{ flexGrow: 1, width: "250px", maxWidth: "300px", paddingLeft: "30px" }}>
+                    <FormControl fullWidth error={Boolean(errorMessage[index])}>
+                      {control && (
+                        <Controller
+                          name={`puerto-${index}`}
+                          control={control}
+                          render={({ field }) => (
+                            <>
+                              <SelectPuerto
+                                field={field}
+                                data={dataPuerto}
+                                onChange={(selectedValue) => {
+                                  field.onChange(selectedValue.idPuerto);
+                                  setSelectedPuerto((prevState) => ({
+                                    ...prevState,
+                                    [index]: {
+                                      idPuerto: selectedValue.idPuerto,
+                                      nombre: selectedValue.nombre,
+                                      pais: selectedValue.pais.descripcion,
+                                    },
+                                  }));
 
-                {/* Botón Agregar Descripción */}
-                <Grid item sx={{ flexShrink: 0, ml: 30 }}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      backgroundColor: "blue",
-                      color: "white",
-                      "&:hover": { backgroundColor: "darkblue" },
-                      width: "auto",
-                      minWidth: "180px",
-                      height: "40px",
-                    }}
-                    onClick={() => {
-                      console.log(
-                        "Estado actual de selectedPuerto:",
-                        selectedPuerto
-                      );
-                      console.log(
-                        `Intentando abrir modal para el Día ${index + 1}, Puerto:`,
-                        selectedPuerto[index]
-                      );
+                                  setErrorMessage((prev) => ({
+                                    ...prev,
+                                    [index]: null, // Limpia el error si selecciona algo
+                                  }));
+                                }}
+                              />
+                              {errorMessage[index] && (
+                                <Typography color="error" variant="caption">
+                                  {errorMessage[index]}
+                                </Typography>
+                              )}
+                            </>
+                          )}
+                        />
+                      )}
+                    </FormControl>
+                  </Grid>
 
-                      if (
-                        !selectedPuerto[index] ||
-                        !selectedPuerto[index].idPuerto
-                      ) {
-                        console.error("No se seleccionó ningún puerto.");
-                        return;
-                      }
+                  {/* Botón Agregar Descripción */}
+                  <Grid item sx={{ flexShrink: 0, ml: 30 }}>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      sx={{
+                        backgroundColor: "blue",
+                        color: "white",
+                        "&:hover": { backgroundColor: "darkblue" },
+                        width: "auto",
+                        minWidth: "180px",
+                        height: "40px",
+                      }}
+                      onClick={() => {
+                        console.log("Estado actual de selectedPuerto:", selectedPuerto);
+                        console.log(`Intentando abrir modal para el Día ${index + 1}, Puerto:`, selectedPuerto[index]);
 
-                      setSelectedDiaIndex(index + 1);
-                      setOpenModalDesc(true);
-                      setSelectedPuerto({
-                        idPuerto: selectedPuerto?.idPuerto,
-                        nombre: selectedPuerto[index]?.nombre,
-                        pais: selectedPuerto[index]?.pais?.descripcion,
-                      });
-                    }}
-                  >
-                    Agregar descripción
-                  </Button>
+                        if (!selectedPuerto[index] || !selectedPuerto[index].idPuerto) {
+                          console.error("No se seleccionó ningún puerto.");
+                          setErrorMessage((prev) => ({
+                            ...prev,
+                            [index]: "Debe seleccionar un puerto",
+                          }));
+                          return;
+                        }
+
+                        setSelectedDiaIndex(index + 1);
+                        setOpenModalDesc(true);
+                        setSelectedPuerto({
+                          idPuerto: selectedPuerto?.idPuerto,
+                          nombre: selectedPuerto[index]?.nombre,
+                          pais: selectedPuerto[index]?.pais,
+                        });
+                      }}
+                    >
+                      Gestionar descripción
+                    </Button>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          ))}
+            );
+          })}
         </Grid>
 
         {/* Modal para Agregar Descripción */}
         <ModalDescripcion
           open={openModalDesc}
           handleClose={() => setOpenModalDesc(false)}
+          resetSelect={resetSelect}
           nombrePuerto={selectedPuerto?.nombre}
           paisPuerto={selectedPuerto?.pais}
           diaIndex={selectedDiaIndex}
@@ -209,17 +234,17 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
         {/* Botón para cerrar el modal */}
         <Button
           variant="contained"
-          onClick={handleClose}
+          onClick={handleModalClose}
           sx={{
             mt: 3,
             backgroundColor: "#16537e",
             color: "white",
             "&:hover": { backgroundColor: "#133d5a" },
-            width: "200px", // Reduce el ancho del botón
-            height: "40px", // Reduce la altura para hacerlo más compacto
-            fontSize: "0.9rem", // Hace el texto más pequeño para mejor proporción
-            mx: "auto", // Centra el botón en la pantalla
-            display: "block", // Asegura que el botón no se expanda innecesariamente
+            width: "200px",
+            height: "40px",
+            fontSize: "0.9rem",
+            mx: "auto",
+            display: "block",
           }}
           fullWidth
         >
@@ -232,9 +257,9 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
 
 // Validación de las props con PropTypes
 ModalGestionPuertos.propTypes = {
-  open: PropTypes.bool.isRequired, // 'open' debe ser un booleano obligatorio
-  handleClose: PropTypes.func.isRequired,// 'handleClose' debe ser una función obligatoria
+  open: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
   cantDias: PropTypes.number.isRequired,
-  control: PropTypes.object.isRequired, 
+  control: PropTypes.object.isRequired,
+  fechaSeleccionada: PropTypes.object,
 };
-
