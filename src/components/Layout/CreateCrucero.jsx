@@ -14,6 +14,12 @@ import CrucerosService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import { SelectBarco } from "./SelectBarco";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
+import { ModalVerPuertos } from './ModalVerPuertos';
+//IMPORTS PARA DATEPICKER
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 export function CreateCrucero() {
@@ -59,6 +65,7 @@ export function CreateCrucero() {
   //Función para manejar el form
   const {
     control,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -75,10 +82,13 @@ export function CreateCrucero() {
   // Estado para almacenar el valor de cantidad de días
   const [cantDias, setCantDias] = useState(7); // Valor mínimo predeterminado
 
-  // Estado para controlar la apertura del modal
-  const [openModal, setOpenModal] = useState(false);
+  // Estado para controlar la apertura del modal de Gestion Cruceros
+  const [openModalGestPuertos, setOpenModalGestPuertos] = useState(false);
 
-  //Hooks gestión de imagen
+   // Estado para controlar la apertura del modal de Gestion Cruceros
+  const [openModalVerPuertos, setOpenModalVerPuertos] = useState(false);
+
+  //Hooks y funcion para gestionar imagen
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
   function handleChangeImage(e) {
@@ -94,11 +104,14 @@ export function CreateCrucero() {
   const [error, setError] = useState("");
   const onError = (errors, e) => console.log(errors, e);
 
-  if (error) return <p>Error: {error.message}</p>;
+  //Hooks de fecha del dia de hoy
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(dayjs().add(1,"month")); //dia de hoy por defecto
 
-  //Hooks Lista de barcos
+  //Hooks de datos de barco de barcos
   const [dataBarco, setDataBarco] = useState({});
   const [loadedBarco, setLoadedBarco] = useState(false);
+
+  if (error) return <p>Error: {error.message}</p>;
 
   useEffect(() => {
     BarcoService.getBarcos()
@@ -153,7 +166,7 @@ export function CreateCrucero() {
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
-        <Grid container spacing={5}>
+        <Grid container spacing={3}>
           <Grid size={12} sm={12}>
             <Typography variant="h5" gutterBottom>
               <b>Crear Crucero</b>
@@ -179,6 +192,7 @@ export function CreateCrucero() {
               />
             </FormControl>
             <br></br>
+
             {/* Foto */}
             <Grid size={6} sm={6}>
               <Typography variant="subtitle1">
@@ -188,6 +202,30 @@ export function CreateCrucero() {
                 <input type="file" onChange={handleChangeImage} />
               </FormControl>
               {fileURL && <img src={fileURL} alt="preview" width={150} />}
+            </Grid>
+            <br></br>
+
+            {/* Fecha */}    
+            <Grid size={6} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Seleccione una fecha"
+                  value={fechaSeleccionada} //Valor por defecto: hoy
+                  onChange={(newValue) => setFechaSeleccionada(newValue)}
+                  slotProps={{
+                    textField: { variant: "outlined", fullWidth: true },
+                  }}
+                  format="DD/MM/YYYY"
+                  // Para configurar la fecha al día de hoy -> minDate={dayjs()}
+                  // Para configurar la fecha dentro de un mes
+                  minDate={dayjs().add(1,"month")}
+
+                  //Para forzar la selección en el UI al valor mínimo por defecto
+                  onOpen={() => {
+                    if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                  }}
+                />
+              </LocalizationProvider>
             </Grid>
             <br></br>
 
@@ -225,6 +263,7 @@ export function CreateCrucero() {
               </FormControl>
             </Grid>
             <br></br>
+
             {/* Barco */}
             <Grid size={12} sm={4}>
               <Typography variant="subtitle1">
@@ -245,7 +284,7 @@ export function CreateCrucero() {
             <br></br>
             <br></br>
 
-            {/* Botón */}
+            {/* Botón Guardar*/}
             <Grid size={4} sm={4}>
               <Button
                 type="submit"
@@ -278,7 +317,7 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#50C878" }}
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => setOpenModalGestPuertos(true)}
                   >
                     Gestionar puertos
                   </Button>
@@ -286,22 +325,33 @@ export function CreateCrucero() {
 
                 {/* Modal importado para Geston de puertos */}
                 <ModalGestionPuertos
-                  open={openModal}
-                  handleClose={() => setOpenModal(false)}
+                  open={openModalGestPuertos}
+                  handleClose={() => setOpenModalGestPuertos(false)}
+                  //pasar la fecha seleccionada
                   //pasar la cantidad de dias
                   cantDias={cantDias}
-                  control={control}
+                  control={{ ...control, setValue }}
+                  fechaSeleccionada={fechaSeleccionada ? fechaSeleccionada.format("YYYY-MM-DD") : null} 
+                  
                 />
 
                 <Grid item>
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#B5485E" }}
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => setOpenModalVerPuertos(true)}
                   >
                     Mostrar puertos
                   </Button>
                 </Grid>
+
+                {/* Modal importado para Geston de puertos */}
+                <ModalVerPuertos
+                  open={openModalVerPuertos}
+                  handleClose={() => setOpenModalVerPuertos(false)}
+                  cantDias={cantDias}
+                  control={{ ...control, setValue }}
+                />
               </Grid>
             </Grid>
 
@@ -323,7 +373,7 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#50C878" }}
-                    onClick={() => setOpenModal(true)}
+                    // onClick={() => setOpenModal(true)}
                   >
                     Gestionar fechas
                   </Button>
@@ -333,7 +383,7 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#B5485E" }}
-                    onClick={() => setOpenModal(true)}
+                    // onClick={() => setOpenModal(true)}
                   >
                     Mostrar fechas
                   </Button>
