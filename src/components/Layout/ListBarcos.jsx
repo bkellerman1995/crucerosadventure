@@ -182,6 +182,15 @@ function TableHabitacionesToolbar(props) {
 >
   Crear
 </Button>
+<Button
+    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+    component={Link}
+    to="/admin/barco/crear"
+    variant="contained"
+    endIcon={<AddIcon />}
+>
+  Editar
+</Button>
     </Toolbar>
     
   );
