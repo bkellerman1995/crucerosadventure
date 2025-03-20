@@ -1,5 +1,5 @@
 import axios from 'axios'; 
-const BASE_URL = import.meta.env.VITE_BASE_URL + 'image';
+const BASE_URL = import.meta.env.VITE_BASE_URL + 'foto';
 class ImageService {
   createImage(formData) {    
     return axios.post(BASE_URL, formData, {
