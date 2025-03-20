@@ -118,18 +118,13 @@ export function CreateBarco() {
           </FormControl>
         </Grid>
         <Grid item>
-          <FormControl fullWidth>
+        <FormControl fullWidth disabled>
             <Controller
               name="estado"
               control={control}
               render={({ field }) => (
-                <Select
-                  {...field}
-                  label="Estado"
-                  error={Boolean(errors.estado)}
-                >
+                <Select {...field} label="Estado" error={Boolean(errors.estado)} value={1}>
                   <MenuItem value={1}>Activo</MenuItem>
-                  <MenuItem value={0}>Inactivo</MenuItem>
                 </Select>
               )}
             />
