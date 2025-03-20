@@ -25,10 +25,14 @@ class PuertoModel
 
             if (!empty($vResultado) && is_array($vResultado)) {
                 foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
-                    
+
+                    //Codificar la foto en formato base64
+                    if (!empty($row->foto)) {
+                        $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
+                    }
                     //Obtener el nombre del pais
                     if (!empty($row->idPais)) {
-                        $pais = $paisModel -> get($row->idPais);
+                        $pais = $paisModel->get($row->idPais);
                         $row->pais = $pais;
                     }
                 }

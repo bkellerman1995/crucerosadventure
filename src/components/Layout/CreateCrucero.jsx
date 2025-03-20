@@ -13,8 +13,8 @@ import BarcoService from "../../services/BarcoService";
 import CrucerosService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import { SelectBarco } from "./SelectBarco";
-import { ModalGestionPuertos } from './ModalGestionPuertos';
-
+import { ModalGestionPuertos } from "./ModalGestionPuertos";
+import { ModalVerPuertos } from "./ModalVerPuertos";
 
 export function CreateCrucero() {
   const navigate = useNavigate();
@@ -75,8 +75,11 @@ export function CreateCrucero() {
   // Estado para almacenar el valor de cantidad de días
   const [cantDias, setCantDias] = useState(7); // Valor mínimo predeterminado
 
-  // Estado para controlar la apertura del modal
-  const [openModal, setOpenModal] = useState(false);
+  // Estado para controlar la apertura del modal (gestion Puertos)
+  const [openModalGestPuerto, setOpenModalGestPuerto] = useState(false);
+
+  // Estado para controlar la apertura del modal (ver Puertos)
+  const [openModalVerPuerto, setOpenModalVerPuerto] = useState(false);
 
   //Hooks gestión de imagen
   const [file, setFile] = useState(null);
@@ -206,14 +209,9 @@ export function CreateCrucero() {
                       label="Seleccione un valor"
                       type="number"
                       variant="outlined"
-                      inputProps={{
-                        min: 7,
-                        max: 14,
-                        step: 1,
-                      }}
                       onChange={(e) => {
                         let value = parseInt(e.target.value, 10);
-                        if (isNaN(value) || value < 7) value = 7;
+                        if (isNaN(value) || value < 1) value = 1;
                         else if (value > 14) value = 14;
                         setCantDias(value); // ACTUALIZA el estado cantDias con el valor seleccionado
                         field.onChange(value); // ACTUALIZA el valor en react-hook-form
@@ -225,7 +223,8 @@ export function CreateCrucero() {
               </FormControl>
             </Grid>
             <br></br>
-            {/* Barco */}
+
+            {/* Select barco */}
             <Grid size={12} sm={4}>
               <Typography variant="subtitle1">
                 <b>Barco</b>
@@ -278,16 +277,16 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#50C878" }}
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => setOpenModalGestPuerto(true)}
                   >
                     Gestionar puertos
                   </Button>
                 </Grid>
 
-                {/* Modal importado para Geston de puertos */}
+                {/* Modal importado para Gestion de puertos */}
                 <ModalGestionPuertos
-                  open={openModal}
-                  handleClose={() => setOpenModal(false)}
+                  open={openModalGestPuerto}
+                  handleClose={() => setOpenModalGestPuerto(false)}
                   //pasar la cantidad de dias
                   cantDias={cantDias}
                   control={control}
@@ -297,11 +296,17 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#B5485E" }}
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => setOpenModalVerPuerto(true)}
                   >
                     Mostrar puertos
                   </Button>
                 </Grid>
+
+                {/* Modal importado para Ver los puertos */}
+                <ModalVerPuertos
+                  open={openModalVerPuerto}
+                  handleClose={() => setOpenModalVerPuerto(false)}
+                />
               </Grid>
             </Grid>
 

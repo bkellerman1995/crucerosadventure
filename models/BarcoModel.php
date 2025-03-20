@@ -26,7 +26,7 @@ class BarcoModel
             if (!empty($vResultado) && is_array($vResultado)) {
                 foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
                     
-                    //Codificar lfoto en formato base64
+                    //Codificar la foto en formato base64
                     if (!empty($row->foto)) {
                         $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
                     }

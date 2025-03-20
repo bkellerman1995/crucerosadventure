@@ -37,6 +37,7 @@
     "react-numeric-input": "^2.2.3",
     "react-select": "^5.10.1",
     "styled-components": "^6.1.15",
+    "swiper": "^11.2.5",
     "yup": "^1.6.1"
   },
   "devDependencies": {
