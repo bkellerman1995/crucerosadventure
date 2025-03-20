@@ -147,7 +147,6 @@ export function CreateBarco() {
           </Grid>
         </Grid>
       </form>
-
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', p: 4, boxShadow: 24, borderRadius: 2 }}>
           {barcoDetails && (
