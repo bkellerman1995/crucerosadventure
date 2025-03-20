@@ -46,7 +46,6 @@ export function SelectPuerto({ field, data, onChange }) {
       placeholder="Seleccione un puerto"
       value={selectedOption} // Mantiene la opción seleccionada
       onChange={(selectedOption) => {
-        console.log("Puerto seleccionado:", selectedOption);
         field.onChange(selectedOption.value); // Guarda solo el ID en react-hook-form
         if (onChange) onChange(selectedOption.obj); // Guarda el objeto completo en selectedPuerto
       }}

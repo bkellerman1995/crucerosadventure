@@ -183,6 +183,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                       setSelectedDiaIndex(index + 1);
                       setOpenModalDesc(true);
                       setSelectedPuerto({
+                        idPuerto: selectedPuerto?.idPuerto,
                         nombre: selectedPuerto[index]?.nombre,
                         pais: selectedPuerto[index]?.pais?.descripcion,
                       });
