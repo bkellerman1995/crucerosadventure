@@ -1,5 +1,5 @@
 <?php
-class ImageBarcoModel
+class ImageModel
 {
     private $upload_path = 'uploads/';
     private $valid_extensions = array('jpeg', 'jpg', 'png', 'gif');

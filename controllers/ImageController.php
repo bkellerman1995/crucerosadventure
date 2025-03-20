@@ -1,7 +1,7 @@
 <?php
 //class Genre
 class image{
-  
+    //POST Crear
     public function create()
     {
         try {
@@ -14,7 +14,7 @@ class image{
             //Obtener json enviado
             $inputFILE = $request->getBody();
             //Instancia del modelo
-            $barco = new ImageBarcoModel();
+            $barco = new ImageModel();
             //Acción del modelo a ejecutar
             $result = $barco->uploadFile($inputFILE);
            
