@@ -23,6 +23,9 @@ import HabitacionService from "../../services/HabitacionService";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
+import { Visibility } from "@mui/icons-material";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add"
 
 ListHabitaciones.propTypes = {
   data: PropTypes.array
@@ -158,8 +161,7 @@ TableHabitacionesHead.propTypes = {
 
 //Barra de opciones
 function TableHabitacionesToolbar(props) {
-  const { numSelected } = props;
-  const { idSelected } = props;
+  const { numSelected, idSelected } = props;
   const navigate = useNavigate();
   const update = () => {
     return navigate(`/habitacion/update/${idSelected}`);
@@ -197,9 +199,28 @@ function TableHabitacionesToolbar(props) {
           Lista de habitaciones
         </Typography>
       )}
+      <Button
+    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+    component={Link}
+    to="/admin/habitacion/crear"
+    variant="contained"
+    endIcon={<AddIcon />}
+>
+  Crear
+</Button>
+<Button
+    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+    component={Link}
+    to="/admin/habitacion/crear"
+    variant="contained"
+    endIcon={<AddIcon />}
+>
+  Editar
+</Button>
     </Toolbar>
   );
 }
+
 //Propieades Barra de opciones
 TableHabitacionesToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
@@ -209,9 +230,8 @@ TableHabitacionesToolbar.propTypes = {
 //Componente tabla con hooks
 export function ListHabitaciones() {
   //Datos a cargar en la tabla
-  const [data, setData] = useState(null);
-
-  const [error, setError] = useState("");
+  const [data, setData] = useState([]);
+  const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
 
   //Obtener lista del API (useEffect)
@@ -241,13 +261,8 @@ export function ListHabitaciones() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
-    let newOrder = "asc";
-
-    if (orderBy === property) {
-      newOrder = order === "asc" ? "desc" : "asc";
-    }
-
-    setOrder(newOrder);
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
@@ -281,8 +296,7 @@ export function ListHabitaciones() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Evita un salto de diseño al llegar a la última página con datos vacíos.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -353,7 +367,9 @@ export function ListHabitaciones() {
                               to={`/habitacion/${row.idHabitacion}`}
                               aria-label="Detalle"
                               sx={{ ml: "auto", backgroundColor: "#00304E" }}
-                            ></IconButton>
+                            >
+                              <Visibility sx={{ color: "white" }} />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       );
