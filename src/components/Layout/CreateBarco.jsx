@@ -37,11 +37,11 @@ export function CreateBarco() {
 
   } = useForm({
     defaultValues: {
-      'nombre': '',
-      'descripcion': '',
-      'capacidadHuesped': '',
+      nombre: '',
+      descripcion: '',
+      capacidadHuesped: '',
       foto: '',
-      'estado': 1,
+      estado: 1,
     },
     resolver: yupResolver(barcoSchema),
   });
@@ -49,6 +49,7 @@ export function CreateBarco() {
   //Gestión de errores
   const [error, setError] = useState('');
   // Si ocurre error al realizar el submit
+  const onError = (errors, e) => console.log(errors, e);
  
   //Accion de sumit
   const onSubmit = (DataForm) => {
@@ -86,7 +87,7 @@ export function CreateBarco() {
              }
            })
            toast.success(
-             `barco creada #${response.data.id} - ${response.data.title}`,
+             `barco creada #${response.data.id} - ${response.data.nombre}`,
              {
                duration: 4000,
                position:'top-center'
@@ -125,7 +126,7 @@ export function CreateBarco() {
     if (error) return <p>Error: {error.message}</p>;
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate encType="multipart/form-data">
+      <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
         <Grid container spacing={2} direction="column" sx={{ maxWidth: '50%', margin: 'auto' }}>
           <Grid item>
             <Typography variant="h5" gutterBottom>
