@@ -26,7 +26,7 @@ export function CreateBarco() {
     yup.string().required('La descripción es requerida'),
     capacidadHuesped:
     yup.number().typeError('Debe ser un número').required('La capacidad es requerida').positive('Debe ser un número positivo'),
-    foto: yup.mixed().test("fileRequired", "La foto es requerida", (value) => value instanceof File),
+    //foto: yup.mixed().test("fileRequired", "La foto es requerida", (value) => value instanceof File),
     estado: yup.number().required('El estado es requerido'),
   });
 
@@ -68,7 +68,7 @@ export function CreateBarco() {
            //Gestionar imagen
            formData.append ("file",file)
            formData.append("barco_id",response.data.id)
-           ImageService.createImage(formData)
+           //ImageService.createImage(formData)
            .then((response)=>{
              setError(response.error)
              if(response.data !=null){
