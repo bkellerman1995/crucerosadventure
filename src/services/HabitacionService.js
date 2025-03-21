@@ -21,12 +21,6 @@ class HabitacionService {
     return axios.get(BASE_URL + "/" + HabitacionesId);
   }
 
-  //Obtener la lista de habitaciones por barco
-  getHabitacionesPorBarco(idbarco) {
-    console.log("Obteniendo habitaciones para barco:", idbarco);
-    return axios.get(`http://localhost:81/crucerosadventure/barco/${idbarco}`);
-  }
-
   createHabitacion(Habitacion) {
     return axios.post(BASE_URL, JSON.stringify(Habitacion));
   }

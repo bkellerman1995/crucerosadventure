@@ -15,7 +15,6 @@ import HabitacionService from "../../services/HabitacionService";
 import CatHabitacionService from "../../services/CatHabitacionService";
 import toast from "react-hot-toast";
 import { SelectCatHabitacion } from "./SelectCatHabitacion";
-import { SelectBarco } from "./SelectBarco";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 

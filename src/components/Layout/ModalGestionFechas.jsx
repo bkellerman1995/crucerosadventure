@@ -2,29 +2,44 @@ import React, { useEffect, useState } from "react";
 import { Modal, Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
+import TextField from "@mui/material/TextField";
+import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
-import PuertoService from "../../services/PuertoService";
-import { SelectPuerto } from "./SelectPuerto";
-import { Controller } from "react-hook-form";
-import { ModalDescripcion } from "./ModalDescripcion";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import HabitacionService from "../../services/HabitacionService";
+import BarcoService from "../../services/BarcoService";
 
 
 import PropTypes from "prop-types";
 
-export function ModalGestionFechas({ open, handleClose, cantDias, control, barco }) {
-  const [idItinerario, setIdItinerario] = useState(null);
-  const [habitaciones, setHabitaciones] = useState([]);
+export function ModalGestionFechas({ open, handleClose,barco }) {
+  const [barcoData, setBarcoData] = useState([]);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [error, setError] = useState("");
+  const onError = (errors, e) => console.log(errors, e);
 
   //Hooks de fecha del dia de hoy
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
     dayjs().add(1, "month")
   );
+
+  //Función para manejar el form
+  const {
+    // control,
+    // setValue,
+    // handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      nombre: "",
+      descripcion: "",
+      capacidadHuesped: "",
+      estado: "",
+      foto: "",
+    },
+    // resolver: yupResolver(cruceroSchema),
+  });
 
   useEffect(() => {
     if (open && barco) {
@@ -32,14 +47,18 @@ export function ModalGestionFechas({ open, handleClose, cantDias, control, barco
       const idbarco = barco.value;
       console.log("Id de barco:", barco);
 
-      HabitacionService.getHabitacionesPorBarco(idbarco)
+      BarcoService.getBarcobyId(idbarco)
         .then((response) => {
           console.log("Habitaciones cargadas:", response.data);
-          setHabitaciones(response.data);
+          setBarcoData(response.data);
         })
-        .catch((error) =>
-          console.error("Error al cargar habitaciones:", error)
-        );
+        .catch((error) => {
+          if (error instanceof SyntaxError) {
+            console.log(error);
+            setError(error);
+            throw new Error("Respuesta no válida del servidor");
+          }
+        });
     }
   }, [open, barco]);
 
@@ -129,10 +148,26 @@ export function ModalGestionFechas({ open, handleClose, cantDias, control, barco
                 sm={6}
                 sx={{ backgroundColor: "#ADD8E6", padding: 2 }}
               >
-                {habitaciones.length > 0 ? (
-                  habitaciones.map((habitacion) => (
+                {barcoData.habitaciones?.length > 0 ? (
+                  barcoData.habitaciones.map((habitacion) => (
                     <Typography key={habitacion.idHabitacion}>
-                      <b>{habitacion.nombre}</b>: ${habitacion.precio} USD
+                      <React.Fragment>
+                        <b>{habitacion.nombre}</b>:
+                        <br />
+                        <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+                        <TextField
+                                // {...field}
+                                id="precio"
+                                label="$"
+                                error={Boolean(errors.precio)}
+                                sx = {{backgroundColor:"white", width:"100%",ml:-1 }}
+                                // helperText={
+                                //   errors.nombre ? errors.nombre.message : " "
+                                // }
+                              />
+                          
+                        </FormControl>
+                      </React.Fragment>
                     </Typography>
                   ))
                 ) : (
@@ -213,6 +248,5 @@ ModalGestionFechas.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   cantDias: PropTypes.number.isRequired,
-  control: PropTypes.object.isRequired,
   barco: PropTypes.object, 
 };
