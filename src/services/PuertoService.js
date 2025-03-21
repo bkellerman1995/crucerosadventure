@@ -6,16 +6,16 @@ console.log ('BASE_URL: ', BASE_URL);
 
 
 class PuertoService {
-  //Definición para llamar al API y obtener el listado de los barco}
+  //Definición para llamar al API y obtener el listado de los cruceros
 
   //Lista de todos los puertos.
-  //localhost:81/crucerosadventure/habitacion
+  //localhost:81/crucerosadventure/crucero
   getPuertos() {
     return axios.get(BASE_URL);
   }
 
-  //Obtener la informacion de un barco por su id
-  //localhost:81/crucerosadventure/barco/{id}
+  //Obtener la informacion de un crucero por su id
+  //localhost:81/crucerosadventure/crucero/{id}
   getPuertoById(puertoId) {
     console.log('BASE_URL BARCO: ', BASE_URL+ '/'+ puertoId);
     console.log('barco ID: ', puertoId);

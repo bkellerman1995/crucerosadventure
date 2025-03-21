@@ -29,6 +29,7 @@ require_once "models/PaisModel.php";
 require_once "models/ReservaModel.php";
 require_once "models/CruceroFechaModel.php";
 //require_once "models/ImageBarcoModel.php";
+require_once "models/ItinerarioModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/BarcoController.php";
@@ -39,6 +40,8 @@ require_once "controllers/CruceroController.php";
 require_once "controllers/CategoriaHabitacionController.php";
 require_once "controllers/ReservaController.php";
 //require_once "controllers/ImageBarcoController.php";
+require_once "controllers/ItinerarioController.php";
+
 
 //Enrutador
 require_once "routes/RoutesController.php";

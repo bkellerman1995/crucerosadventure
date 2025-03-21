@@ -79,4 +79,40 @@ class ItinerarioModel
         }
     }
 
+    /**
+     * Crear itinerario
+     * @param $objeto itinerario a insertar
+     * @return $this->get($idItinerario) - Objeto itinerario
+     */
+    //
+    public function create($objeto)
+    {
+        try {
+            //Consulta sql
+            //Identificador autoincrementable
+            $sql = "Insert into itinerario (estado) Values ('$objeto->estado')";
+
+            //Ejecutar la consulta
+            //Obtener ultimo insert
+            $idItinerario=$this->enlace->executeSQL_DML_last($sql);
+
+            //Retornar itinerario
+            return $this->get($idItinerario);
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $vSQL = "DELETE FROM itinerario WHERE idItinerario = $id;";
+            $this->enlace->executeSQL_DML($vSQL);
+            return ["success" => true, "message" => "Itinerario eliminado correctamente"];
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
 }

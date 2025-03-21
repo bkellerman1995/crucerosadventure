@@ -106,7 +106,7 @@ export function ModalVerPuertos({ open, handleClose}) {
                     }}
                   />
                   <Typography variant="h6" sx={{ mt: 2 }}>
-                    {puerto.nombre} - {puerto.pais.descripcion}
+                    <b>{puerto.nombre} - {puerto.pais.descripcion}</b>
                   </Typography>
                 </Box>
               </SwiperSlide>

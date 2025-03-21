@@ -15,11 +15,11 @@ import toast from "react-hot-toast";
 import { SelectBarco } from "./SelectBarco";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
 import { ModalVerPuertos } from './ModalVerPuertos';
-//IMPORTS PARA DATEPICKER
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import ItinerarioService from "../../services/ItinerarioService";
 
 
 export function CreateCrucero() {
@@ -205,7 +205,7 @@ export function CreateCrucero() {
             </Grid>
             <br></br>
 
-            {/* Fecha */}    
+            {/* Fecha */}
             <Grid size={6} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
@@ -218,8 +218,7 @@ export function CreateCrucero() {
                   format="DD/MM/YYYY"
                   // Para configurar la fecha al día de hoy -> minDate={dayjs()}
                   // Para configurar la fecha dentro de un mes
-                  minDate={dayjs().add(1,"month")}
-
+                  minDate={dayjs().add(1, "month")}
                   //Para forzar la selección en el UI al valor mínimo por defecto
                   onOpen={() => {
                     if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
@@ -317,7 +316,29 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#50C878" }}
-                    onClick={() => setOpenModalGestPuertos(true)}
+                    onClick={async () => {
+                      try {
+                        // Llamada al servicio para crear el itinerario
+                        const nuevoItinerario = {
+                          estado: 1,
+                        };
+
+                        const response =
+                          await ItinerarioService.createItinerario(
+                            nuevoItinerario
+                          );
+
+                        console.log("Itinerario creado:", response.data);
+
+                        // Si quieres abrir el modal después de crear el itinerario:
+                        setOpenModalGestPuertos(true);
+                      } catch (error) {
+                        console.error(
+                          "Error al crear el itinerario:",
+                          error
+                        );
+                      }
+                    }}
                   >
                     Gestionar puertos
                   </Button>
@@ -331,8 +352,11 @@ export function CreateCrucero() {
                   //pasar la cantidad de dias
                   cantDias={cantDias}
                   control={{ ...control, setValue }}
-                  fechaSeleccionada={fechaSeleccionada ? fechaSeleccionada.format("YYYY-MM-DD") : null} 
-                  
+                  fechaSeleccionada={
+                    fechaSeleccionada
+                      ? fechaSeleccionada.format("YYYY-MM-DD")
+                      : null
+                  }
                 />
 
                 <Grid item>

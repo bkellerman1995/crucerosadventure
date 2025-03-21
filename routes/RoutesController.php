@@ -3,6 +3,17 @@ class RoutesController
 {
     public function index()
     {
+        // Habilitar CORS para todas las solicitudes
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+        // Manejar solicitud OPTIONS (preflight)
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            http_response_code(200);
+            exit();
+        }
+
         //include "routes/routes.php";
         if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI'])) {
             //Gestion de imagenes
@@ -106,23 +117,29 @@ class RoutesController
                                     }
                                     break;
 
-                                case 'DELETE':
-                                    if ($param1) {
-                                        $response->delete($param1);
-                                    } elseif ($action) {
-                                        if (method_exists($controller, $action)) {
-                                            $response->$action();
-                                        } else {
-                                            $json = array(
-                                                'status' => 404,
-                                                'result' => 'Acción no encontrada'
-                                            );
-                                            echo json_encode($json, http_response_code($json["status"]));
+                                    case 'DELETE':
+                                        // Ajustar la forma en que se obtiene el ID
+                                        if (!$param1 && is_numeric($action)) {
+                                            $param1 = $action; // Si la acción es un número, es el ID
+                                            $action = null; // Limpiar acción para evitar errores
                                         }
-                                    } else {
-                                        $response->delete();
-                                    }
-                                    break;
+                
+                                        if ($param1) {
+                                            if (method_exists($response, "delete")) {
+                                                $response->delete($param1);
+                                            } else {
+                                                echo json_encode([
+                                                    'status' => 404,
+                                                    'result' => "Método 'delete' no encontrado en el controlador"
+                                                ], http_response_code(404));
+                                            }
+                                        } else {
+                                            echo json_encode([
+                                                "status" => 400,
+                                                "result" => "ID no proporcionado"
+                                            ], http_response_code(400));
+                                        }
+                                        break;
 
                                 default:
                                     $json = array(
