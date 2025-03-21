@@ -1,7 +1,7 @@
 <?php
 class ImageModel
 {
-    private $upload_path = 'uploads/';
+//private $upload_path = 'uploads/';
     private $valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
 
     public $enlace;
@@ -27,14 +27,32 @@ class ImageModel
                 // Crear un nombre único para el archivo
                 $fileExt = explode('.', $fileName);
                 $fileActExt = strtolower(end($fileExt));
-                $fileName = "barco-" . uniqid() . "." . $fileActExt;
+               // $fileName = "barco-" . uniqid() . "." . $fileActExt;
                 
                 // Validar el tipo de archivo
                 if (in_array($fileActExt, $this->valid_extensions)) {
                     // Validar que no sobrepase el tamaño
                     if ($fileSize < 2000000 && $fileError == 0) {
+
+                        $imagenBlob = file_get_contents($tempPath);
+
+                        // Guardar en la base de datos
+                        $sql = "UPDATE barco SET foto = ? WHERE idbarco = ?";
+                        $stmt = $this->enlace->prepare($sql);
+                        $stmt->bind_param("bi", $imagenBlob, $barco_id);
+
+                        if ($stmt->execute()) {
+                            return 'Imagen guardada en la base de datos';
+                        } else {
+                            return 'Error al guardar la imagen';
+                        }
+
+                        $stmt->close();
+
+                    
+            
                         // Moverlo a la carpeta del servidor del API
-                        if (move_uploaded_file($tempPath, $this->upload_path . $fileName)) {
+                     /*   if (move_uploaded_file($tempPath, $this->upload_path . $fileName)) {
                             // Insertar la imagen en la BD
                             $sql = "INSERT INTO barco (idbarco, foto) VALUES ($barco_id, '$fileName')";
                             $vResultado = $this->enlace->executeSQL_DML($sql);
@@ -42,7 +60,7 @@ class ImageModel
                                 return 'Imagen guardada exitosamente';
                             }
                             return false;
-                        }
+                        }*/
                     }
                 }
             }
