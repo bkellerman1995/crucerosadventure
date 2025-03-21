@@ -33,6 +33,19 @@ class barco
             handleException($e);
         }
     }
+
+    // GET habitaciones por barco
+    public function getByBarco($idBarco)
+    {
+        try {
+            $response = new Response();
+            $habitacionModel = new HabitacionModel();
+            $result = $habitacionModel->getHabitacionesCrucero($idBarco);
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     public function create()
     {
         try {

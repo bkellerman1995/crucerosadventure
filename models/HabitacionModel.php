@@ -104,7 +104,7 @@ class HabitacionModel
             //Obtener el barco relacionado al crucero
             $barcoModel = new BarcoModel();
             $vSql = "SELECT * FROM habitacion
-                    where idBarco='$id' order by idHabitacion desc;";
+                    where idBarco='$id' order by idHabitacion asc;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);

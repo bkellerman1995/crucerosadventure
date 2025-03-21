@@ -1,0 +1,218 @@
+import React, { useEffect, useState } from "react";
+import { Modal, Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import FormControl from "@mui/material/FormControl";
+import dayjs from "dayjs";
+import PuertoService from "../../services/PuertoService";
+import { SelectPuerto } from "./SelectPuerto";
+import { Controller } from "react-hook-form";
+import { ModalDescripcion } from "./ModalDescripcion";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import HabitacionService from "../../services/HabitacionService";
+
+
+import PropTypes from "prop-types";
+
+export function ModalGestionFechas({ open, handleClose, cantDias, control, barco }) {
+  const [idItinerario, setIdItinerario] = useState(null);
+  const [habitaciones, setHabitaciones] = useState([]);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [error, setError] = useState("");
+
+  //Hooks de fecha del dia de hoy
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(
+    dayjs().add(1, "month")
+  );
+
+  useEffect(() => {
+    if (open && barco) {
+      console.log("Se recibió barco en ModalGestionFechas:", barco);
+      const idbarco = barco.value;
+      console.log("Id de barco:", barco);
+
+      HabitacionService.getHabitacionesPorBarco(idbarco)
+        .then((response) => {
+          console.log("Habitaciones cargadas:", response.data);
+          setHabitaciones(response.data);
+        })
+        .catch((error) =>
+          console.error("Error al cargar habitaciones:", error)
+        );
+    }
+  }, [open, barco]);
+
+  const handleModalClose = () => {
+    setOpenConfirmDialog(true);
+  };
+
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <Modal open={open} onClose={handleClose}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "70vw",
+          maxWidth: "900px",
+          maxHeight: "80vh",
+          overflowY: "auto",
+          bgcolor: "background.paper",
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <Button
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            top: "5px",
+            right: "5px",
+            minWidth: "30px",
+            height: "30px",
+            backgroundColor: "#16537e",
+            color: "white",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            "&:hover": { backgroundColor: "darkred" },
+            zIndex: 1000,
+          }}
+        >
+          ✕
+        </Button>
+        <Typography variant="h4" component="h2">
+          <b>Gestionar Fechas</b>
+        </Typography>
+        <br />
+
+        <Grid container spacing={2}>
+          {/* Fecha límite de pago*/}
+          <Grid size={3} sm={6}>
+            <Typography variant="subtitle1">
+              <b>Fecha de inicio</b>
+            </Typography>
+            <br></br>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Seleccione una fecha"
+                value={fechaSeleccionada} //Valor por defecto: hoy
+                onChange={(newValue) => setFechaSeleccionada(newValue)}
+                slotProps={{
+                  textField: { variant: "outlined", fullWidth: true },
+                }}
+                format="DD/MM/YYYY"
+                // Para configurar la fecha al día de hoy -> minDate={dayjs()}
+                // Para configurar la fecha dentro de un mes
+                minDate={dayjs().add(1, "month")}
+                //Para forzar la selección en el UI al valor mínimo por defecto
+                onOpen={() => {
+                  if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                }}
+              />
+            </LocalizationProvider>
+          </Grid>
+
+          <Grid container spacing={2}>
+            <Grid size={20} sm={6}>
+              <Typography variant="subtitle1">
+                <b>Precios de habitaciones</b>
+              </Typography>
+              <br />
+
+              <Grid
+                size={20}
+                sm={6}
+                sx={{ backgroundColor: "#ADD8E6", padding: 2 }}
+              >
+                {habitaciones.length > 0 ? (
+                  habitaciones.map((habitacion) => (
+                    <Typography key={habitacion.idHabitacion}>
+                      <b>{habitacion.nombre}</b>: ${habitacion.precio} USD
+                    </Typography>
+                  ))
+                ) : (
+                  <Typography color="error">
+                    <b>No hay habitaciones disponibles.</b>
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        <br></br>
+
+        <Grid container spacing={2}>
+          {/* Fecha */}
+          <Grid size={3} sm={6}>
+            <Typography variant="subtitle1">
+              <b>Fecha límite de pago</b>
+            </Typography>
+            <br></br>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Seleccione una fecha"
+                value={fechaSeleccionada} //Valor por defecto: hoy
+                onChange={(newValue) => setFechaSeleccionada(newValue)}
+                slotProps={{
+                  textField: { variant: "outlined", fullWidth: true },
+                }}
+                format="DD/MM/YYYY"
+                minDate={dayjs().add(1, "month")}
+                onOpen={() => {
+                  if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                }}
+              />
+            </LocalizationProvider>
+          </Grid>
+        </Grid>
+        <br></br>
+
+        <Button
+          variant="contained"
+          onClick={handleClose}
+          sx={{
+            mt: 3,
+            backgroundColor: "#16537e",
+            color: "white",
+            "&:hover": { backgroundColor: "#133d5a" },
+            width: "200px",
+            height: "40px",
+            fontSize: "0.9rem",
+            mx: "auto",
+            display: "block",
+          }}
+          fullWidth
+        >
+          Confirmar
+        </Button>
+
+        <Dialog
+          open={openConfirmDialog}
+          onClose={() => setOpenConfirmDialog(false)}
+        >
+          <DialogTitle>¿Desea salir sin guardar?</DialogTitle>
+          <DialogContent>Esto eliminará el itinerario creado.</DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenConfirmDialog(false)}>
+              Cancelar
+            </Button>
+            <Button color="error">Sí, eliminar</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </Modal>
+  );
+}
+
+ModalGestionFechas.propTypes = {
+  open: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  cantDias: PropTypes.number.isRequired,
+  control: PropTypes.object.isRequired,
+  barco: PropTypes.object, 
+};

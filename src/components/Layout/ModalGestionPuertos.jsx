@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Modal, Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
-import dayjs from "dayjs";
 import PuertoService from "../../services/PuertoService";
 import { SelectPuerto } from "./SelectPuerto";
 import { Controller } from "react-hook-form";
@@ -11,7 +10,7 @@ import ItinerarioService from "../../services/ItinerarioService";
 
 import PropTypes from "prop-types";
 
-export function ModalGestionPuertos({ open, handleClose, cantDias, control, fechaSeleccionada }) {
+export function ModalGestionPuertos({ open, handleClose, cantDias, control}) {
   const [dataPuerto, setDataPuerto] = useState({});
   const [loadedPuerto, setLoadedPuerto] = useState(false);
   const [idItinerario, setIdItinerario] = useState(null);
@@ -93,14 +92,13 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control, fech
 
         <Grid container spacing={2}>
           {[...Array(cantDias)].map((_, index) => {
-            const fechaActual = fechaSeleccionada ? dayjs(fechaSeleccionada).add(index, "day").format("DD/MM/YYYY") : "Sin fecha";
 
             return (
               <Grid item xs={12} key={index}>
                 <Grid container alignItems="center" sx={{ display: "flex", justifyContent: "space-between", flexWrap: "nowrap" }}>
                   <Grid item sx={{ display: "flex", alignItems: "center", minWidth: "120px", marginRight: "10px" }}>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ whiteSpace: "nowrap", marginRight: "-40px" }}>
-                      Día {index + 1} - {fechaActual}
+                      Día {index + 1}
                     </Typography>
                   </Grid>
                   <Grid item sx={{ flexGrow: 1, minwidth: "400px", maxWidth: "450px", paddingLeft: "20px" }}>
@@ -147,11 +145,9 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control, fech
                           setErrorMessage((prev) => ({ ...prev, [index]: "Debe seleccionar un puerto" }));
                           return;
                         }
-                        const fechaDiaSeleccionado = fechaSeleccionada ? dayjs(fechaSeleccionada).add(index, "day").format("DD/MM/YYYY") : "Sin fecha";
                         setSelectedDiaIndex(index + 1);
                         setOpenModalDesc(true);
                         setSelectedPuerto({ idPuerto: selectedPuerto?.idPuerto, nombre: selectedPuerto[index]?.nombre, pais: selectedPuerto[index]?.pais });
-                        setFechaDescripcion(fechaDiaSeleccionado);
                       }}
                     >
                       Gestionar descripción
@@ -170,7 +166,6 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control, fech
           nombrePuerto={selectedPuerto?.nombre}
           paisPuerto={selectedPuerto?.pais}
           diaIndex={selectedDiaIndex}
-          fecha={fechaDescripcion}
         />
 
         <Button variant="contained" onClick={handleModalClose} sx={{ mt: 3, backgroundColor: "#16537e", color: "white", "&:hover": { backgroundColor: "#133d5a" }, width: "200px", height: "40px", fontSize: "0.9rem", mx: "auto", display: "block" }} fullWidth>

@@ -12,19 +12,44 @@ import { useNavigate } from "react-router-dom";
 import BarcoService from "../../services/BarcoService";
 import CrucerosService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
-import { SelectBarco } from "./SelectBarco";
+import Select from "react-select";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
 import { ModalVerPuertos } from './ModalVerPuertos';
-import dayjs from 'dayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { ModalGestionFechas } from './ModalGestionFechas';
 import ItinerarioService from "../../services/ItinerarioService";
 
 
 export function CreateCrucero() {
   const navigate = useNavigate();
 
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused
+        ? "#ADD8E6" // Color cuando se hace hover
+        : state.isSelected
+          ? "white" // Color cuando está seleccionado (blanco)
+          : "white", // Color normal
+
+      color: state.isSelected ? "black" : "black", // Asegura que el texto sea visible
+      cursor: "pointer", // Cambia el cursor al pasar el mouse
+      transition: "background-color 0.2s ease-in-out", // Suaviza la transición de color
+    }),
+
+    control: (provided) => ({
+      ...provided,
+      borderColor: "gray",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#16537e", // Cambia el borde cuando pasas el mouse
+      },
+    }),
+
+    menu: (provided) => ({
+      ...provided,
+      zIndex: 9999, // Asegura que el menú esté visible sobre otros elementos
+    }),
+  };
   // Esquema de validación
   const cruceroSchema = yup.object({
     nombre: yup
@@ -85,8 +110,20 @@ export function CreateCrucero() {
   // Estado para controlar la apertura del modal de Gestion Cruceros
   const [openModalGestPuertos, setOpenModalGestPuertos] = useState(false);
 
-   // Estado para controlar la apertura del modal de Gestion Cruceros
+  // Estado para controlar la apertura del modal de Ver Cruceros
   const [openModalVerPuertos, setOpenModalVerPuertos] = useState(false);
+
+  // Estado para controlar la apertura del modal de Gestion Fechas y Precios
+  const [openModalGestFechas, setOpenModalGestFechas] = useState(false);
+
+  //Hooks de control de errores
+  const [error, setError] = useState("");
+  const onError = (errors, e) => console.log(errors, e);
+
+  //Estado de barcos Cargados en el select
+  const [selectedBarco, setSelectedBarco] = useState(null);
+  const [dataBarco, setDataBarco] = useState([]);
+  const [loadedBarco, setLoadedBarco] = useState(false);
 
   //Hooks y funcion para gestionar imagen
   const [file, setFile] = useState(null);
@@ -99,17 +136,6 @@ export function CreateCrucero() {
       setFile(e.target.files[0], e.target.files[0].name);
     }
   }
-
-  //Hooks de control de errores
-  const [error, setError] = useState("");
-  const onError = (errors, e) => console.log(errors, e);
-
-  //Hooks de fecha del dia de hoy
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(dayjs().add(1,"month")); //dia de hoy por defecto
-
-  //Hooks de datos de barco de barcos
-  const [dataBarco, setDataBarco] = useState({});
-  const [loadedBarco, setLoadedBarco] = useState(false);
 
   if (error) return <p>Error: {error.message}</p>;
 
@@ -205,29 +231,6 @@ export function CreateCrucero() {
             </Grid>
             <br></br>
 
-            {/* Fecha */}
-            <Grid size={6} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Seleccione una fecha"
-                  value={fechaSeleccionada} //Valor por defecto: hoy
-                  onChange={(newValue) => setFechaSeleccionada(newValue)}
-                  slotProps={{
-                    textField: { variant: "outlined", fullWidth: true },
-                  }}
-                  format="DD/MM/YYYY"
-                  // Para configurar la fecha al día de hoy -> minDate={dayjs()}
-                  // Para configurar la fecha dentro de un mes
-                  minDate={dayjs().add(1, "month")}
-                  //Para forzar la selección en el UI al valor mínimo por defecto
-                  onOpen={() => {
-                    if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <br></br>
-
             {/* Cantidad de días */}
             <Grid size={4} sm={6} spacing={2}>
               <Typography variant="subtitle1">
@@ -268,14 +271,40 @@ export function CreateCrucero() {
               <Typography variant="subtitle1">
                 <b>Barco</b>
               </Typography>
-              <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+              <FormControl fullWidth>
                 {loadedBarco && (
-                  <Controller
-                    name="barco"
-                    control={control}
-                    render={({ field }) => (
-                      <SelectBarco field={field} data={dataBarco} />
-                    )}
+                  <Select
+                    options={dataBarco.map((barco) => ({
+                      label: (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          {barco.nombre} / Capacidad: {barco.capacidadHuesped}{" "}
+                          pasajeros
+                          <img
+                            src={barco.foto}
+                            alt={barco.nombre}
+                            style={{
+                              width: 30,
+                              height: 30,
+                              borderRadius: "50%",
+                            }}
+                          />
+                        </div>
+                      ),
+                      value: barco.idbarco,
+                    }))}
+                    onChange={(selectedOption) => {
+                      setSelectedBarco(selectedOption);
+                      setValue("barco", selectedOption);
+                    }}
+                    value={selectedBarco}
+                    styles={customStyles}
+                    placeholder="Seleccione un barco"
                   />
                 )}
               </FormControl>
@@ -333,18 +362,15 @@ export function CreateCrucero() {
                         // Si quieres abrir el modal después de crear el itinerario:
                         setOpenModalGestPuertos(true);
                       } catch (error) {
-                        console.error(
-                          "Error al crear el itinerario:",
-                          error
-                        );
+                        console.error("Error al crear el itinerario:", error);
                       }
                     }}
                   >
-                    Gestionar puertos
+                    Gestión de itinerario
                   </Button>
                 </Grid>
 
-                {/* Modal importado para Geston de puertos */}
+                {/* Modal importado para Gestión de puertos */}
                 <ModalGestionPuertos
                   open={openModalGestPuertos}
                   handleClose={() => setOpenModalGestPuertos(false)}
@@ -352,11 +378,6 @@ export function CreateCrucero() {
                   //pasar la cantidad de dias
                   cantDias={cantDias}
                   control={{ ...control, setValue }}
-                  fechaSeleccionada={
-                    fechaSeleccionada
-                      ? fechaSeleccionada.format("YYYY-MM-DD")
-                      : null
-                  }
                 />
 
                 <Grid item>
@@ -365,11 +386,11 @@ export function CreateCrucero() {
                     style={{ backgroundColor: "#B5485E" }}
                     onClick={() => setOpenModalVerPuertos(true)}
                   >
-                    Mostrar puertos
+                    Mostrar itinerario
                   </Button>
                 </Grid>
 
-                {/* Modal importado para Geston de puertos */}
+                {/* Modal importado para ver los puertos */}
                 <ModalVerPuertos
                   open={openModalVerPuertos}
                   handleClose={() => setOpenModalVerPuertos(false)}
@@ -397,9 +418,29 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#50C878" }}
-                    // onClick={() => setOpenModal(true)}
+                    onClick={() => {
+                      console.log(
+                        "Estado actual de selectedBarco:",
+                        selectedBarco
+                      );
+
+                      if (!selectedBarco) {
+                        setTimeout(() => {
+                          if (!selectedBarco) {
+                            alert(
+                              "Debe seleccionar un barco antes de gestionar fechas."
+                            );
+                          } else {
+                            setOpenModalGestFechas(true);
+                          }
+                        }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
+                        return;
+                      }
+
+                      setOpenModalGestFechas(true);
+                    }}
                   >
-                    Gestionar fechas
+                    Gestión de fecha
                   </Button>
                 </Grid>
 
@@ -407,11 +448,20 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#B5485E" }}
-                    // onClick={() => setOpenModal(true)}
+                    onClick={() => setOpenModalGestFechas(true)}
                   >
-                    Mostrar fechas
+                    Mostrar fechas y precios
                   </Button>
                 </Grid>
+
+                {/* Modal importado para gestionar las fechas */}
+                <ModalGestionFechas
+                  open={openModalGestFechas}
+                  handleClose={() => setOpenModalGestFechas(false)}
+                  cantDias={cantDias}
+                  control={{ ...control, setValue }}
+                  barco={selectedBarco}
+                />
               </Grid>
             </Grid>
           </Grid>

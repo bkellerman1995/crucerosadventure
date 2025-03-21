@@ -14,11 +14,17 @@ class HabitacionService {
   }
 
   //Obtener la informacion de una habitacion por su id
-  //localhost:81/crucerosadventure/crucero/{id}
+  //localhost:81/crucerosadventure/habitacion/{id}
   getHabitacionById(HabitacionesId) {
     console.log("BASE_URL HABITACONES: ", BASE_URL + "/" + HabitacionesId);
     console.log("HabitacionesId: ", HabitacionesId);
     return axios.get(BASE_URL + "/" + HabitacionesId);
+  }
+
+  //Obtener la lista de habitaciones por barco
+  getHabitacionesPorBarco(idbarco) {
+    console.log("Obteniendo habitaciones para barco:", idbarco);
+    return axios.get(`http://localhost:81/crucerosadventure/barco/${idbarco}`);
   }
 
   createHabitacion(Habitacion) {
