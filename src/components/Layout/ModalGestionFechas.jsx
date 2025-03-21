@@ -111,29 +111,79 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
 
         <Grid container spacing={2}>
           {/* Fecha límite de pago*/}
-          <Grid size={3} sm={6}>
-            <Typography variant="subtitle1">
-              <b>Fecha de inicio</b>
-            </Typography>
+          <Grid>
+            <Grid size={10} sm={6}>
+              <Typography variant="subtitle1">
+                <b>Fecha de inicio</b>
+              </Typography>
+              <br></br>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Seleccione una fecha"
+                  value={fechaSeleccionada} //Valor por defecto: hoy
+                  onChange={(newValue) => setFechaSeleccionada(newValue)}
+                  slotProps={{
+                    textField: { variant: "outlined", fullWidth: true },
+                  }}
+                  format="DD/MM/YYYY"
+                  // Para configurar la fecha al día de hoy -> minDate={dayjs()}
+                  // Para configurar la fecha dentro de un mes
+                  minDate={dayjs().add(1, "month")}
+                  //Para forzar la selección en el UI al valor mínimo por defecto
+                  onOpen={() => {
+                    if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
             <br></br>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Seleccione una fecha"
-                value={fechaSeleccionada} //Valor por defecto: hoy
-                onChange={(newValue) => setFechaSeleccionada(newValue)}
-                slotProps={{
-                  textField: { variant: "outlined", fullWidth: true },
-                }}
-                format="DD/MM/YYYY"
-                // Para configurar la fecha al día de hoy -> minDate={dayjs()}
-                // Para configurar la fecha dentro de un mes
-                minDate={dayjs().add(1, "month")}
-                //Para forzar la selección en el UI al valor mínimo por defecto
-                onOpen={() => {
-                  if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
-                }}
-              />
-            </LocalizationProvider>
+
+            {/* Fecha límite de pago*/}
+            <Grid size={10} sm={6}>
+              <Typography variant="subtitle1">
+                <b>Fecha límite de pago</b>
+              </Typography>
+              <br></br>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Seleccione una fecha"
+                  value={fechaSeleccionada} //Valor por defecto: hoy
+                  onChange={(newValue) => setFechaSeleccionada(newValue)}
+                  slotProps={{
+                    textField: { variant: "outlined", fullWidth: true },
+                  }}
+                  format="DD/MM/YYYY"
+                  minDate={dayjs().add(1, "month")}
+                  onOpen={() => {
+                    if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <br></br>
+
+            <Grid size={10} sm={6}>
+            <Button
+              variant="contained"
+              onClick={handleClose}
+              sx={{
+                mt: 20,
+                ml: 4,
+                backgroundColor: "#16537e",
+                color: "white",
+                "&:hover": { backgroundColor: "#133d5a" },
+                width: "200px",
+                height: "40px",
+                fontSize: "0.9rem",
+                mx: "auto",
+                display: "block",
+              }}
+              fullWidth
+            >
+              Confirmar
+            </Button>
+            </Grid>
+
           </Grid>
 
           <Grid container spacing={2}>
@@ -155,17 +205,20 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                         <b>{habitacion.nombre}</b>:
                         <br />
                         <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-                        <TextField
-                                // {...field}
-                                id="precio"
-                                label="$"
-                                error={Boolean(errors.precio)}
-                                sx = {{backgroundColor:"white", width:"100%",ml:-1 }}
-                                // helperText={
-                                //   errors.nombre ? errors.nombre.message : " "
-                                // }
-                              />
-                          
+                          <TextField
+                            // {...field}
+                            id="precio"
+                            label="$"
+                            error={Boolean(errors.precio)}
+                            sx={{
+                              backgroundColor: "white",
+                              width: "100%",
+                              ml: -1,
+                            }}
+                            // helperText={
+                            //   errors.nombre ? errors.nombre.message : " "
+                            // }
+                          />
                         </FormControl>
                       </React.Fragment>
                     </Typography>
@@ -181,50 +234,7 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
         </Grid>
         <br></br>
 
-        <Grid container spacing={2}>
-          {/* Fecha */}
-          <Grid size={3} sm={6}>
-            <Typography variant="subtitle1">
-              <b>Fecha límite de pago</b>
-            </Typography>
-            <br></br>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Seleccione una fecha"
-                value={fechaSeleccionada} //Valor por defecto: hoy
-                onChange={(newValue) => setFechaSeleccionada(newValue)}
-                slotProps={{
-                  textField: { variant: "outlined", fullWidth: true },
-                }}
-                format="DD/MM/YYYY"
-                minDate={dayjs().add(1, "month")}
-                onOpen={() => {
-                  if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
-                }}
-              />
-            </LocalizationProvider>
-          </Grid>
-        </Grid>
         <br></br>
-
-        <Button
-          variant="contained"
-          onClick={handleClose}
-          sx={{
-            mt: 3,
-            backgroundColor: "#16537e",
-            color: "white",
-            "&:hover": { backgroundColor: "#133d5a" },
-            width: "200px",
-            height: "40px",
-            fontSize: "0.9rem",
-            mx: "auto",
-            display: "block",
-          }}
-          fullWidth
-        >
-          Confirmar
-        </Button>
 
         <Dialog
           open={openConfirmDialog}

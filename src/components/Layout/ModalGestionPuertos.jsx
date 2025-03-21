@@ -19,7 +19,6 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control}) {
   const [openModalDesc, setOpenModalDesc] = useState(false);
   const [selectedPuerto, setSelectedPuerto] = useState({});
   const [selectedDiaIndex, setSelectedDiaIndex] = useState(null);
-  const [fechaDescripcion, setFechaDescripcion] = useState(null);
   const [errorMessage, setErrorMessage] = useState({});
 
   // Crear itinerario al abrir modal
