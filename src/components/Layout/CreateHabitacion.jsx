@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select from "react-select";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,35 @@ export function CreateHabitacion() {
   const [habitacionDetails, setHabitacionDetails] = useState(null);
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
+
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused
+        ? "#ADD8E6" // Color cuando se hace hover
+        : state.isSelected
+          ? "white" // Color cuando está seleccionado (blanco)
+          : "white", // Color normal
+
+      color: state.isSelected ? "black" : "black", // Asegura que el texto sea visible
+      cursor: "pointer", // Cambia el cursor al pasar el mouse
+      transition: "background-color 0.2s ease-in-out", // Suaviza la transición de color
+    }),
+
+    control: (provided) => ({
+      ...provided,
+      borderColor: "gray",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#16537e", // Cambia el borde cuando pasas el mouse
+      },
+    }),
+
+    menu: (provided) => ({
+      ...provided,
+      zIndex: 9999, // Asegura que el menú esté visible sobre otros elementos
+    }),
+  };
 
   const habitacionSchema = yup.object({
     nombre: yup
@@ -45,25 +74,29 @@ export function CreateHabitacion() {
       .typeError("Debe ser un número")
       .required("La capacidad máxima es requerida")
       .positive("Debe ser un número positivo")
-      .when('minHuesped', (minHuesped) => {
-        if(minHuesped) {
-        return yup.value()
-          .min(minHuesped, 'La canticad máxima no puede ser menor o igual a la mínima')
-          .typeError("Debe ser un número") 
+      .when("minHuesped", (minHuesped) => {
+        if (minHuesped) {
+          return yup
+            .value()
+            .min(
+              minHuesped,
+              "La canticad máxima no puede ser menor o igual a la mínima"
+            )
+            .typeError("Debe ser un número");
         }
       }),
-    
+
     tamanno: yup
       .number()
       .typeError("Debe ser un número")
       .required("El tamaño es requerido")
       .positive("Debe ser un número positivo"),
-    
-    categoriaHabitacion: yup
-      .string().required("La categoría de la habitacion es requerida"),
 
-    barco: yup
-      .string().required("El barco es requerido"),
+    categoriaHabitacion: yup
+      .string()
+      .required("La categoría de la habitacion es requerida"),
+
+    barco: yup.string().required("El barco es requerido"),
 
     foto: yup
       .mixed()
@@ -100,6 +133,7 @@ export function CreateHabitacion() {
   const onError = (errors, e) => console.log(errors, e);
 
   //Hooks de datos de barco de barcos
+  const [selectedBarco, setSelectedBarco] = useState(null);
   const [dataBarco, setDataBarco] = useState({});
   const [loadedBarco, setLoadedBarco] = useState(false);
 
@@ -296,12 +330,38 @@ export function CreateHabitacion() {
             </Typography>
             <FormControl fullWidth>
               {loadedBarco && (
-                <Controller
-                  name="barco"
-                  control={control}
-                  render={({ field }) => (
-                    <SelectBarco field={field} data={dataBarco} />
-                  )}
+                <Select
+                  options={dataBarco.map((barco) => ({
+                    label: (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        {barco.nombre} / Capacidad: {barco.capacidadHuesped}{" "}
+                        pasajeros
+                        <img
+                          src={barco.foto}
+                          alt={barco.nombre}
+                          style={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </div>
+                    ),
+                    value: barco.idbarco,
+                  }))}
+                  onChange={(selectedOption) => {
+                    setSelectedBarco(selectedOption);
+                    setValue("barco", selectedOption);
+                  }}
+                  value={selectedBarco}
+                  styles={customStyles}
+                  placeholder="Seleccione un barco"
                 />
               )}
             </FormControl>
@@ -379,11 +439,10 @@ export function CreateHabitacion() {
                 Tamaño: {habitacionDetails.tamanno} + m<sup>2</sup>
               </Typography>
               <Typography>
-                Categoría de la Habitacion: {habitacionDetails.categoriaHabitacion}
+                Categoría de la Habitacion:{" "}
+                {habitacionDetails.categoriaHabitacion}
               </Typography>
-              <Typography>
-                Barco: {habitacionDetails.barco}
-              </Typography>
+              <Typography>Barco: {habitacionDetails.barco}</Typography>
               <Typography>Estado: Activo</Typography>
               <Button
                 onClick={() => navigate("/admin/barco")}

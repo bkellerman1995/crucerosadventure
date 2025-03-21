@@ -82,7 +82,7 @@ export function ModalVerPuertos({ open, handleClose}) {
         <br></br>
 
         {/* Carrusel con imágenes de los puertos */}
-        {loadedPuerto && (
+        {loadedPuerto == true ? (
           <Swiper navigation={true} modules={[Navigation]} className="mySwiper">
             {dataPuerto.map((puerto, index) => (
               <SwiperSlide key={index}>
@@ -106,12 +106,18 @@ export function ModalVerPuertos({ open, handleClose}) {
                     }}
                   />
                   <Typography variant="h6" sx={{ mt: 2 }}>
-                    <b>{puerto.nombre} - {puerto.pais.descripcion}</b>
+                    <b>
+                      {puerto.nombre} - {puerto.pais.descripcion}
+                    </b>
                   </Typography>
                 </Box>
               </SwiperSlide>
             ))}
           </Swiper>
+        ) : (
+          <Typography color="error">
+            <b>No hay puertos registrados disponibles.</b>
+          </Typography>
         )}
       </Box>
     </Modal>
