@@ -12,82 +12,127 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
 import BarcoService from '../../services/BarcoService';
 import toast from 'react-hot-toast';
-import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
+import ImageService from '../../services/ImageService';
 
 export function CreateBarco() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [barcoDetails, setBarcoDetails] = useState(null);
-  const [file, setFile] = useState(null);
-  const [fileURL, setFileURL] = useState(null);
+  let formData = new FormData();
 
+  /* Validaciones del formulario con Yup */
   const barcoSchema = yup.object({
     nombre: yup.string().required('El nombre es requerido').min(2, 'Debe tener al menos 2 caracteres'),
     descripcion: yup.string().required('La descripción es requerida'),
     capacidadHuesped: yup.number().typeError('Debe ser un número').required('La capacidad es requerida').positive('Debe ser un número positivo'),
-    foto: yup.mixed().test("fileRequired", "La foto es requerida", (value) => value instanceof File),
+    // foto: yup.mixed().test("fileRequired", "La foto es requerida", (value) => value instanceof File),
     estado: yup.number().required('El estado es requerido'),
   });
 
+  /* Hook de React Hook Form para gestionar el formulario */
   const {
     control,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm({
     defaultValues: {
       nombre: '',
       descripcion: '',
       capacidadHuesped: '',
-      foto: null,
+      foto: '',
       estado: 1,
     },
     resolver: yupResolver(barcoSchema),
   });
 
+  /* Estado para manejar errores en pantalla */
+  const [error, setError] = useState('');
+
+  // Función para manejar errores al enviar el formulario
+  const onError = (errors, e) => console.log(errors, e);
+
+  /* Función que maneja el envío del formulario */
+  const onSubmit = (DataForm) => {
+    console.log('Formulario:');
+    console.log(DataForm);
+
+    try {
+      if (barcoSchema.isValid()) {
+        // Crear barco en backend
+        BarcoService.createBarco(DataForm)
+          .then((response) => {
+            setError(response.error);
+            if (response.data != null) {
+              /* Subida de imagen luego de crear el barco */
+              formData.append("file", file);
+              formData.append("barco_id", response.data.idbarco);
+              ImageService.createImage(formData)
+                .then((response) => {
+                  setError(response.error);
+                  if (response.data != null) {
+                    toast.success(response.data, {
+                      duration: 4000,
+                      position: "top-center"
+                    });
+                  }
+                })
+                .catch((error) => {
+                  if (error instanceof SyntaxError) {
+                    console.log(error);
+                    setError(error);
+                    throw new Error('Respuesta no válida del servidor');
+                  }
+                });
+
+              // Notificación y redirección
+              toast.success(
+                `Barco creado #${response.data.idbarco} - ${response.data.nombre}`,
+                {
+                  duration: 4000,
+                  position: 'top-center'
+                }
+              );
+              return navigate('/admin/barco');
+            }
+          })
+          .catch((error) => {
+            if (error instanceof SyntaxError) {
+              console.log(error);
+              setError(error);
+              throw new Error('Respuesta no válida del servidor');
+            }
+          });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  /* Manejo de archivo de imagen */
+  const [file, setFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
+
   function handleChangeImage(e) {
-    if (e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setFileURL(URL.createObjectURL(file));
-      setFile(file);
-      setValue("foto", file); // Actualiza el campo en react-hook-form
+    if (e.target.files) {
+      setFileURL(
+        URL.createObjectURL(e.target.files[0])
+      );
+      setFile(e.target.files[0]);
     }
   }
 
-  const onSubmit = (DataForm) => {
-    const formData = new FormData();
-    formData.append('nombre', DataForm.nombre);
-    formData.append('descripcion', DataForm.descripcion);
-    formData.append('capacidadHuesped', DataForm.capacidadHuesped);
-    formData.append('estado', DataForm.estado);
-    if (file) {
-      formData.append('foto', file);
-    }
+  if (error) return <p>Error: {error.message}</p>;
 
-    BarcoService.createBarco(formData)
-      .then((response) => {
-        if (response.data) {
-          setBarcoDetails(response.data);
-          setOpen(true);
-          toast.success(`Barco creado #${response.data.idbarco} - ${response.data.nombre}`, {
-            duration: 4000,
-            position: 'top-center',
-          });
-        }
-      })
-      .catch((error) => console.error(error.message));
-  };
-
+  /* Render del formulario */
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate encType="multipart/form-data">
+      <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
         <Grid container spacing={2} direction="column" sx={{ maxWidth: '50%', margin: 'auto' }}>
           <Grid item>
             <Typography variant="h5" gutterBottom>
               Crear Barco
             </Typography>
           </Grid>
+
+          {/* Campo: Nombre */}
           <Grid item>
             <FormControl fullWidth>
               <Controller
@@ -99,6 +144,8 @@ export function CreateBarco() {
               />
             </FormControl>
           </Grid>
+
+          {/* Campo: Descripción */}
           <Grid item>
             <FormControl fullWidth>
               <Controller
@@ -110,6 +157,8 @@ export function CreateBarco() {
               />
             </FormControl>
           </Grid>
+
+          {/* Campo: Capacidad de Huéspedes */}
           <Grid item>
             <FormControl fullWidth>
               <Controller
@@ -121,13 +170,23 @@ export function CreateBarco() {
               />
             </FormControl>
           </Grid>
-          <Grid item>
-            <Typography variant="h6">Foto</Typography>
-            <input type="file" accept="image/*" onChange={handleChangeImage} />
-            {fileURL && <img src={fileURL} alt="Vista previa" width={200} style={{ marginTop: '10px' }} />}
-            {errors.foto && <Typography color="error">{errors.foto.message}</Typography>}
+
+          {/* Campo: Imagen */}
+          <Grid item size={12} sm={12}>
+            <FormControl variant='standard' fullWidth sx={{ m: 1 }}>
+              <Controller
+                name='foto'
+                control={control}
+                render={({ field }) => (
+                  <input type='file' {...field} onChange={handleChangeImage} />
+                )}
+              />
+            </FormControl>
+            <img src={fileURL} width={300} />
           </Grid>
-          <Grid item>
+
+          {/* Campo: Estado (fijo en 1) */}
+          <Grid item size={12} sm={12}>
             <FormControl fullWidth disabled>
               <Controller
                 name="estado"
@@ -140,6 +199,8 @@ export function CreateBarco() {
               />
             </FormControl>
           </Grid>
+
+          {/* Botón de Envío */}
           <Grid item>
             <Button type="submit" variant="contained" color="primary">
               Guardar
@@ -147,24 +208,6 @@ export function CreateBarco() {
           </Grid>
         </Grid>
       </form>
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', p: 4, boxShadow: 24, borderRadius: 2 }}>
-          {barcoDetails && (
-            <>
-              <Typography variant="h6" gutterBottom>
-                ¡Barco Creado Exitosamente!
-              </Typography>
-              <Typography>Nombre: {barcoDetails.nombre}</Typography>
-              <Typography>Descripción: {barcoDetails.descripcion}</Typography>
-              <Typography>Capacidad: {barcoDetails.capacidadHuesped}</Typography>
-              <Typography>Estado: Activo</Typography>
-              <Button onClick={() => navigate('/admin/crucero')} variant="contained" sx={{ mt: 2 }}>
-                Ir a Cruceros
-              </Button>
-            </>
-          )}
-        </Box>
-      </Modal>
     </>
   );
 }

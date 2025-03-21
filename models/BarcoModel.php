@@ -114,8 +114,8 @@ class BarcoModel
     {
         try {
             // Consulta SQL para insertar un barco
-            $sql = "INSERT INTO barco (nombre, descripcion, capacidadHuesped, foto, estado) " .
-                   "VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->foto', '$objeto->estado')";
+            $sql = "INSERT INTO barco (nombre, descripcion, capacidadHuesped, estado) " .
+                   "VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->estado')";
             
             // Ejecutar la consulta y obtener el ID del barco insertado
             $idBarco = $this->enlace->executeSQL_DML_last($sql);
