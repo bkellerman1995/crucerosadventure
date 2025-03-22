@@ -366,7 +366,7 @@ export function CreateCrucero() {
                       }
                     }}
                   >
-                    Gestión de itinerario
+                    Gestionar itinerarios
                   </Button>
                 </Grid>
 
@@ -386,7 +386,7 @@ export function CreateCrucero() {
                     style={{ backgroundColor: "#B5485E" }}
                     onClick={() => setOpenModalVerPuertos(true)}
                   >
-                    Mostrar itinerario
+                    Mostrar puertos
                   </Button>
                 </Grid>
 
@@ -440,7 +440,7 @@ export function CreateCrucero() {
                       setOpenModalGestFechas(true);
                     }}
                   >
-                    Gestión de fecha
+                    Gestionar fechas
                   </Button>
                 </Grid>
 

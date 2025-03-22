@@ -161,13 +161,11 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
               </LocalizationProvider>
             </Grid>
             <br></br>
-
             <Grid size={10} sm={6}>
             <Button
               variant="contained"
               onClick={handleClose}
               sx={{
-                mt: 20,
                 ml: 4,
                 backgroundColor: "#16537e",
                 color: "white",

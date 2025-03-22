@@ -9,10 +9,13 @@ import PropTypes from "prop-types";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
-import ItinerarioService from "../../services/PuertoService";
+import ItinerarioPuertoService from "../../services/ItinerarioPuertoService";
 
 
-export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, diaIndex, resetSelect, fecha }) {
+export function ModalDescripcion({ open, handleClose, resetSelect, puertoSeleccionado, diaIndex,idItinerario }) {
+  
+  const puerto = puertoSeleccionado[0];
+  console.log ("puerto recibido en modal",puerto);
   // Esquema de validación
   const puertoSchema = yup.object({
     descripcion: yup
@@ -33,9 +36,6 @@ export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, 
     formState: { errors },
     reset, //limpiar el formulario cuando el modal se cierre
   } = useForm({
-    defaultValues: {
-      descripcion: "",
-    },
     resolver: yupResolver(puertoSchema),
     mode: "onSubmit" //validar al salir del campo
   });
@@ -50,15 +50,21 @@ export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, 
 
   // Accion submit del botón guardar
   const onSubmit = (DataForm,e) => {
-    e.preventDefault();  // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
-    console.log("Enviando datos:", DataForm);
+    e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
+    // Agregar los valores de idItinerario y idPuerto a los datos del formulario
+    const formData = {
+      ...DataForm, // Datos del formulario
+      idItinerario, // ID del itinerario
+      puertoSeleccionado,
+    };
+    console.log("Enviando datos:", formData );
     try {
-      ItinerarioService.createItinerarioDescripcion(DataForm)
+      ItinerarioPuertoService.agregarPuertoItinerario(formData)
         .then((response) => {
           setError(response.error);
           if (response.data != null) {
             toast.success(
-              `Día #${response.data.idCrucero} - ${response.data.nombre}`,
+              `Día #${response.data.idItinerario} - ${response.data.idPuerto} -  ${response.data.descripcion}`,
               {
                 duration: 4000,
                 position: "top-center",
@@ -112,10 +118,12 @@ export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, 
             </Typography>
             <br></br>
             <Typography>
-              <b>Día {diaIndex} </b> - {fecha} <br />
-              {console.log("fecha seleccionada", fecha)}
-              <b>Puerto: </b> {nombrePuerto ?? "No seleccionado"} <br />
-              <b>País: </b> {paisPuerto ?? "No seleccionado"}
+              <b>Día {diaIndex} </b><br />
+              <b>Puerto: </b> {puerto?.nombre ?? "No seleccionado"} <br />
+              {console.log("Nombre puerto", puerto?.nombre)}
+              <b>País: </b> {puerto?.pais?.descripcion ?? "No seleccionado"}
+              {console.log("Pais puerto", puerto?.pais.descripcion)}
+
             </Typography>
             <br></br>
             <Grid size={6} sm={6}>
@@ -190,9 +198,8 @@ ModalDescripcion.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   resetSelect: PropTypes.func,
-  nombrePuerto: PropTypes.string, 
-  paisPuerto: PropTypes.string,
+  puertoSeleccionado: PropTypes.object.isRequired,
   diaIndex: PropTypes.number.isRequired,
-  fechaSeleccionada: PropTypes.object,
+  idItinerario: PropTypes.number.isRequired
 
 };
