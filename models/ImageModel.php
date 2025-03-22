@@ -1,9 +1,9 @@
 <?php
 class ImageModel
-{
-    private $upload_path = 'uploads/';
-    private $valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
-
+{ 
+    
+private $upload_path = 'uploads/';
+ private $valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
     public $enlace;
     public function __construct()
     {
@@ -14,79 +14,64 @@ class ImageModel
     public function uploadFile($object)
     {
         try {
-            $file = $object['file'];
-            $barco_id = intval($object['barco_id']);
+            $file = $object['foto'];
+            $barco_id = $object['barco_id'];
     
-            // Verificar que existe archivo
-            if (empty($file['name']) || $file['error'] !== UPLOAD_ERR_OK) {
-                return json_encode([
-                    "success" => false,
-                    "error" => "Archivo no válido o no enviado"
-                ]);
-            }
-    
-            // Validaciones
-            $fileName = basename($file['name']);
+            $fileName = $file['name'];
+            $tempPath = $file['tmp_name'];
             $fileSize = $file['size'];
-            $fileTmp = $file['tmp_name'];
-            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+            $fileError = $file['error'];
     
-            if (!in_array($fileExt, $allowed)) {
-                return json_encode([
-                    "success" => false,
-                    "error" => "Extensión de archivo no permitida"
-                ]);
+            if (!empty($fileName)) {
+                $fileExt = explode('.', $fileName);
+                $fileActExt = strtolower(end($fileExt));
+                $newFileName = "barco-" . uniqid() . "." . $fileActExt;
+    
+                if (in_array($fileActExt, $this->valid_extensions)) {
+                    if (!file_exists($this->upload_path . $newFileName)) {
+                        if ($fileSize < 2000000 && $fileError == 0) {
+                            
+                            $fullPath = $this->upload_path . $newFileName;
+    
+                            // 1. Guardar archivo en la carpeta /uploads
+                            if (move_uploaded_file($tempPath, $fullPath)) {
+    
+                                // 2. Leer archivo desde la carpeta como binario
+                                $imageData = file_get_contents($fullPath);
+                                $imageData = addslashes($imageData); // Escapar contenido para SQL
+    
+                                // 3. Insertar BLOB en el campo `foto` del barco
+                                $sql = "UPDATE barco SET foto = '$imageData' WHERE idbarco = $barco_id";
+                                
+                                $resultado = $this->enlace->executeSQL_DML($sql);
+    
+                                if ($resultado > 0) {
+                                    return ['success' => true, 'message' => 'Imagen guardada en carpeta y base de datos (BLOB)'];
+                                } else {
+                                    return ['success' => false, 'message' => 'Error al guardar BLOB en la base de datos'];
+                                }
+    
+                            } else {
+                                return ['success' => false, 'message' => 'Error al mover archivo a carpeta'];
+                            }
+    
+                        } else {
+                            return ['success' => false, 'message' => 'Archivo inválido o muy grande'];
+                        }
+                    } else {
+                        return ['success' => false, 'message' => 'Archivo ya existe'];
+                    }
+                } else {
+                    return ['success' => false, 'message' => 'Extensión no permitida'];
+                }
             }
     
-            if ($fileSize > 2 * 1024 * 1024) {
-                return json_encode([
-                    "success" => false,
-                    "error" => "El archivo excede el tamaño máximo permitido (2MB)"
-                ]);
-            }
-    
-            // Generar nombre único para el archivo
-            $uniqueFileName = 'barco-' . uniqid() . '.' . $fileExt;
-            $uploadPath = $this->upload_path . $uniqueFileName;
-    
-            // Mover archivo a carpeta /uploads
-            if (!move_uploaded_file($fileTmp, $uploadPath)) {
-                return json_encode([
-                    "success" => false,
-                    "error" => "Error al mover el archivo al servidor"
-                ]);
-            }
-    
-            // Leer el contenido binario del archivo guardado
-            $imageData = file_get_contents($uploadPath);
-            $imageData = $this->enlace->escape_string($imageData); // Escapar binario
-    
-            // Guardar el contenido binario en la base de datos como BLOB
-            $sql = "UPDATE barco SET foto = '$imageData' WHERE idbarco = $barco_id";
-            $resultado = $this->enlace->executeSQL_DML($sql);
-    
-            if ($resultado > 0) {
-                return json_encode([
-                    "success" => true,
-                    "message" => "Imagen subida y guardada en la base de datos (BLOB)",
-                    "file" => $uniqueFileName
-                ]);
-            } else {
-                return json_encode([
-                    "success" => false,
-                    "error" => "Error al guardar la imagen en la base de datos"
-                ]);
-            }
         } catch (Exception $e) {
-            return json_encode([
-                "success" => false,
-                "error" => "Excepción: " . $e->getMessage()
-            ]);
+            return ['success' => false, 'message' => 'Excepción: ' . $e->getMessage()];
         }
     }
     
-    
+
     // Obtener la imagen de un barco
     public function getImageBarco($idBarco)
     {

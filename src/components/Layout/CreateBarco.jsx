@@ -61,7 +61,7 @@ export function CreateBarco() {
 
         // Subir imagen
         if (file) {
-          formData.append("file", file);
+          formData.append("foto", file);
           formData.append("barco_id", barco.idbarco);
 
           try {
