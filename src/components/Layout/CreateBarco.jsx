@@ -58,7 +58,9 @@ export function CreateBarco() {
       if (barcoSchema.isValid()) {
         // Crear barco en backend
         BarcoService.createBarco(DataForm)
+        
           .then((response) => {
+            console.log("Respuesta del backend:", response);
             setError(response.error);
             if (response.data != null) {
               /* Subida de imagen luego de crear el barco */
@@ -103,6 +105,7 @@ export function CreateBarco() {
       }
     } catch (error) {
       console.error(error);
+      console.error("Error al crear barco:", error.response?.data || error.message);
     }
   };
 

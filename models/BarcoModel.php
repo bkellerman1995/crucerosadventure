@@ -113,11 +113,15 @@ class BarcoModel
     public function create($objeto)
     {
         try {
-            $nombreSanitizado = str_replace("\\", "\\\\", $objeto->foto);
+
+            $sql = "INSERT INTO barco (nombre, descripcion, capacidadHuesped, estado, ) 
+        VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->estado')";
+            //"VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->estado',
+            //$nombreSanitizado = str_replace("\\", "\\\\", $objeto->foto);
             // Consulta SQL para insertar un barco
-            $sql = "INSERT INTO barco (nombre, descripcion, capacidadHuesped, estado, foto) " .
-                   "VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->estado',
-                   LOAD_FILE('" . $nombreSanitizado ."')";
+           // $sql = "INSERT INTO barco (nombre, descripcion, capacidadHuesped, estado, foto) " .
+                 //  "VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->estado',
+                  // LOAD_FILE('" . $nombreSanitizado ."')";
             
             // Ejecutar la consulta y obtener el ID del barco insertado
             $idBarco = $this->enlace->executeSQL_DML_last($sql);
