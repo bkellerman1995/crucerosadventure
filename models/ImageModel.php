@@ -1,9 +1,9 @@
 <?php
 class ImageModel
-{
-//private $upload_path = 'uploads/';
-    private $valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
-
+{ 
+    
+private $upload_path = 'uploads/';
+ private $valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
     public $enlace;
     public function __construct()
     {
@@ -14,61 +14,64 @@ class ImageModel
     public function uploadFile($object)
     {
         try {
-            $file = $object['file'];
+            $file = $object['foto'];
             $barco_id = $object['barco_id'];
-            
-            // Obtener la información del archivo
+    
             $fileName = $file['name'];
             $tempPath = $file['tmp_name'];
             $fileSize = $file['size'];
             $fileError = $file['error'];
-
+    
             if (!empty($fileName)) {
-                // Crear un nombre único para el archivo
                 $fileExt = explode('.', $fileName);
                 $fileActExt = strtolower(end($fileExt));
-               // $fileName = "barco-" . uniqid() . "." . $fileActExt;
-                
-                // Validar el tipo de archivo
+                $newFileName = "barco-" . uniqid() . "." . $fileActExt;
+    
                 if (in_array($fileActExt, $this->valid_extensions)) {
-                    // Validar que no sobrepase el tamaño
-                    if ($fileSize < 2000000 && $fileError == 0) {
-
-                        $imagenBlob = file_get_contents($tempPath);
-
-                        // Guardar en la base de datos
-                        $sql = "UPDATE barco SET foto = ? WHERE idbarco = ?";
-                        $stmt = $this->enlace->prepare($sql);
-                        $stmt->bind_param("bi", $imagenBlob, $barco_id);
-
-                        if ($stmt->execute()) {
-                            return 'Imagen guardada en la base de datos';
-                        } else {
-                            return 'Error al guardar la imagen';
-                        }
-
-                        $stmt->close();
-
-                    
-            
-                        // Moverlo a la carpeta del servidor del API
-                     /*   if (move_uploaded_file($tempPath, $this->upload_path . $fileName)) {
-                            // Insertar la imagen en la BD
-                            $sql = "INSERT INTO barco (idbarco, foto) VALUES ($barco_id, '$fileName')";
-                            $vResultado = $this->enlace->executeSQL_DML($sql);
-                            if ($vResultado > 0) {
-                                return 'Imagen guardada exitosamente';
+                    if (!file_exists($this->upload_path . $newFileName)) {
+                        if ($fileSize < 2000000 && $fileError == 0) {
+                            
+                            $fullPath = $this->upload_path . $newFileName;
+    
+                            // 1. Guardar archivo en la carpeta /uploads
+                            if (move_uploaded_file($tempPath, $fullPath)) {
+    
+                                // 2. Leer archivo desde la carpeta como binario
+                                $imageData = file_get_contents($fullPath);
+                                $imageData = addslashes($imageData); // Escapar contenido para SQL
+    
+                                // 3. Insertar BLOB en el campo `foto` del barco
+                                $sql = "UPDATE barco SET foto = '$imageData' WHERE idbarco = $barco_id";
+                                
+                                $resultado = $this->enlace->executeSQL_DML($sql);
+    
+                                if ($resultado > 0) {
+                                    return ['success' => true, 'message' => 'Imagen guardada en carpeta y base de datos (BLOB)'];
+                                } else {
+                                    return ['success' => false, 'message' => 'Error al guardar BLOB en la base de datos'];
+                                }
+    
+                            } else {
+                                return ['success' => false, 'message' => 'Error al mover archivo a carpeta'];
                             }
-                            return false;
-                        }*/
+    
+                        } else {
+                            return ['success' => false, 'message' => 'Archivo inválido o muy grande'];
+                        }
+                    } else {
+                        return ['success' => false, 'message' => 'Archivo ya existe'];
                     }
+                } else {
+                    return ['success' => false, 'message' => 'Extensión no permitida'];
                 }
             }
+    
         } catch (Exception $e) {
-            handleException($e);
+            return ['success' => false, 'message' => 'Excepción: ' . $e->getMessage()];
         }
     }
     
+
     // Obtener la imagen de un barco
     public function getImageBarco($idBarco)
     {
