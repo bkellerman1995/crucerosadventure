@@ -9,10 +9,15 @@ import PropTypes from "prop-types";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
-import ItinerarioService from "../../services/PuertoService";
+import ItinerarioPuertoService from "../../services/ItinerarioPuertoService";
 
 
-export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, diaIndex, resetSelect, fecha }) {
+export function ModalDescripcion({ open, handleClose, resetSelect, puertoSeleccionado, diaIndex,idItinerario, setPuertosContador,setPuertosDeshabilitados}) {
+  
+  const idPuerto = puertoSeleccionado?.idPuerto;
+  const dia = diaIndex;
+  const estado = 1;
+  console.log ("puerto recibido en modal",puertoSeleccionado);
   // Esquema de validación
   const puertoSchema = yup.object({
     descripcion: yup
@@ -33,9 +38,6 @@ export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, 
     formState: { errors },
     reset, //limpiar el formulario cuando el modal se cierre
   } = useForm({
-    defaultValues: {
-      descripcion: "",
-    },
     resolver: yupResolver(puertoSchema),
     mode: "onSubmit" //validar al salir del campo
   });
@@ -49,21 +51,33 @@ export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, 
 
 
   // Accion submit del botón guardar
-  const onSubmit = (DataForm,e) => {
-    e.preventDefault();  // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
-    console.log("Enviando datos:", DataForm);
+  const onSubmit = (descripcion,e) => {
+    e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
+    // Agregar los valores de idItinerario y idPuerto a los datos del formulario
+    const formData = {
+      idItinerario,
+      dia,
+      idPuerto,
+      ...descripcion, // descripción del textField
+      estado
+      
+    };
+    console.log("Enviando datos:", formData );
     try {
-      ItinerarioService.createItinerarioDescripcion(DataForm)
+      ItinerarioPuertoService.agregarPuertoItinerario(formData)
         .then((response) => {
           setError(response.error);
           if (response.data != null) {
+            console.log('objeto Puerto Itinerario:', response.data)
             toast.success(
-              `Día #${response.data.idCrucero} - ${response.data.nombre}`,
+              `Gestión de puerto exitosa`,
               {
-                duration: 4000,
+                duration: 1500,
                 position: "top-center",
               }
             );
+            setPuertosDeshabilitados((prev) => ({ ...prev, [diaIndex -1 ]: true })); // Deshabilitar el select y el botón de ese día
+            setPuertosContador((prevCount) => prevCount + 1); // Incrementar el contador de puertos
           }
         })
         .catch((error) => {
@@ -73,7 +87,8 @@ export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, 
             throw new Error("Respuesta no válida del servidor");
           }
         });
-      // }
+
+        handleClose();
     } catch (error) {
       console.error(error);
     }
@@ -112,10 +127,10 @@ export function ModalDescripcion({ open, handleClose, nombrePuerto, paisPuerto, 
             </Typography>
             <br></br>
             <Typography>
-              <b>Día {diaIndex} </b> - {fecha} <br />
-              {console.log("fecha seleccionada", fecha)}
-              <b>Puerto: </b> {nombrePuerto ?? "No seleccionado"} <br />
-              <b>País: </b> {paisPuerto ?? "No seleccionado"}
+              <b>Día {diaIndex} </b><br />
+              <b>Puerto: </b> {puertoSeleccionado?.nombre ?? "No seleccionado"} <br />
+              <b>País: </b> {puertoSeleccionado?.pais?.descripcion ?? "No seleccionado"}
+
             </Typography>
             <br></br>
             <Grid size={6} sm={6}>
@@ -190,9 +205,9 @@ ModalDescripcion.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   resetSelect: PropTypes.func,
-  nombrePuerto: PropTypes.string, 
-  paisPuerto: PropTypes.string,
+  puertoSeleccionado: PropTypes.object.isRequired,
   diaIndex: PropTypes.number.isRequired,
-  fechaSeleccionada: PropTypes.object,
-
+  idItinerario: PropTypes.number.isRequired,
+  setPuertosContador: PropTypes.number.isRequired,
+  setPuertosDeshabilitados: PropTypes.func.isRequired
 };

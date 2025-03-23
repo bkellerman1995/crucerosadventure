@@ -1,6 +1,6 @@
 <?php
 //localhost:81/crucerosadventure/barco
-class itinerario
+class itinerarioPuerto
 {
     //GET listar
     public function index()
@@ -8,9 +8,9 @@ class itinerario
         try {
             $response = new Response();
             //Instancia modelo
-            $itinerarioModel = new ItinerarioModel();
+            $itinerarioPuertoModel = new ItinerarioPuertoModel();
             //Método del modelo
-            $result = $itinerarioModel->all();
+            $result = $itinerarioPuertoModel->all();
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -27,9 +27,9 @@ class itinerario
             //Obtener json enviado
             $inputJSON = $request->getJSON();
             //Instancia del modelo
-            $tinerario = new ItinerarioModel();
+            $itinerario = new ItinerarioPuertoModel();
             //Acción del modelo a ejecutar
-            $result = $tinerario->create($inputJSON);
+            $result = $itinerario->create($inputJSON);
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -38,14 +38,14 @@ class itinerario
     }
     
 
-    // DELETE eliminar (ESTO ES SOLO PARA EL FRONTEND Y ELIMINAR DATOS BASURA EN BD)    public function delete($id)
+    // DELETE eliminar (ESTO ES SOLO PARA EL FRONTEND Y ELIMINAR DATOS BASURA EN BD)
     public function delete($id)
     {
         try {
             $response = new Response();
-            $itinerarioModel = new ItinerarioModel();
+            $itinerarioPuertoModel = new ItinerarioPuertoModel();
 
-            $result = $itinerarioModel->delete($id);
+            $result = $itinerarioPuertoModel->delete($id);
             $response->toJSON($result);
         
         } catch (Exception $e) {
