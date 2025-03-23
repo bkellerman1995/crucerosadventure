@@ -21,7 +21,7 @@ class CruceroModel
 
 
             // Consulta SQL
-            $vSQL = "SELECT * FROM crucero ORDER BY idCrucero DESC;";
+            $vSQL = "SELECT * FROM crucero where estado = 1 ORDER BY idCrucero asc;";
 
             // Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);

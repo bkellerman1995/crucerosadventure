@@ -18,6 +18,7 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
   const dia = diaIndex;
   const estado = 1;
   console.log ("puerto recibido en modal",puertoSeleccionado);
+  
   // Esquema de validación
   const puertoSchema = yup.object({
     descripcion: yup
@@ -104,10 +105,8 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
 
   return (
     <>
-      {/* <form onSubmit={handleSubmit(onSubmit, onError)} noValidate> */}
-        <Modal open={open} onClose={handleModalClose}>
-                <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
-
+      <Modal open={open} onClose={handleModalClose}>
+        <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
           <Box
             sx={{
               position: "absolute",
@@ -127,10 +126,12 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
             </Typography>
             <br></br>
             <Typography>
-              <b>Día {diaIndex} </b><br />
-              <b>Puerto: </b> {puertoSeleccionado?.nombre ?? "No seleccionado"} <br />
-              <b>País: </b> {puertoSeleccionado?.pais?.descripcion ?? "No seleccionado"}
-
+              <b>Día {diaIndex} </b>
+              <br />
+              <b>Puerto: </b> {puertoSeleccionado?.nombre ?? "No seleccionado"}{" "}
+              <br />
+              <b>País: </b>{" "}
+              {puertoSeleccionado?.pais?.descripcion ?? "No seleccionado"}
             </Typography>
             <br></br>
             <Grid size={6} sm={6}>
@@ -194,7 +195,7 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
               ✕
             </Button>
           </Box>
-      </form>
+        </form>
       </Modal>
     </>
   );

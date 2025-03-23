@@ -14,7 +14,6 @@ import CrucerosService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
-import { ModalVerPuertos } from './ModalVerPuertos';
 import { ModalGestionFechas } from './ModalGestionFechas';
 import ItinerarioService from "../../services/ItinerarioService";
 
@@ -50,6 +49,7 @@ export function CreateCrucero() {
       zIndex: 9999, // Asegura que el menú esté visible sobre otros elementos
     }),
   };
+  
   // Esquema de validación
   const cruceroSchema = yup.object({
     nombre: yup
@@ -336,8 +336,8 @@ export function CreateCrucero() {
                 padding: "10px",
               }}
             >
-              <Typography variant="h5" gutterBottom color="white">
-                <b>Itinerario (puertos y actividades)</b>
+              <Typography align = "center" variant="h5" gutterBottom color="white">
+                <b>Itinerario y fechas</b>
               </Typography>
 
               <Grid container spacing={2}>
@@ -380,86 +380,38 @@ export function CreateCrucero() {
                   control={{ ...control, setValue }}
                 />
 
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    style={{ backgroundColor: "#B5485E" }}
-                    onClick={() => setOpenModalVerPuertos(true)}
-                  >
-                    Mostrar puertos
-                  </Button>
-                </Grid>
+                <Button
+                  variant="contained"
+                  style={{ backgroundColor: "#50C878" }}
+                  onClick={() => {
+                    console.log(
+                      "Estado actual de selectedBarco:",
+                      selectedBarco
+                    );
 
-                {/* Modal importado para ver los puertos */}
-                <ModalVerPuertos
-                  open={openModalVerPuertos}
-                  handleClose={() => setOpenModalVerPuertos(false)}
-                  cantDias={cantDias}
-                  control={{ ...control, setValue }}
-                />
-              </Grid>
-            </Grid>
+                    if (!selectedBarco) {
+                      setTimeout(() => {
+                        if (!selectedBarco) {
+                          alert(
+                            "Debe seleccionar un barco antes de gestionar fechas."
+                          );
+                        } else {
+                          setOpenModalGestFechas(true);
+                        }
+                      }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
+                      return;
+                    }
 
-            <Grid
-              item
-              xs={12}
-              style={{
-                backgroundColor: "#16537e",
-                borderRadius: "16px",
-                padding: "10px",
-              }}
-            >
-              <Typography variant="h5" gutterBottom color="white">
-                <b>Fechas y precios de habitaciones</b>
-              </Typography>
+                    setOpenModalGestFechas(true);
+                  }}
+                >
+                  Gestionar fechas y precios
+                </Button>
 
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    style={{ backgroundColor: "#50C878" }}
-                    onClick={() => {
-                      console.log(
-                        "Estado actual de selectedBarco:",
-                        selectedBarco
-                      );
-
-                      if (!selectedBarco) {
-                        setTimeout(() => {
-                          if (!selectedBarco) {
-                            alert(
-                              "Debe seleccionar un barco antes de gestionar fechas."
-                            );
-                          } else {
-                            setOpenModalGestFechas(true);
-                          }
-                        }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
-                        return;
-                      }
-
-                      setOpenModalGestFechas(true);
-                    }}
-                  >
-                    Gestionar fechas y precios
-                  </Button>
-                </Grid>
-
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    style={{ backgroundColor: "#B5485E" }}
-                    onClick={() => setOpenModalGestFechas(true)}
-                  >
-                    Mostrar fechas y precios
-                  </Button>
-                </Grid>
-
-                {/* Modal importado para gestionar las fechas */}
+                {/* Modal importado para Gestión de fechas y habitaciones */}
                 <ModalGestionFechas
                   open={openModalGestFechas}
                   handleClose={() => setOpenModalGestFechas(false)}
-                  cantDias={cantDias}
-                  control={{ ...control, setValue }}
                   barco={selectedBarco}
                 />
               </Grid>
