@@ -30,25 +30,25 @@ private $upload_path = 'uploads/';
                 if (in_array($fileActExt, $this->valid_extensions)) {
                     if (!file_exists($this->upload_path . $newFileName)) {
                         if ($fileSize < 2000000 && $fileError == 0) {
-                            
-                            $fullPath = $this->upload_path . $newFileName;
     
-                            // 1. Guardar archivo en la carpeta /uploads
-                            if (move_uploaded_file($tempPath, $fullPath)) {
+                            $relativePath = $this->upload_path . $newFileName;
+                            $fullPath = realpath($relativePath); // ruta absoluta necesaria para file_get_contents
     
-                                // 2. Leer archivo desde la carpeta como binario
+                            // 1. Mover archivo a /uploads
+                            if (move_uploaded_file($tempPath, $relativePath)) {
+    
+                                // 2. Leer como binario (BLOB)
                                 $imageData = file_get_contents($fullPath);
-                                $imageData = addslashes($imageData); // Escapar contenido para SQL
+                                $imageData = addslashes($imageData); // escapar para SQL
     
-                                // 3. Insertar BLOB en el campo `foto` del barco
-                               $sql = "UPDATE barco SET foto = '$imageData' WHERE idbarco = $barco_id";
-                                
+                                // 3. Insertar el binario en la base de datos
+                                $sql = "UPDATE barco SET foto = '$imageData' WHERE idbarco = $barco_id";
                                 $resultado = $this->enlace->executeSQL_DML($sql);
     
                                 if ($resultado > 0) {
-                                    return ['success' => true, 'message' => 'Imagen guardada en carpeta y base de datos (BLOB)'];
+                                    return ['success' => true, 'message' => 'Imagen guardada como BLOB desde carpeta'];
                                 } else {
-                                    return ['success' => false, 'message' => 'Error al guardar BLOB en la base de datos'];
+                                    return ['success' => false, 'message' => 'Error al guardar BLOB en base de datos'];
                                 }
     
                             } else {
