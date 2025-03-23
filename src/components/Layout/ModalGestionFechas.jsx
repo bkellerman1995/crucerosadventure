@@ -19,7 +19,9 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
   const [barcoData, setBarcoData] = useState([]);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [error, setError] = useState("");
-  const onError = (errors, e) => console.log(errors, e);
+  const onError = (errors) => {
+    console.log("Errores en el formulario:", errors);
+  };
 
   //Hooks de fecha del dia de hoy
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
@@ -31,17 +33,18 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
     precio: yup
       .number()
       .transform((value, originalValue) => {
-        return originalValue === "" ? null : value;
+        // Si el valor es vacío, devuelve undefined
+        return originalValue === "" ? undefined : value;
       })
       .min(500, "El precio mínimo debe ser de $500")
       .max(9999, "El precio máximo debe ser $9999")
-      .required("El precio es requerido"),
+      // .required("El precio es requerido")
   });
 
   //Función para manejar el form
   const {
-    handleSubmit,
     control,
+    handleSubmit,
     formState: { errors },
     reset, //limpiar el formulario cuando el modal se cierre
   } = useForm({
@@ -78,46 +81,54 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
   if (error) return <p>Error: {error.message}</p>;
 
   // Accion submit del botón confirmar
-  const onSubmit = (precio, e) => {
-    e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
-    // Agregar los valores de idItinerario y idPuerto a los datos del formulario
+  const onSubmit = (data) => {
+    // e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
+    console.log("Dato recibido del form:", data);
+
+    // Iterar sobre las claves de "precio-1", "precio-2", etc.
+    // Object.keys(data).forEach((key) => {
+    //   if (key.startsWith("precio-")) {
+    //     // console.log(`Valor de ${key}:`, data[key]);
+    //   }
+    // });
+
     const formData = {
       // idItinerario,
       // dia,
       // idPuerto,
-      ...precio, // descripción del textField
+      ...data, // descripción del textField
       // estado,
     };
     console.log("Enviando datos:", formData);
-    try {
-      ItinerarioPuertoService.agregarPuertoItinerario(formData)
-        .then((response) => {
-          setError(response.error);
-          if (response.data != null) {
-            console.log("objeto Puerto Itinerario:", response.data);
-            toast.success(`Gestión de puerto exitosa`, {
-              duration: 1500,
-              position: "top-center",
-            });
-            setPuertosDeshabilitados((prev) => ({
-              ...prev,
-              [diaIndex - 1]: true,
-            })); // Deshabilitar el select y el botón de ese día
-            setPuertosContador((prevCount) => prevCount + 1); // Incrementar el contador de puertos
-          }
-        })
-        .catch((error) => {
-          if (error instanceof SyntaxError) {
-            console.log(error);
-            setError(error);
-            throw new Error("Respuesta no válida del servidor");
-          }
-        });
+    // try {
+    //   ItinerarioPuertoService.agregarPuertoItinerario(formData)
+    //     .then((response) => {
+    //       setError(response.error);
+    //       if (response.data != null) {
+    //         console.log("objeto Puerto Itinerario:", response.data);
+    //         toast.success(`Gestión de puerto exitosa`, {
+    //           duration: 1500,
+    //           position: "top-center",
+    //         });
+    //         setPuertosDeshabilitados((prev) => ({
+    //           ...prev,
+    //           [diaIndex - 1]: true,
+    //         })); // Deshabilitar el select y el botón de ese día
+    //         setPuertosContador((prevCount) => prevCount + 1); // Incrementar el contador de puertos
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       if (error instanceof SyntaxError) {
+    //         console.log(error);
+    //         setError(error);
+    //         throw new Error("Respuesta no válida del servidor");
+    //       }
+    //     });
 
-      handleClose();
-    } catch (error) {
-      console.error(error);
-    }
+    //   handleClose();
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
   return (
@@ -267,9 +278,9 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                                 $
                               </InputLabel>
                               <Controller
-                                name={`precio-${habitacion.idHabitacion}`} // Usar ID único
+                                name={`precio de habitación-${habitacion.idHabitacion}`} // Usar ID único
                                 control={control} //valor predeterminado vacio
-                                defaultValue={""}
+                                // defaultValue={""}
                                 render={({ field }) => {
 
                                   const handleKeyPress = (e) => {
@@ -279,14 +290,14 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                                     }
                                   };
                                   console.log(
-                                    `Valor de precio ${habitacion.idHabitacion}: `,
+                                    `Valor de habitación ${habitacion.idHabitacion} - ${habitacion.nombre}: `,
                                     field.value
                                   );
 
                                   return (
                                     <Input
+                                      {...field} // Asocia el input con el estado del formulario
                                       id={`precio-${habitacion.idHabitacion}`} // Usar ID único
-                                      {...field}
                                       placeholder="0"
                                       style={{
                                         backgroundColor: "white",
