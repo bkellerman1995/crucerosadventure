@@ -12,7 +12,12 @@ class image{
             $request = new Request();
             $response = new Response();
             //Obtener json enviado
-            $inputFILE = $request->getBody();
+            // Construir manualmente el array esperado por el modelo
+            $inputFILE = [
+                'foto' => $_FILES['file'],
+                'barco_id' => $_POST['barco_id']
+            ];
+
             //Instancia del modelo
             $barco = new ImageModel();
             //Acción del modelo a ejecutar

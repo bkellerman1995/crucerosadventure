@@ -41,7 +41,7 @@ private $upload_path = 'uploads/';
                                 $imageData = addslashes($imageData); // Escapar contenido para SQL
     
                                 // 3. Insertar BLOB en el campo `foto` del barco
-                                $sql = "UPDATE barco SET foto = '$imageData' WHERE idbarco = $barco_id";
+                               $sql = "UPDATE barco SET foto = '$imageData' WHERE idbarco = $barco_id";
                                 
                                 $resultado = $this->enlace->executeSQL_DML($sql);
     
