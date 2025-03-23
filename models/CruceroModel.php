@@ -33,7 +33,7 @@ class CruceroModel
                         $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
                     }
 
-                    $barco = $barcoModel->get($row->idBarco);
+                    $barco = $barcoModel->get($row->idbarco);
                     $row->barco = $barco;
                 }
             }
@@ -77,16 +77,22 @@ class CruceroModel
                 }
 
                 //Extrar el objeto barco relacionado a este crucero
-                $barco = $barcoModel->get($vResultado->idBarco);
+                $barco = $barcoModel->get($vResultado->idbarco);
                 $vResultado->barco = $barco;
 
-                //Extrar el objeto itinerario relacionado a este crucero
-                $itinerario = $itinerarioModel->get($vResultado->idItinerario);
-                $vResultado->itinerario = $itinerario;
+                if ($vResultado->idItinerario != null) {
+                    //Extrar el objeto itinerario relacionado a este crucero
+                    $itinerario = $itinerarioModel->get($vResultado->idItinerario);
+                    $vResultado->itinerario = $itinerario;  
+                }
+                else {
+                    $vResultado->itinerario = "";
+                }
+
 
                 //Extraer la información de los puertos del itinerario
-                $puertos = $itinerarioModel->getPuertosItinerario($vResultado->idItinerario);
-                $vResultado->puertos = $puertos;
+                // $puertos = $itinerarioModel->getPuertosItinerario($vResultado->idItinerario);
+                // $vResultado->puertos = $puertos;
 
                 //Extraer las diferentes fechas en las que se oferta el crucero
                 //junto con el precio de las habitaciones
@@ -95,7 +101,7 @@ class CruceroModel
 
                 //Extraer las habitaciones que estan ligadas al crucero (barco)
                 $habitacionModel = new HabitacionModel();
-                $habitacionesCrucero = $habitacionModel->getHabitacionesCrucero($vResultado->idBarco);
+                $habitacionesCrucero = $habitacionModel->getHabitacionesCrucero($vResultado->idbarco);
                 $vResultado->habitaciones = $habitacionesCrucero;
 
                 //Recorrer la lista de habitaciones ($vResultado->habitaciones) para asignarle la
@@ -180,6 +186,32 @@ class CruceroModel
             }
 
             return $vResultado;
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+        /**
+     * Crear itinerario
+     * @param $objeto itinerario a insertar
+     * @return $this->get($idItinerario) - Objeto itinerario
+     */
+    //
+    public function create($objeto)
+    {
+        try {
+            //Consulta sql
+            //Identificador autoincrementable
+            $sql = "Insert into crucero (nombre,foto, cantDias,idbarco,estado) 
+            Values ('$objeto->nombre',LOAD_FILE('$objeto->fotoRuta'), 
+            '$objeto->cantDias',  '$objeto->idbarco',1)";
+            //Ejecutar la consulta
+            //Obtener ultimo insert
+            $idCrucero=$this->enlace->executeSQL_DML_last($sql);
+
+            //Retornar crucero
+            return $this->get($idCrucero);
 
         } catch (Exception $e) {
             handleException($e);

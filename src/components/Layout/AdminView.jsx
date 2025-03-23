@@ -104,7 +104,7 @@ function DashboardLayoutBranding() {
             flexGrow: 1,
             p: 4,
             minHeight: "calc(100vh - 64px)", // Resta el tamaño del header
-            overflow: "hidden", // Evita el scroll innecesario
+            overflow: "auto", // Evita el scroll innecesario
           }}
         >
           <Outlet /> {/*React Router renderizará el contenido aquí */}

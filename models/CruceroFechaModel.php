@@ -16,7 +16,7 @@ class cruceroFechaModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT * FROM crucero_fecha ORDER BY idCruceroFecha DESC;";
+            $vSQL = "SELECT * FROM crucero_fecha ORDER BY idCruceroFecha asc;";
                         //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
             //Retornar la respuesta
@@ -93,6 +93,32 @@ class cruceroFechaModel
                 //Retornar la respuesta
                 return $vResultado;
             }
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    public function create ($objeto)
+    {
+        try {
+
+            $vResultado = $this->get($objeto->idItinerario, $objeto->dia, $objeto->idPuerto);
+
+            if ($vResultado ==null){
+                $sql = "Insert into itinerario_puerto (idItinerario, dia, idPuerto, descripcion, estado) 
+                Values ('$objeto->idItinerario', '$objeto->dia','$objeto->idPuerto','$objeto->descripcion', '$objeto->estado')";
+    
+            } else {
+                $sql = "UPDATE itinerario_puerto SET descripcion = '$objeto->descripcion'
+                WHERE idItinerario = $objeto->idItinerario AND dia = $objeto->dia AND idPuerto = $objeto->idPuerto;";
+            }
+
+            //Ejecutar la consulta
+            $vResultado=$this->enlace->executeSQL_DML($sql);
+
+            //Retornar itinerario
+            return $this->get($objeto->idItinerario, $objeto->dia, $objeto->idPuerto);
 
         } catch (Exception $e) {
             handleException($e);

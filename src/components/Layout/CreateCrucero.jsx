@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
+import FormHelperText from '@mui/material/FormHelperText';
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import { useForm, Controller } from "react-hook-form";
@@ -19,6 +20,10 @@ import ItinerarioService from "../../services/ItinerarioService";
 
 
 export function CreateCrucero() {
+  
+  //ruta "quemada" para subir un archivo a la base de datos
+  const rutaArchivo = 'C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\cruceros\\\\';
+  const rutaVerificacion = 'C://xamp//htdocs//rucerosadventure//uploads//cruceros/';
   const navigate = useNavigate();
 
   const customStyles = {
@@ -66,25 +71,17 @@ export function CreateCrucero() {
       .min(7, "La cantidad de días debe ser al menos 7")
       .max(14, "La cantidad de días no debe ser mayor a 14"),
 
-    // foto: yup.required("La foto es requerida"),
     foto: yup
       .mixed()
-      .test(
-        "fileRequired",
-        "La imagen es obligatoria",
-        (value) => value && value.length > 0
+      .required("La imagen es obligatoria")
+      .test("fileType", "Debe cargar una imagen (jpg, png, jpeg)", (value) => {
+        return (
+          value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+        );
+      })
+      .test("fileSize", "El tamaño debe ser menor a 500MB", (value) =>
+        value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
       )
-      .test(
-        "fileType",
-        "Solo se permiten imágenes (jpg, png, jpeg)",
-        (value) =>
-          value && value[0]
-            ? ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
-            : false
-      )
-      .test("fileSize", "El tamaño debe ser menor a 2MB", (value) =>
-        value && value[0] ? value[0].size <= 2 * 1024 * 1024 : false
-      ),
   });
 
   //Función para manejar el form
@@ -96,22 +93,20 @@ export function CreateCrucero() {
   } = useForm({
     defaultValues: {
       nombre: "",
-      descripcion: "",
-      capacidadHuesped: "",
-      estado: "",
       foto: "",
+      cantDias: 7,
+      idBarco: null,
+      estado: "",
     },
     resolver: yupResolver(cruceroSchema),
   });
 
   // Estado para almacenar el valor de cantidad de días
   const [cantDias, setCantDias] = useState(7); // Valor mínimo predeterminado
+  console.log("Cant Dias cargados", cantDias)
 
   // Estado para controlar la apertura del modal de Gestion Cruceros
   const [openModalGestPuertos, setOpenModalGestPuertos] = useState(false);
-
-  // Estado para controlar la apertura del modal de Ver Cruceros
-  const [openModalVerPuertos, setOpenModalVerPuertos] = useState(false);
 
   // Estado para controlar la apertura del modal de Gestion Fechas y Precios
   const [openModalGestFechas, setOpenModalGestFechas] = useState(false);
@@ -126,17 +121,10 @@ export function CreateCrucero() {
   const [loadedBarco, setLoadedBarco] = useState(false);
 
   //Hooks y funcion para gestionar imagen
-  const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
-  function handleChangeImage(e) {
-    if (e.target.files) {
-      setFileURL(
-        URL.createObjectURL(e.target.files[0], e.target.files[0].name)
-      );
-      setFile(e.target.files[0], e.target.files[0].name);
-    }
-  }
+  const [file,setFile]=useState(null)
 
+  
   if (error) return <p>Error: {error.message}</p>;
 
   useEffect(() => {
@@ -159,19 +147,53 @@ export function CreateCrucero() {
 
   // Accion submit
   const onSubmit = (DataForm) => {
+    //Validar si se ha seleccionado un barco
+
+    if (!selectedBarco) {
+      setTimeout(() => {
+        if (!selectedBarco) {
+          alert("Debe seleccionar un barco para el crucero.");
+        }
+      }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
+      return;
+    }
+
     try {
       if (cruceroSchema.isValid()) {
-        CrucerosService.createCrucero(DataForm)
+
+        //Acceder al nombre del archivo de la foto
+        const fotoNombre = DataForm.foto
+          ? DataForm.foto.name
+          : "No hay foto cargada";
+
+        console.log("Nombre del archivo cargado:", fotoNombre);
+
+        const { barco, ...restoDeDataForm } = DataForm;
+        //adjuntar el nombre de la imagen a la ruta por defecto
+        const archivoRuta = rutaArchivo + fotoNombre;
+
+        // Agregar la ruta al objeto DataForm como un campo adicional
+        const dataConRuta = {
+          ...restoDeDataForm, // Copiar todos los demás datos
+          fotoRuta: archivoRuta,
+          idbarco: barco?.value,
+        };
+
+        console.log("Enviando datos del crucero al form: ", dataConRuta);
+
+        CrucerosService.createCrucero(dataConRuta)
           .then((response) => {
             setError(response.error);
             if (response.data != null) {
               toast.success(
-                `Crucero #${response.data.idCrucero} - ${response.data.nombre}`,
+                `Crucero # ${response.data.idCrucero} - ${response.data.nombre} 
+                añadido correctamente`,
                 {
-                  duration: 4000,
+                  duration: 2500,
                   position: "top-center",
                 }
               );
+              //Redirección admin crucero
               return navigate("/admin/crucero");
             }
           })
@@ -186,6 +208,14 @@ export function CreateCrucero() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  //Gestion de la imagen
+  const handleChangeImage = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+    setFileURL(URL.createObjectURL(selectedFile));
+    setValue("foto", selectedFile); // Pasar el archivo a react-hook-form
   };
 
   //Cargar el grid del componente.
@@ -218,18 +248,18 @@ export function CreateCrucero() {
               />
             </FormControl>
             <br></br>
-
-            {/* Foto */}
-            <Grid size={6} sm={6}>
+            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Typography variant="subtitle1">
                 <b>Foto</b>
               </Typography>
-              <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-                <input type="file" onChange={handleChangeImage} />
-              </FormControl>
+              <input type="file" onChange={handleChangeImage} />
               {fileURL && <img src={fileURL} alt="preview" width={150} />}
-            </Grid>
-            <br></br>
+              {errors.foto && (
+                <FormHelperText error>{errors.foto.message}</FormHelperText>
+              )}
+              <br></br>
+            </FormControl>
+            {/* <img src={fileURL} width={100} /> */}
 
             {/* Cantidad de días */}
             <Grid size={4} sm={6} spacing={2}>
@@ -246,11 +276,6 @@ export function CreateCrucero() {
                       label="Seleccione un valor"
                       type="number"
                       variant="outlined"
-                      inputProps={{
-                        min: 7,
-                        max: 14,
-                        step: 1,
-                      }}
                       onChange={(e) => {
                         let value = parseInt(e.target.value, 10);
                         if (isNaN(value) || value < 7) value = 7;
@@ -265,7 +290,6 @@ export function CreateCrucero() {
               </FormControl>
             </Grid>
             <br></br>
-
             {/* Barco */}
             <Grid size={12} sm={4}>
               <Typography variant="subtitle1">
@@ -311,13 +335,15 @@ export function CreateCrucero() {
             </Grid>
             <br></br>
             <br></br>
-
             {/* Botón Guardar*/}
             <Grid size={4} sm={4}>
               <Button
-                type="submit"
                 variant="contained"
+                type="submit"
                 style={{ backgroundColor: "#16537e" }}
+                onClick={() => {
+                  console.log("Estado actual de selectedBarco:", selectedBarco);
+                }}
               >
                 Guardar
               </Button>
@@ -336,7 +362,12 @@ export function CreateCrucero() {
                 padding: "10px",
               }}
             >
-              <Typography align = "center" variant="h5" gutterBottom color="white">
+              <Typography
+                align="center"
+                variant="h5"
+                gutterBottom
+                color="white"
+              >
                 <b>Itinerario y fechas</b>
               </Typography>
 

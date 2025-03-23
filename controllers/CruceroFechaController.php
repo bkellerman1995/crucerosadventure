@@ -19,24 +19,6 @@ class crucero
         }
     }
 
-    //POST Crear
-    public function create()
-    {
-        try {
-            $request = new Request();
-            $response = new Response();
-            //Obtener json enviado
-            $inputJSON = $request->getJSON();
-            //Instancia del modelo
-            $crucero = new CruceroModel();
-            //Acción del modelo a ejecutar
-            $result = $crucero->create($inputJSON);
-            //Dar respuesta
-            $response->toJSON($result);
-        } catch (Exception $e) {
-            handleException($e);
-        }
-    }
     //GET Obtener 
     public function get($id)
     {

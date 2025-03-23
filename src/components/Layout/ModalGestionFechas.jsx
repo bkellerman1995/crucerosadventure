@@ -19,6 +19,7 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
   const [barcoData, setBarcoData] = useState([]);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [error, setError] = useState("");
+  
   const onError = (errors) => {
     console.log("Errores en el formulario:", errors);
   };
@@ -28,55 +29,59 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
     dayjs().add(1, "month")
   );
 
-  // Esquema de validación
-  const fechaHabitacionSchema = yup.object({
-    precio: yup
-      .number()
-      .transform((value, originalValue) => {
-        // Si el valor es vacío, devuelve undefined
-        return originalValue === "" ? undefined : value;
-      })
-      .min(500, "El precio mínimo debe ser de $500")
-      .max(9999, "El precio máximo debe ser $9999")
-      // .required("El precio es requerido")
-  });
+  // Estado para almacenar el esquema de validación
+  const [fechaHabitacionSchema, setFechaHabitacionSchema] = useState(
+    yup.object()
+  );
+
+  // Generación dinámica del esquema de validación
+  useEffect(() => {
+    if (open && barco) {
+      // Obtener las habitaciones
+      const idbarco = barco.value;
+      BarcoService.getBarcobyId(idbarco)
+        .then((response) => {
+          setBarcoData(response.data);
+
+          // Generar el esquema de validación dinámicamente
+          const dynamicValidationSchema = {};
+          response.data.habitaciones.forEach((habitacion) => {
+            const precioFieldName =`precio-${habitacion.idHabitacion}`;
+            dynamicValidationSchema[precioFieldName] = yup
+              .number()
+              .transform((value, originalValue) =>
+                originalValue === "" ? undefined : value
+              )
+              .min(
+                500,
+                `El precio mínimo debe ser de $500`
+              )
+              .max(
+                9999,
+                `El precio máximo debe ser $9999`
+              )
+              .required(`El precio es requerido`);
+          });
+
+          // Crear el esquema de validación con yup
+          setFechaHabitacionSchema(yup.object().shape(dynamicValidationSchema));
+        })
+        .catch((error) => {
+          setError(error.message);
+        });
+    }
+  }, [open, barco]);
 
   //Función para manejar el form
   const {
     control,
     handleSubmit,
     formState: { errors },
-    reset, //limpiar el formulario cuando el modal se cierre
+    //reset, //limpiar el formulario cuando el modal se cierre
   } = useForm({
     resolver: yupResolver(fechaHabitacionSchema),
     mode: "onSubmit", //validar al salir del campo
   });
-
-  //Cuando el modal se abre, resetear el precio de la habitación
-  useEffect(() => {
-    if (open) {
-      reset({ precio: "" });
-    }
-  }, [open, reset]);
-
-  useEffect(() => {
-    if (open && barco) {
-      console.log("id de barco recibido en ModalGestionFechas:", barco);
-      const idbarco = barco.value;
-      BarcoService.getBarcobyId(idbarco)
-        .then((response) => {
-          console.log("Habitaciones cargadas:", response.data);
-          setBarcoData(response.data);
-        })
-        .catch((error) => {
-          if (error instanceof SyntaxError) {
-            console.log(error);
-            setError(error);
-            throw new Error("Respuesta no válida del servidor");
-          }
-        });
-    }
-  }, [open, barco]);
 
   if (error) return <p>Error: {error.message}</p>;
 
@@ -84,13 +89,6 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
   const onSubmit = (data) => {
     // e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
     console.log("Dato recibido del form:", data);
-
-    // Iterar sobre las claves de "precio-1", "precio-2", etc.
-    // Object.keys(data).forEach((key) => {
-    //   if (key.startsWith("precio-")) {
-    //     // console.log(`Valor de ${key}:`, data[key]);
-    //   }
-    // });
 
     const formData = {
       // idItinerario,
@@ -100,35 +98,35 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
       // estado,
     };
     console.log("Enviando datos:", formData);
-    // try {
-    //   ItinerarioPuertoService.agregarPuertoItinerario(formData)
-    //     .then((response) => {
-    //       setError(response.error);
-    //       if (response.data != null) {
-    //         console.log("objeto Puerto Itinerario:", response.data);
-    //         toast.success(`Gestión de puerto exitosa`, {
-    //           duration: 1500,
-    //           position: "top-center",
-    //         });
-    //         setPuertosDeshabilitados((prev) => ({
-    //           ...prev,
-    //           [diaIndex - 1]: true,
-    //         })); // Deshabilitar el select y el botón de ese día
-    //         setPuertosContador((prevCount) => prevCount + 1); // Incrementar el contador de puertos
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       if (error instanceof SyntaxError) {
-    //         console.log(error);
-    //         setError(error);
-    //         throw new Error("Respuesta no válida del servidor");
-    //       }
-    //     });
+    try {
+      ItinerarioPuertoService.agregarPuertoItinerario(formData)
+        .then((response) => {
+          setError(response.error);
+          if (response.data != null) {
+            console.log("objeto Puerto Itinerario:", response.data);
+            toast.success(`Gestión de puerto exitosa`, {
+              duration: 1500,
+              position: "top-center",
+            });
+            setPuertosDeshabilitados((prev) => ({
+              ...prev,
+              [diaIndex - 1]: true,
+            })); // Deshabilitar el select y el botón de ese día
+            setPuertosContador((prevCount) => prevCount + 1); // Incrementar el contador de puertos
+          }
+        })
+        .catch((error) => {
+          if (error instanceof SyntaxError) {
+            console.log(error);
+            setError(error);
+            throw new Error("Respuesta no válida del servidor");
+          }
+        });
 
-    //   handleClose();
-    // } catch (error) {
-    //   console.error(error);
-    // }
+      handleClose();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -278,11 +276,10 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                                 $
                               </InputLabel>
                               <Controller
-                                name={`precio de habitación-${habitacion.idHabitacion}`} // Usar ID único
+                                name={`precio-${habitacion.idHabitacion}`} // Usar ID único
                                 control={control} //valor predeterminado vacio
-                                // defaultValue={""}
+                                // defaultValue={0}
                                 render={({ field }) => {
-
                                   const handleKeyPress = (e) => {
                                     // Prevenir la entrada del signo "-"
                                     if (e.key === "-") {
@@ -330,9 +327,11 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                                 {errors[`precio-${habitacion.idHabitacion}`]
                                   ? errors[`precio-${habitacion.idHabitacion}`]
                                       ?.message
-                                  : "Ingrese un precio entre 500 y 9999"}
+                                  : "Ingrese un precio entre $500 y $9999"}
                               </FormHelperText>
+                              <br></br>
                             </FormControl>
+
                           </React.Fragment>
                         </Typography>
                       ))
