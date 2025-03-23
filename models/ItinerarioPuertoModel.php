@@ -28,12 +28,12 @@ class ItinerarioPuertoModel
         }
     }
 
-    public function get($idItinerario, $idPuerto)
+    public function get($idItinerario, $dia, $idPuerto)
     {
         try {
 
             $vSql = "SELECT * FROM itinerario_puerto
-                    where idItinerario=$idItinerario and idPuerto=$idPuerto;";
+                    where idItinerario=$idItinerario and dia=$dia and idPuerto=$idPuerto;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -85,20 +85,26 @@ class ItinerarioPuertoModel
      * @return $this->get($idItinerario) - Objeto itinerario
      */
     //
-    public function create($objeto)
+    public function create ($objeto)
     {
         try {
-            //Consulta sql
-            //Identificador autoincrementable
-            $sql = "Insert into itinerario_puerto (idItinerario,idPuerto,descripcion,estado) 
-            Values ('$objeto->idItinerario','$objeto->idPuerto','$objeto->descripcion', '$objeto->estado')";
+
+            $vResultado = $this->get($objeto->idItinerario, $objeto->dia, $objeto->idPuerto);
+
+            if ($vResultado ==null){
+                $sql = "Insert into itinerario_puerto (idItinerario, dia, idPuerto, descripcion, estado) 
+                Values ('$objeto->idItinerario', '$objeto->dia','$objeto->idPuerto','$objeto->descripcion', '$objeto->estado')";
+    
+            } else {
+                $sql = "UPDATE itinerario_puerto SET descripcion = '$objeto->descripcion'
+                WHERE idItinerario = $objeto->idItinerario AND dia = $objeto->dia AND idPuerto = $objeto->idPuerto;";
+            }
 
             //Ejecutar la consulta
-            //Obtener ultimo insert
             $vResultado=$this->enlace->executeSQL_DML($sql);
 
             //Retornar itinerario
-            return $this->get($objeto->idItinerario, $objeto->idPuerto);
+            return $this->get($objeto->idItinerario, $objeto->dia, $objeto->idPuerto);
 
         } catch (Exception $e) {
             handleException($e);

@@ -8,7 +8,7 @@ import PuertoService from "../../services/PuertoService";
 import ItinerarioService from "../../services/ItinerarioService";
 import PropTypes from "prop-types";
 import Select from "react-select";
-
+import toast from "react-hot-toast";
 export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
   const [dataPuerto, setDataPuerto] = useState([]);
   const [loadedPuerto, setLoadedPuerto] = useState(false);
@@ -18,8 +18,10 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
   const [openModalDesc, setOpenModalDesc] = useState(false);
   const [selectedPuerto, setSelectedPuerto] = useState({});
   const [selectedDiaIndex, setSelectedDiaIndex] = useState(null);
-  const [errorMessage, setErrorMessage] = useState({});
-
+  const [puertosContador, setPuertosContador] = useState(0); // Estado para contar puertos seleccionados
+  const [puertosDeshabilitados, setPuertosDeshabilitados] = useState({}); // 1. Crear el estado disabledPorts
+  const [errorMessage, setErrorMessage] = useState({}); 
+  
   // Crear itinerario al abrir modal
   useEffect(() => {
     if (open && !idItinerario) {
@@ -46,17 +48,25 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
       });
   }, []);
 
+  //Abrir confirm Dialog en caso de que
+  //se quiera cerrar el modal
   const handleModalClose = () => {
     setOpenConfirmDialog(true);
   };
 
-  const confirmarCerrarYEliminar = () => {
-    if (idItinerario) {
-      ItinerarioService.deleteItinerario(idItinerario)
-        .then(() => console.log("Itinerario eliminado"))
-        .catch((err) => console.error("Error al eliminar:", err));
+  //Confirmar que al menos dos puertos 
+  //estén añadidos al itinerario
+  const handleConfirmar = () => {
+    // Verificar si se han seleccionado al menos dos puertos
+    if (puertosContador < 2) {
+      toast.error("Se debe agregar más de un puerto al itinerario.");
+      return;
     }
-    setIdItinerario(null);
+
+    // Si la verificación es correcta, mostrar éxito y cerrar modal
+    toast.success("Puertos agregados correctamente.");
+    setPuertosContador(0);
+    setPuertosDeshabilitados(false);
     setSelectedPuerto({});
     setSelectedDiaIndex(null);
     if (control && control.setValue) {
@@ -64,6 +74,22 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
         control.setValue(`puerto-${i}`, null);
       }
     }
+    handleClose();
+  };
+
+  const confirmarCerrarYEliminar = () => {
+    if (idItinerario) {
+      setPuertosDeshabilitados(false);
+      setIdItinerario(null);
+      setSelectedPuerto({});
+      setSelectedDiaIndex(null);
+    }
+    if (control && control.setValue) {
+      for (let i = 0; i < cantDias; i++) {
+        control.setValue(`puerto-${i}`, null);
+      }
+    }
+    
     setOpenConfirmDialog(false);
     handleClose();
   };
@@ -225,10 +251,17 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                                   [index]: null,
                                 }));
                               }}
+                              isDisabled={puertosDeshabilitados[index]} // Deshabilitar el select según el estado
                             />
                           );
                         }}
                       />
+                    )}
+                    {/* Mostrar el mensaje de error debajo del Select */}
+                    {errorMessage[index] && (
+                      <Typography color="error" variant="caption">
+                        {errorMessage[index]}
+                      </Typography>
                     )}
                   </FormControl>
                 </Grid>
@@ -260,6 +293,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                       console.log("selectedDiaIndex:", selectedDiaIndex);
                       setOpenModalDesc(true);
                     }}
+                    disabled={puertosDeshabilitados[index]} // Deshabilitar el botón solo si este puerto fue modificado
                   >
                     Gestionar descripción
                   </Button>
@@ -276,11 +310,13 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
           puertoSeleccionado={selectedPuerto[selectedDiaIndex - 1]}
           diaIndex={selectedDiaIndex}
           idItinerario={idItinerario}
+          setPuertosContador={setPuertosContador}
+          setPuertosDeshabilitados={setPuertosDeshabilitados}
         />
 
         <Button
           variant="contained"
-          onClick={handleModalClose}
+          onClick={handleConfirmar}
           sx={{
             mt: 3,
             backgroundColor: "#16537e",

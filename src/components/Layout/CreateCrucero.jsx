@@ -440,7 +440,7 @@ export function CreateCrucero() {
                       setOpenModalGestFechas(true);
                     }}
                   >
-                    Gestionar fechas
+                    Gestionar fechas y precios
                   </Button>
                 </Grid>
 

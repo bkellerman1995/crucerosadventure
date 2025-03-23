@@ -12,9 +12,10 @@ import toast from "react-hot-toast";
 import ItinerarioPuertoService from "../../services/ItinerarioPuertoService";
 
 
-export function ModalDescripcion({ open, handleClose, resetSelect, puertoSeleccionado, diaIndex,idItinerario }) {
+export function ModalDescripcion({ open, handleClose, resetSelect, puertoSeleccionado, diaIndex,idItinerario, setPuertosContador,setPuertosDeshabilitados}) {
   
   const idPuerto = puertoSeleccionado?.idPuerto;
+  const dia = diaIndex;
   const estado = 1;
   console.log ("puerto recibido en modal",puertoSeleccionado);
   // Esquema de validación
@@ -55,8 +56,9 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
     // Agregar los valores de idItinerario y idPuerto a los datos del formulario
     const formData = {
       idItinerario,
-      idPuerto, // ID del itinerario
-      ...descripcion, // Datos del formulario
+      dia,
+      idPuerto,
+      ...descripcion, // descripción del textField
       estado
       
     };
@@ -68,12 +70,14 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
           if (response.data != null) {
             console.log('objeto Puerto Itinerario:', response.data)
             toast.success(
-              `Puerto agregado exitosamente`,
+              `Gestión de puerto exitosa`,
               {
                 duration: 1500,
                 position: "top-center",
               }
             );
+            setPuertosDeshabilitados((prev) => ({ ...prev, [diaIndex -1 ]: true })); // Deshabilitar el select y el botón de ese día
+            setPuertosContador((prevCount) => prevCount + 1); // Incrementar el contador de puertos
           }
         })
         .catch((error) => {
@@ -203,6 +207,7 @@ ModalDescripcion.propTypes = {
   resetSelect: PropTypes.func,
   puertoSeleccionado: PropTypes.object.isRequired,
   diaIndex: PropTypes.number.isRequired,
-  idItinerario: PropTypes.number.isRequired
-
+  idItinerario: PropTypes.number.isRequired,
+  setPuertosContador: PropTypes.number.isRequired,
+  setPuertosDeshabilitados: PropTypes.func.isRequired
 };
