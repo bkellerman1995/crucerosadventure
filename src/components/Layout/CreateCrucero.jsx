@@ -23,7 +23,6 @@ export function CreateCrucero() {
   
   //ruta "quemada" para subir un archivo a la base de datos
   const rutaArchivo = 'C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\cruceros\\\\';
-  const rutaVerificacion = 'C://xamp//htdocs//rucerosadventure//uploads//cruceros/';
   const navigate = useNavigate();
 
   const customStyles = {
