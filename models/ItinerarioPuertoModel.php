@@ -28,12 +28,12 @@ class ItinerarioPuertoModel
         }
     }
 
-    public function get($id)
+    public function get($idItinerario, $idPuerto)
     {
         try {
 
             $vSql = "SELECT * FROM itinerario_puerto
-                    where idItinerario=$id;";
+                    where idItinerario=$idItinerario and idPuerto=$idPuerto;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -91,14 +91,14 @@ class ItinerarioPuertoModel
             //Consulta sql
             //Identificador autoincrementable
             $sql = "Insert into itinerario_puerto (idItinerario,idPuerto,descripcion,estado) 
-            Values ('$objeto->estado')";
+            Values ('$objeto->idItinerario','$objeto->idPuerto','$objeto->descripcion', '$objeto->estado')";
 
             //Ejecutar la consulta
             //Obtener ultimo insert
-            $idItinerario=$this->enlace->executeSQL_DML_last($sql);
+            $vResultado=$this->enlace->executeSQL_DML($sql);
 
             //Retornar itinerario
-            return $this->get($idItinerario);
+            return $this->get($objeto->idItinerario, $objeto->idPuerto);
 
         } catch (Exception $e) {
             handleException($e);

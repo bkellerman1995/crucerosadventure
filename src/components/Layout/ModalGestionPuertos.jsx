@@ -211,8 +211,11 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                               placeholder="Seleccione un puerto"
                               value={selectedOption} // Mostrar el puerto seleccionado
                               onChange={(selectedOption) => {
-                                field.onChange(selectedOption.value); 
-                                console.log('puerto seleccionado', selectedOption.obj) // Solo se guarda el ID en el formulario
+                                field.onChange(selectedOption.value);
+                                console.log(
+                                  "puerto seleccionado",
+                                  selectedOption.obj
+                                ); // Solo se guarda el ID en el formulario
                                 setSelectedPuerto((prevState) => ({
                                   ...prevState,
                                   [index]: selectedOption.obj, // Guardar el objeto completo
@@ -250,7 +253,11 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                         }));
                         return;
                       }
-                      setSelectedDiaIndex(index + 1);
+
+                      // Actualizar el índice del día y abrir el modal
+                      const diaIndex = index + 1;
+                      setSelectedDiaIndex(diaIndex);
+                      console.log("selectedDiaIndex:", selectedDiaIndex);
                       setOpenModalDesc(true);
                     }}
                   >
@@ -266,7 +273,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
           open={openModalDesc}
           handleClose={() => setOpenModalDesc(false)}
           resetSelect={resetSelect}
-          puertoSeleccionado={selectedPuerto}
+          puertoSeleccionado={selectedPuerto[selectedDiaIndex - 1]}
           diaIndex={selectedDiaIndex}
           idItinerario={idItinerario}
         />

@@ -14,8 +14,9 @@ import ItinerarioPuertoService from "../../services/ItinerarioPuertoService";
 
 export function ModalDescripcion({ open, handleClose, resetSelect, puertoSeleccionado, diaIndex,idItinerario }) {
   
-  const puerto = puertoSeleccionado[0];
-  console.log ("puerto recibido en modal",puerto);
+  const idPuerto = puertoSeleccionado?.idPuerto;
+  const estado = 1;
+  console.log ("puerto recibido en modal",puertoSeleccionado);
   // Esquema de validación
   const puertoSchema = yup.object({
     descripcion: yup
@@ -49,13 +50,15 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
 
 
   // Accion submit del botón guardar
-  const onSubmit = (DataForm,e) => {
+  const onSubmit = (descripcion,e) => {
     e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
     // Agregar los valores de idItinerario y idPuerto a los datos del formulario
     const formData = {
-      ...DataForm, // Datos del formulario
-      idItinerario, // ID del itinerario
-      puertoSeleccionado,
+      idItinerario,
+      idPuerto, // ID del itinerario
+      ...descripcion, // Datos del formulario
+      estado
+      
     };
     console.log("Enviando datos:", formData );
     try {
@@ -63,10 +66,11 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
         .then((response) => {
           setError(response.error);
           if (response.data != null) {
+            console.log('objeto Puerto Itinerario:', response.data)
             toast.success(
-              `Día #${response.data.idItinerario} - ${response.data.idPuerto} -  ${response.data.descripcion}`,
+              `Puerto agregado exitosamente`,
               {
-                duration: 4000,
+                duration: 1500,
                 position: "top-center",
               }
             );
@@ -79,7 +83,8 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
             throw new Error("Respuesta no válida del servidor");
           }
         });
-      // }
+
+        handleClose();
     } catch (error) {
       console.error(error);
     }
@@ -119,10 +124,8 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
             <br></br>
             <Typography>
               <b>Día {diaIndex} </b><br />
-              <b>Puerto: </b> {puerto?.nombre ?? "No seleccionado"} <br />
-              {console.log("Nombre puerto", puerto?.nombre)}
-              <b>País: </b> {puerto?.pais?.descripcion ?? "No seleccionado"}
-              {console.log("Pais puerto", puerto?.pais.descripcion)}
+              <b>Puerto: </b> {puertoSeleccionado?.nombre ?? "No seleccionado"} <br />
+              <b>País: </b> {puertoSeleccionado?.pais?.descripcion ?? "No seleccionado"}
 
             </Typography>
             <br></br>
