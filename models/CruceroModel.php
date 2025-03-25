@@ -217,4 +217,22 @@ class CruceroModel
             handleException($e);
         }
     }
+
+    public function updateCrucero($crucero)
+    {
+        try {
+            //Consulta sql
+            $sql = "Update crucero SET idItinerario =$crucero->idItinerario
+            Where idCrucero = $crucero->idCrucero;";
+
+            //Ejecutar la consulta
+            $cResults = $this->enlace->executeSQL_DML($sql);
+
+            //Retornar crucero
+            return $this->get($crucero->idCrucero);
+            
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

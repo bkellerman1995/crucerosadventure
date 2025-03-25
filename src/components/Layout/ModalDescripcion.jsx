@@ -54,6 +54,7 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
   // Accion submit del botón guardar
   const onSubmit = (descripcion,e) => {
     e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
+    
     // Agregar los valores de idItinerario y idPuerto a los datos del formulario
     const formData = {
       idItinerario,

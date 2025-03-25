@@ -23,6 +23,16 @@ class CruceroService {
   createCrucero(crucero) {
     return axios.post(BASE_URL, JSON.stringify(crucero));
   }
+
+  // Actualizar crucero con Itinerario
+  //localhost:81/crucerosadventure/crucero
+  update(crucero) {
+    return axios({
+      method: "put",
+      url: BASE_URL,
+      data: JSON.stringify(crucero), 
+    });
+  }
 }
 
 export default new CruceroService();

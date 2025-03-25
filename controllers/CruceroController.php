@@ -53,4 +53,24 @@ class crucero
             handleException($e);
         }
     }
+
+    //Actualizar el Crucero
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $crucero = new CruceroModel();
+            //Acción del modelo a ejecutar
+            $result = $crucero->updateCrucero($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
 }

@@ -6,10 +6,11 @@ import { Controller } from "react-hook-form";
 import { ModalDescripcion } from "./ModalDescripcion";
 import PuertoService from "../../services/PuertoService";
 import ItinerarioService from "../../services/ItinerarioService";
+import CrucerosService from "../../services/CrucerosService";
 import PropTypes from "prop-types";
 import Select from "react-select";
 import toast from "react-hot-toast";
-export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
+export function ModalGestionPuertos({ open, handleClose, cantDias, control, setCruceroCreado,setPuertosItinerario, idCrucero }) {
   const [dataPuerto, setDataPuerto] = useState([]);
   const [loadedPuerto, setLoadedPuerto] = useState(false);
   const [idItinerario, setIdItinerario] = useState(null);
@@ -63,12 +64,34 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
       return;
     }
 
-    // Si la verificación es correcta, mostrar éxito y cerrar modal
-    toast.success("Puertos agregados correctamente.");
-    setPuertosContador(0);
-    setPuertosDeshabilitados(false);
-    setSelectedPuerto({});
-    setSelectedDiaIndex(null);
+    const crucero = {
+      idCrucero : parseInt(idCrucero,10),
+      idItinerario: parseInt (idItinerario,10)
+    }
+
+    console.log(typeof crucero.idCrucero); // Imprime 'number' o 'string', dependiendo del valor
+    console.log(typeof crucero.idItinerario);
+
+    CrucerosService.update(crucero)
+      .then((response) => {
+        setError(response.error);
+        if (response.data != null) {
+          toast.success("Puertos agregados correctamente.");
+          setPuertosContador(0);
+          setPuertosDeshabilitados(false);
+          setSelectedPuerto({});
+          setSelectedDiaIndex(null);
+          setPuertosItinerario(true);
+          setCruceroCreado(true);
+        }
+      })
+      .catch((error) => {
+        if (error instanceof SyntaxError) {
+          console.log(error);
+          setError(error);
+          throw new Error("Respuesta no válida del servidor");
+        }
+      });
     if (control && control.setValue) {
       for (let i = 0; i < cantDias; i++) {
         control.setValue(`puerto-${i}`, null);
@@ -83,6 +106,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
       setIdItinerario(null);
       setSelectedPuerto({});
       setSelectedDiaIndex(null);
+      setCruceroCreado(true);
     }
     if (control && control.setValue) {
       for (let i = 0; i < cantDias; i++) {
@@ -267,6 +291,7 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
                 </Grid>
                 <Grid item sx={{ flexShrink: 0, ml: 35 }}>
                   <Button
+                    type="button"
                     variant="contained"
                     fullWidth
                     sx={{
@@ -338,13 +363,13 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control }) {
           onClose={() => setOpenConfirmDialog(false)}
         >
           <DialogTitle>¿Deseas salir sin guardar?</DialogTitle>
-          <DialogContent>Esto eliminará el itinerario creado.</DialogContent>
+          <DialogContent>El itinerario no se asignará al crucero.</DialogContent>
           <DialogActions>
+            <Button onClick={confirmarCerrarYEliminar} color="error">
+              Sí
+            </Button>
             <Button onClick={() => setOpenConfirmDialog(false)}>
               Cancelar
-            </Button>
-            <Button onClick={confirmarCerrarYEliminar} color="error">
-              Sí, eliminar
             </Button>
           </DialogActions>
         </Dialog>
@@ -358,4 +383,8 @@ ModalGestionPuertos.propTypes = {
   handleClose: PropTypes.func.isRequired,
   cantDias: PropTypes.number.isRequired,
   control: PropTypes.object.isRequired,
+  setCruceroCreado: PropTypes.func.isRequired,
+  setPuertosItinerario: PropTypes.func.isRequired,
+  idCrucero: PropTypes.number.isRequired,
+
 };

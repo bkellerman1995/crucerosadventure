@@ -20,11 +20,12 @@ import ItinerarioService from "../../services/ItinerarioService";
 
 
 export function CreateCrucero() {
-  
   //ruta "quemada" para subir un archivo a la base de datos
-  const rutaArchivo = 'C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\cruceros\\\\';
+  const rutaArchivo =
+    "C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\cruceros\\\\";
   const navigate = useNavigate();
 
+  //Estilos personalizados para el select
   const customStyles = {
     option: (provided, state) => ({
       ...provided,
@@ -53,7 +54,7 @@ export function CreateCrucero() {
       zIndex: 9999, // Asegura que el menú esté visible sobre otros elementos
     }),
   };
-  
+
   // Esquema de validación
   const cruceroSchema = yup.object({
     nombre: yup
@@ -78,9 +79,11 @@ export function CreateCrucero() {
           value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
         );
       })
-      .test("fileSize", "El tamaño debe ser menor a 500MB", (value) =>
-        value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
-      )
+      .test(
+        "fileSize",
+        "El tamaño debe ser menor a 500MB",
+        (value) => value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
+      ),
   });
 
   //Función para manejar el form
@@ -102,7 +105,7 @@ export function CreateCrucero() {
 
   // Estado para almacenar el valor de cantidad de días
   const [cantDias, setCantDias] = useState(7); // Valor mínimo predeterminado
-  console.log("Cant Dias cargados", cantDias)
+  console.log("Cant Dias cargados", cantDias);
 
   // Estado para controlar la apertura del modal de Gestion Cruceros
   const [openModalGestPuertos, setOpenModalGestPuertos] = useState(false);
@@ -119,11 +122,23 @@ export function CreateCrucero() {
   const [dataBarco, setDataBarco] = useState([]);
   const [loadedBarco, setLoadedBarco] = useState(false);
 
+  //Estado del crucero creado
+  const [cruceroCreado, setCruceroCreado] = useState(false);
+
+  // Estado para almacenar el id del crucero
+  const [idCrucero, setIdCrucero] = useState(null);
+
+  //Estado de los puertos añadidos al itinerario
+  const [puertosItinerario, setPuertosItinerario] = useState(false);
+
+  //Estado de las fecas añadidas al crucero
+  const [fechasCrucero, setFechasCrucero] = useState(false);
+
   //Hooks y funcion para gestionar imagen
   const [fileURL, setFileURL] = useState(null);
-  const [file,setFile]=useState(null)
+  const [file, setFile] = useState(null);
 
-  
+  //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
   useEffect(() => {
@@ -145,7 +160,7 @@ export function CreateCrucero() {
   }, []);
 
   // Accion submit
-  const onSubmit = (DataForm) => {
+  const onSubmit = async (DataForm) => {
     //Validar si se ha seleccionado un barco
 
     if (!selectedBarco) {
@@ -158,8 +173,10 @@ export function CreateCrucero() {
     }
 
     try {
-      if (cruceroSchema.isValid()) {
+      // Validar el objeto con Yup de manera asíncrona
+      const isValid = await cruceroSchema.isValid(DataForm);
 
+      if (isValid) {
         //Acceder al nombre del archivo de la foto
         const fotoNombre = DataForm.foto
           ? DataForm.foto.name
@@ -184,16 +201,20 @@ export function CreateCrucero() {
           .then((response) => {
             setError(response.error);
             if (response.data != null) {
+              //Obtener el valor del id del crucero creado
+              setIdCrucero(response.data.idCrucero);
+
               toast.success(
                 `Crucero # ${response.data.idCrucero} - ${response.data.nombre} 
-                añadido correctamente`,
+                Añadido correctamente 
+                Proceda a añadir el itinerario y las fechas del crucero`,
                 {
-                  duration: 2500,
+                  duration: 3000,
                   position: "top-center",
                 }
               );
-              //Redirección admin crucero
-              return navigate("/admin/crucero");
+              //Configurar el estado de crucero creado a true
+              setCruceroCreado(true);
             }
           })
           .catch((error) => {
@@ -203,6 +224,9 @@ export function CreateCrucero() {
               throw new Error("Respuesta no válida del servidor");
             }
           });
+      } else {
+        //Configurar el estado de crucero creado a false
+        setCruceroCreado(false);
       }
     } catch (error) {
       console.error(error);
@@ -235,6 +259,7 @@ export function CreateCrucero() {
               <Controller
                 name="nombre"
                 control={control}
+                style={{ backgroundColor: "#16537e" }}
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -242,16 +267,26 @@ export function CreateCrucero() {
                     label="Nombre"
                     error={Boolean(errors.nombre)}
                     helperText={errors.nombre ? errors.nombre.message : " "}
+                    disabled={cruceroCreado}
                   />
                 )}
               />
             </FormControl>
             <br></br>
-            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+            <FormControl
+              variant="standard"
+              fullWidth
+              sx={{ m: 1 }}
+              style={{ disabled: cruceroCreado }}
+            >
               <Typography variant="subtitle1">
                 <b>Foto</b>
               </Typography>
-              <input type="file" onChange={handleChangeImage} />
+              <input
+                type="file"
+                onChange={handleChangeImage}
+                disabled={cruceroCreado}
+              />
               {fileURL && <img src={fileURL} alt="preview" width={150} />}
               {errors.foto && (
                 <FormHelperText error>{errors.foto.message}</FormHelperText>
@@ -283,6 +318,7 @@ export function CreateCrucero() {
                         field.onChange(value); // ACTUALIZA el valor en react-hook-form
                       }}
                       value={cantDias} // SE ASIGNA EL VALOR ACTUAL
+                      disabled={cruceroCreado}
                     />
                   )}
                 />
@@ -328,23 +364,28 @@ export function CreateCrucero() {
                     value={selectedBarco}
                     styles={customStyles}
                     placeholder="Seleccione un barco"
+                    isDisabled={cruceroCreado}
                   />
                 )}
               </FormControl>
             </Grid>
             <br></br>
             <br></br>
-            {/* Botón Guardar*/}
-            <Grid size={4} sm={4}>
+
+            {/* Botón Crear Crucero*/}
+            <Grid size={4} sm={4} spacing={1}>
               <Button
                 variant="contained"
                 type="submit"
-                style={{ backgroundColor: "#16537e" }}
+                style={{
+                  backgroundColor: "#16537e",
+                  display: !cruceroCreado ? "block" : "none",
+                }}
                 onClick={() => {
                   console.log("Estado actual de selectedBarco:", selectedBarco);
                 }}
               >
-                Guardar
+                Crear crucero
               </Button>
             </Grid>
           </Grid>
@@ -375,6 +416,7 @@ export function CreateCrucero() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#50C878" }}
+                    disabled={!cruceroCreado} // Deshabilita el botón si el crucero no ha sido creado
                     onClick={async () => {
                       try {
                         // Llamada al servicio para crear el itinerario
@@ -389,8 +431,9 @@ export function CreateCrucero() {
 
                         console.log("Itinerario creado:", response.data);
 
-                        // Si quieres abrir el modal después de crear el itinerario:
+                        // Abrir el modal después de crear el itinerario:
                         setOpenModalGestPuertos(true);
+                        setCruceroCreado(false);
                       } catch (error) {
                         console.error("Error al crear el itinerario:", error);
                       }
@@ -400,19 +443,10 @@ export function CreateCrucero() {
                   </Button>
                 </Grid>
 
-                {/* Modal importado para Gestión de puertos */}
-                <ModalGestionPuertos
-                  open={openModalGestPuertos}
-                  handleClose={() => setOpenModalGestPuertos(false)}
-                  //pasar la fecha seleccionada
-                  //pasar la cantidad de dias
-                  cantDias={cantDias}
-                  control={{ ...control, setValue }}
-                />
-
                 <Button
                   variant="contained"
                   style={{ backgroundColor: "#50C878" }}
+                  disabled={!cruceroCreado} // Deshabilita el botón si el crucero no ha sido creado
                   onClick={() => {
                     console.log(
                       "Estado actual de selectedBarco:",
@@ -427,6 +461,7 @@ export function CreateCrucero() {
                           );
                         } else {
                           setOpenModalGestFechas(true);
+                          setCruceroCreado(false);
                         }
                       }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
                       return;
@@ -437,18 +472,49 @@ export function CreateCrucero() {
                 >
                   Gestionar fechas y precios
                 </Button>
-
-                {/* Modal importado para Gestión de fechas y habitaciones */}
-                <ModalGestionFechas
-                  open={openModalGestFechas}
-                  handleClose={() => setOpenModalGestFechas(false)}
-                  barco={selectedBarco}
-                />
               </Grid>
+            </Grid>
+
+            {/* Botón Confirmar*/}
+            <Grid size={4} sm={4} spacing={1}>
+              <Button
+                variant="contained"
+                // type="submit"
+                style={{
+                  backgroundColor: "#16537e",
+                  color: "white",
+                  display: puertosItinerario && fechasCrucero ? "block" : "none",
+                }}
+                onClick={() => {
+                  console.log("Estado actual de selectedBarco:", selectedBarco);
+                }}
+              >
+                Confirmar
+              </Button>
             </Grid>
           </Grid>
         </Grid>
       </form>
+
+      {/* Modal importado para Gestión de puertos */}
+      <ModalGestionPuertos
+        open={openModalGestPuertos}
+        handleClose={() => setOpenModalGestPuertos(false)}
+        //pasar la cantidad de dias
+        cantDias={cantDias}
+        control={{ ...control, setValue }}
+        setCruceroCreado={setCruceroCreado}
+        setPuertosItinerario={setPuertosItinerario}
+        idCrucero={idCrucero} // Pasar el id del crucero
+      />
+
+      {/* Modal importado para Gestión de fechas y habitaciones */}
+      <ModalGestionFechas
+        open={openModalGestFechas}
+        handleClose={() => setOpenModalGestFechas(false)}
+        barco={selectedBarco}
+        setFechasCrucero={setFechasCrucero}
+      />
     </>
   );
 }
