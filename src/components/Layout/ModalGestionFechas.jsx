@@ -1,25 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, InputLabel, Input, FormHelperText } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  InputLabel,
+  Input,
+  FormHelperText,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import toast from "react-hot-toast";
 import BarcoService from "../../services/BarcoService";
-
+import CruceroFechaService from "../../services/CruceroFechaService";
 
 import PropTypes from "prop-types";
 
-export function ModalGestionFechas({ open, handleClose,barco }) {
+export function ModalGestionFechas({
+  open,
+  handleClose,
+  barco,
+  setFechasCrucero,
+  idCrucero,
+}) {
   const [barcoData, setBarcoData] = useState([]);
+  const [idCruceroFecha, setidCruceroFecha] = useState(null);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [error, setError] = useState("");
-  
+
   const onError = (errors) => {
     console.log("Errores en el formulario:", errors);
   };
@@ -34,7 +53,23 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
     yup.object()
   );
 
+  // Crear cruceroFecha al abrir modal
+  useEffect(() => {
+    if (open && !idCruceroFecha) {
+      const nuevo = { estado: 1 };
+      CruceroFechaService.createFechaCrucero(nuevo)
+        .then((res) => {
+          if (res?.data?.idCruceroFecha) {
+            setidCruceroFecha(res.data.idCruceroFecha);
+          }
+        })
+        .catch((err) => console.error("Error al crear fecha del crucero:", err));
+    }
+  }, [open]);
+
   // Generación dinámica del esquema de validación
+  // para las habitaciones
+
   useEffect(() => {
     if (open && barco) {
       // Obtener las habitaciones
@@ -46,20 +81,14 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
           // Generar el esquema de validación dinámicamente
           const dynamicValidationSchema = {};
           response.data.habitaciones.forEach((habitacion) => {
-            const precioFieldName =`precio-${habitacion.idHabitacion}`;
+            const precioFieldName = `precio-${habitacion.idHabitacion}`;
             dynamicValidationSchema[precioFieldName] = yup
               .number()
               .transform((value, originalValue) =>
                 originalValue === "" ? undefined : value
               )
-              .min(
-                500,
-                `El precio mínimo debe ser de $500`
-              )
-              .max(
-                9999,
-                `El precio máximo debe ser $9999`
-              )
+              .min(500, `El precio mínimo debe ser de $500`)
+              .max(9999, `El precio máximo debe ser $9999`)
               .required(`El precio es requerido`);
           });
 
@@ -90,16 +119,29 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
     // e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
     console.log("Dato recibido del form:", data);
 
+    const cruceroID = parseInt(idCrucero, 10);
+    const fechaInicioFormateada = data.fechaSalida
+      ? dayjs(data.fechaSalida).format("YYYY-MM-DD")
+      : null;
+
+    const fechaLimitePagosFormateada = data.fechaLimitePagos
+      ? dayjs(data.fechaLimitePagos).format("YYYY-MM-DD")
+      : null;
+
+    const estado = 1;
+
     const formData = {
-      // idItinerario,
+      cruceroID,
+      fechaInicioFormateada,
+      fechaLimitePagosFormateada,
       // dia,
       // idPuerto,
       ...data, // descripción del textField
-      // estado,
+      estado,
     };
     console.log("Enviando datos:", formData);
     try {
-      ItinerarioPuertoService.agregarPuertoItinerario(formData)
+      CruceroFechaService.agregarFechaCrucero(formData)
         .then((response) => {
           setError(response.error);
           if (response.data != null) {
@@ -180,24 +222,51 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                     <b>Fecha de inicio</b>
                   </Typography>
                   <br></br>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Seleccione una fecha"
-                      value={fechaSeleccionada} //Valor por defecto: hoy
-                      onChange={(newValue) => setFechaSeleccionada(newValue)}
-                      slotProps={{
-                        textField: { variant: "outlined", fullWidth: true },
-                      }}
-                      format="DD/MM/YYYY"
-                      // Para configurar la fecha al día de hoy -> minDate={dayjs()}
-                      // Para configurar la fecha dentro de un mes
-                      minDate={dayjs().add(1, "month")}
-                      //Para forzar la selección en el UI al valor mínimo por defecto
-                      onOpen={() => {
-                        if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
-                      }}
-                    />
-                  </LocalizationProvider>
+
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    sx={{ m: 1 }}
+                    error={Boolean(errors.fechaSalida)}
+                  >
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <Controller
+                        name="fechaSalida" // El nombre que usas en tu formulario
+                        control={control} // Control de react-hook-form
+                        defaultValue={fechaSeleccionada || dayjs()} // Valor por defecto
+                        render={({ field }) => (
+                          <DatePicker
+                            label="Seleccione una fecha válida"
+                            value={field.value} //Valor por defecto: hoy
+                            onChange={(newValue) => {
+                              const fechaFormateada = newValue
+                                ? newValue.format("YYYY-MM-DD")
+                                : null;
+                              field.onChange(fechaFormateada);
+                            }}
+                            slotProps={{
+                              textField: {
+                                variant: "outlined",
+                                fullWidth: true,
+                              },
+                            }}
+                            format="DD/MM/YYYY"
+                            // Para configurar la fecha al día de hoy -> minDate={dayjs()}
+                            // Para configurar la fecha dentro de un mes
+                            minDate={dayjs().add(1, "month")}
+                            //Para forzar la selección en el UI al valor mínimo por defecto
+                            onOpen={() => {
+                              if (!fechaSeleccionada)
+                                setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                            }}
+                          />
+                        )}
+                      />
+                    </LocalizationProvider>
+                    <FormHelperText>
+                      {errors.fechaSalida ? errors.fechaSalida.message : ""}
+                    </FormHelperText>
+                  </FormControl>
                 </Grid>
                 <br></br>
 
@@ -207,21 +276,53 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                     <b>Fecha límite de pago</b>
                   </Typography>
                   <br></br>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Seleccione una fecha"
-                      value={fechaSeleccionada} //Valor por defecto: hoy
-                      onChange={(newValue) => setFechaSeleccionada(newValue)}
-                      slotProps={{
-                        textField: { variant: "outlined", fullWidth: true },
-                      }}
-                      format="DD/MM/YYYY"
-                      minDate={dayjs().add(1, "month")}
-                      onOpen={() => {
-                        if (!fechaSeleccionada) setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
-                      }}
-                    />
-                  </LocalizationProvider>
+
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    sx={{ m: 1 }}
+                    error={Boolean(errors.fechaLimitePagos)}
+                  >
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <Controller
+                        name="fechaLimitePagos" // El nombre que usas en tu formulario
+                        control={control} // Control de react-hook-form
+                        defaultValue={fechaSeleccionada || dayjs()} // Valor por defecto
+                        render={({ field }) => (
+                          <DatePicker
+                            label="Seleccione una fecha válida"
+                            value={field.value} //Valor por defecto: hoy
+                            onChange={(newValue) => {
+                              const fechaFormateada = newValue
+                                ? newValue.format("YYYY-MM-DD")
+                                : null;
+                              field.onChange(fechaFormateada);
+                            }}
+                            slotProps={{
+                              textField: {
+                                variant: "outlined",
+                                fullWidth: true,
+                              },
+                            }}
+                            format="DD/MM/YYYY"
+                            // Para configurar la fecha al día de hoy -> minDate={dayjs()}
+                            // Para configurar la fecha dentro de un mes
+                            minDate={dayjs().add(1, "month")}
+                            //Para forzar la selección en el UI al valor mínimo por defecto
+                            onOpen={() => {
+                              if (!fechaSeleccionada)
+                                setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                            }}
+                          />
+                        )}
+                      />
+                    </LocalizationProvider>
+                    <FormHelperText>
+                      {errors.fechaLimitePagos
+                        ? errors.fechaLimitePagos.message
+                        : ""}
+                    </FormHelperText>
+                  </FormControl>
                 </Grid>
                 <br></br>
                 <Grid size={10} sm={6}>
@@ -331,7 +432,6 @@ export function ModalGestionFechas({ open, handleClose,barco }) {
                               </FormHelperText>
                               <br></br>
                             </FormControl>
-
                           </React.Fragment>
                         </Typography>
                       ))
@@ -374,5 +474,7 @@ ModalGestionFechas.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   cantDias: PropTypes.number.isRequired,
-  barco: PropTypes.object, 
+  barco: PropTypes.object,
+  setFechasCrucero: PropTypes.func.isRequired,
+  idCrucero: PropTypes.number.isRequired,
 };

@@ -39,7 +39,7 @@ class cruceroFechaModel
     {
         try {
 
-            $vSql = "SELECT * FROM crucero_fecha WHERE idCruceroFecha='$idCruceroFecha'";
+            $vSql = "SELECT * FROM crucero_fecha WHERE idCruceroFecha=$idCruceroFecha";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -59,7 +59,7 @@ class cruceroFechaModel
     {
         try {
 
-            $vSql = "SELECT fechaSalida FROM crucero_fecha WHERE idCruceroFecha='$idCruceroFecha'";
+            $vSql = "SELECT fechaSalida FROM crucero_fecha WHERE idCruceroFecha=$idCruceroFecha";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -68,7 +68,7 @@ class cruceroFechaModel
             
             }
 
-            //Retornar la respuesta (id del Crucero)
+            //Retornar la respuesta (id de crucero Fecha)
             return $vResultado;
         } catch (Exception $e) {
             handleException($e);
@@ -81,7 +81,7 @@ class cruceroFechaModel
         try {
 
             //Obtener las fechas y precios de las habitaciones
-            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero='$id' order by idCruceroFecha desc;";
+            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero=$id order by idCruceroFecha desc;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -99,26 +99,19 @@ class cruceroFechaModel
         }
     }
 
-    public function create ($objeto)
+    public function create($objeto)
     {
         try {
-
-            $vResultado = $this->get($objeto->idItinerario, $objeto->dia, $objeto->idPuerto);
-
-            if ($vResultado ==null){
-                $sql = "Insert into itinerario_puerto (idItinerario, dia, idPuerto, descripcion, estado) 
-                Values ('$objeto->idItinerario', '$objeto->dia','$objeto->idPuerto','$objeto->descripcion', '$objeto->estado')";
-    
-            } else {
-                $sql = "UPDATE itinerario_puerto SET descripcion = '$objeto->descripcion'
-                WHERE idItinerario = $objeto->idItinerario AND dia = $objeto->dia AND idPuerto = $objeto->idPuerto;";
-            }
+            //Consulta sql
+            //Identificador autoincrementable
+            $sql = "Insert into crucero_fecha (estado) Values ('$objeto->estado')";
 
             //Ejecutar la consulta
-            $vResultado=$this->enlace->executeSQL_DML($sql);
+            //Obtener ultimo insert
+            $idCruceroFecha=$this->enlace->executeSQL_DML_last($sql);
 
             //Retornar itinerario
-            return $this->get($objeto->idItinerario, $objeto->dia, $objeto->idPuerto);
+            return $this->getCruceroFecha($idCruceroFecha);
 
         } catch (Exception $e) {
             handleException($e);

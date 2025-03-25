@@ -1,6 +1,6 @@
 <?php
-//localhost:81/crucerosadventure/crucero
-class crucero
+//localhost:81/crucerosadventure/cruceroFecha
+class cruceroFecha
 {
     //GET listar
     public function index()
@@ -28,6 +28,26 @@ class crucero
             $cruceroModel = new CruceroModel();
             //Acción del modelo a ejecutar
             $result = $cruceroModel->get($id);
+            //Dar respuesta
+            $response->toJSON($result);
+            
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    //POST Crear
+    public function create()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $cruceroFecha = new cruceroFechaModel();
+            //Acción del modelo a ejecutar
+            $result = $cruceroFecha->create($inputJSON);
             //Dar respuesta
             $response->toJSON($result);
             

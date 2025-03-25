@@ -483,10 +483,21 @@ export function CreateCrucero() {
                 style={{
                   backgroundColor: "#16537e",
                   color: "white",
-                  display: puertosItinerario && fechasCrucero ? "block" : "none",
+                  display:
+                    puertosItinerario && fechasCrucero ? "block" : "none",
                 }}
                 onClick={() => {
                   console.log("Estado actual de selectedBarco:", selectedBarco);
+                  if (puertosItinerario && fechasCrucero) {
+                    toast.success(
+                      `Gestión de crucero exitosa`,
+                      {
+                        duration: 2000,
+                        position: "top-center",
+                      }
+                    );
+                    navigate("/app/cruceros");
+                  }
                 }}
               >
                 Confirmar
@@ -514,6 +525,7 @@ export function CreateCrucero() {
         handleClose={() => setOpenModalGestFechas(false)}
         barco={selectedBarco}
         setFechasCrucero={setFechasCrucero}
+        idCrucero={idCrucero} // Pasar el id del crucero
       />
     </>
   );

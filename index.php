@@ -32,12 +32,14 @@ require_once "models/CruceroFechaModel.php";
 require_once "models/ImageModel.php";
 require_once "models/ItinerarioModel.php";
 
+
 /***--- Agregar todos los controladores*/
 require_once "controllers/BarcoController.php";
 require_once "controllers/HabitacionController.php";
 require_once "controllers/PuertoController.php";
 require_once "controllers/ItinerarioController.php";
 require_once "controllers/CruceroController.php";
+require_once "controllers/CruceroFechaController.php";
 require_once "controllers/CategoriaHabitacionController.php";
 require_once "controllers/ReservaController.php";
 require_once "controllers/ImageController.php";
