@@ -22,15 +22,15 @@ class BarcoService {
     return axios.get(BASE_URL + "/" + barcoId);
     
   }
-  createBarco(Barco) {
-    return axios.post(BASE_URL, JSON.stringify(Barco));
+  createBarco(barco) {
+    return axios.post(BASE_URL, JSON.stringify(barco));
   }
   
-  updateBarco(Barco) {
+  updateBarco(barco) {
     return axios({
       method: 'put',
       url: BASE_URL,
-      data: JSON.stringify(Barco)
+      data: JSON.stringify(barco)
 
     })
   }
