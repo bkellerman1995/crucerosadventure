@@ -183,7 +183,7 @@ export function CreateCrucero() {
           : "No hay foto cargada";
 
         console.log("Nombre del archivo cargado:", fotoNombre);
-
+        //Extraer el barco del objeto DataForm
         const { barco, ...restoDeDataForm } = DataForm;
         //adjuntar el nombre de la imagen a la ruta por defecto
         const archivoRuta = rutaArchivo + fotoNombre;

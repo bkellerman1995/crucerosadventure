@@ -114,8 +114,8 @@ class BarcoModel
     {
         try {
 
-            $sql = "INSERT INTO barco (nombre, descripcion, capacidadHuesped, foto, estado) 
-        VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, LOAD_FILE('$objeto->fotoRuta, $objeto->estado)";
+            $sql = "Insert into barco (nombre, descripcion, capacidadHuesped, foto, estado) 
+        VALUES ('$objeto->nombre', '$objeto->descripcion', '$objeto->capacidadHuesped', LOAD_FILE('$objeto->fotoRuta'),'$objeto->estado')";
             //"VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->capacidadHuesped, '$objeto->estado',
             //$nombreSanitizado = str_replace("\\", "\\\\", $objeto->foto);
             // Consulta SQL para insertar un barco

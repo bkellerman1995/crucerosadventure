@@ -205,7 +205,7 @@ class CruceroModel
             //Identificador autoincrementable
             $sql = "Insert into crucero (nombre,foto, cantDias,idbarco,estado) 
             Values ('$objeto->nombre',LOAD_FILE('$objeto->fotoRuta'), 
-            '$objeto->cantDias',  '$objeto->idbarco',1)";
+            '$objeto->cantDias','$objeto->idbarco',1)";
             //Ejecutar la consulta
             //Obtener ultimo insert
             $idCrucero=$this->enlace->executeSQL_DML_last($sql);

@@ -82,13 +82,14 @@ export function CreateBarco() {
 
         console.log("Nombre del archivo cargado:", fotoNombre);
 
-       // const { barco, ...restoDeDataForm } = DataForm;
+       const { ...restoDeDataForm } = DataForm;
         //adjuntar el nombre de la imagen a la ruta por defecto
         const archivoRuta = rutaArchivo + fotoNombre;
 
         // Agregar la ruta al objeto DataForm como un campo adicional
         const dataConRuta = {
-          DataForm, // Copiar todos los demás datos
+          ...restoDeDataForm,
+          // DataForm, // Copiar todos los demás datos
           fotoRuta: archivoRuta,
          // idbarco: barco?.value,
         };
