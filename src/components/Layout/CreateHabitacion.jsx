@@ -26,6 +26,11 @@ export function CreateHabitacion() {
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
 
+  const estadoValues = [
+    { value: 1, label: "Activo" },
+    { value: 2, label: "Inactivo" },
+  ];
+
   const customStyles = {
     option: (provided, state) => ({
       ...provided,
@@ -272,23 +277,27 @@ export function CreateHabitacion() {
               />
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Mínimo de Huéspedes"
-              type="number"
-              variant="outlined"
-              name="minHuesped"
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Máximo de Huéspedes"
-              type="number"
-              variant="outlined"
-              name="maxHuesped"
-            />
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Mínimo de Huéspedes"
+                type="number"
+                InputProps={{ inputProps: { min: 1 } }}
+                variant="outlined"
+                name="minHuesped"
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Máximo de Huéspedes"
+                type="number"
+                InputProps={{ inputProps: { min: 1 } }}
+                variant="outlined"
+                name="maxHuesped"
+              />
+            </Grid>
           </Grid>
           <Grid item>
             <FormControl fullWidth>
@@ -374,7 +383,7 @@ export function CreateHabitacion() {
               <img
                 src={fileURL}
                 alt="Vista previa"
-                width={200}
+                width={150}
                 style={{ marginTop: "10px" }}
               />
             )}
@@ -384,20 +393,13 @@ export function CreateHabitacion() {
           </Grid>
           <Grid item>
             <FormControl fullWidth disabled>
-              <Controller
-                name="estado"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    label="Estado"
-                    error={Boolean(errors.estado)}
-                    value={1}
-                  >
-                    <MenuItem value={1}>Activo</MenuItem>
-                  </Select>
-                )}
-              />
+            <Controller
+              name="estado"
+              control={control}
+              render={({ field }) => (
+                <Select {...field} options={estadoValues} isDisabled placeholder="Seleccione un estado" value={estadoValues[0]} />
+              )}
+            />
             </FormControl>
           </Grid>
           <Grid item>
