@@ -72,25 +72,13 @@ export function CreateHabitacion() {
       .number()
       .typeError("Debe ser un número")
       .required("La cantidad mínima es requerida")
-      .positive("Debe ser un número positivo")
-      .min(1, "La capacidad debe ser al menos 1"),
+      .positive("Debe ser un número positivo"),
 
     maxHuesped: yup
       .number()
       .typeError("Debe ser un número")
       .required("La capacidad máxima es requerida")
-      .positive("Debe ser un número positivo")
-      .when("minHuesped", (minHuesped) => {
-        if (minHuesped) {
-          return yup
-            .value()
-            .min(
-              minHuesped,
-              "La canticad máxima no puede ser menor o igual a la mínima"
-            )
-            .typeError("Debe ser un número");
-        }
-      }),
+      .positive("Debe ser un número positivo"),
 
     tamanno: yup
       .number()
@@ -162,6 +150,14 @@ export function CreateHabitacion() {
         }
       });
   }, []);
+
+  function incrementValue()
+  {
+    var value = parseInt(document.getElementsByName('minHuesped').value, 10);
+    value = isNaN(value) ? 0 : value;
+    value++;
+    document.getElementsByName('maxHuesped').value = value;
+  }
 
   //Hooks de datos de categoria habitacion
   const [dataCatHabitacion, setDataCatHabitacion] = useState({});
@@ -283,9 +279,10 @@ export function CreateHabitacion() {
                 fullWidth
                 label="Mínimo de Huéspedes"
                 type="number"
-                InputProps={{ inputProps: { min: 1 } }}
+                minValue="1"
                 variant="outlined"
                 name="minHuesped"
+                onclick={incrementValue()}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -293,7 +290,7 @@ export function CreateHabitacion() {
                 fullWidth
                 label="Máximo de Huéspedes"
                 type="number"
-                InputProps={{ inputProps: { min: 1 } }}
+                minValue = {incrementValue}
                 variant="outlined"
                 name="maxHuesped"
               />
