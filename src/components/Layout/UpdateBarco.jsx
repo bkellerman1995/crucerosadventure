@@ -16,7 +16,9 @@ import toast from 'react-hot-toast';
 export function UpdateBarco() {
   const navigate = useNavigate();
   const { id } = useParams();
+  
   const rutaArchivo = "C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\barcos\\\\";
+
   const [fileURL, setFileURL] = useState(null);
   const [error, setError] = useState('');
 
@@ -48,6 +50,8 @@ export function UpdateBarco() {
     },
     resolver: yupResolver(barcoSchema),
   });
+
+  //Obtener el Barco API
 
   useEffect(() => {
     if (id) {
