@@ -40,9 +40,9 @@ class HabitacionModel
                         $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
                     }
 
-                    if (!empty($row->idcategoriaHabitacion)) {
-                        $row->categoriaHabitacion = $catHabitacionModel->get($row->idcategoriaHabitacion)->nombre;
-                    }
+                    // if (!empty($row->idcategoriaHabitacion)) {
+                    //     $row->categoriaHabitacion = $catHabitacionModel->get($row->idcategoriaHabitacion)->nombre;
+                    // }
 
                 }
             }
@@ -163,5 +163,50 @@ class HabitacionModel
             handleException($e);
         }
 
+    }
+
+    public function create($objeto)
+    {
+        try {
+
+            $sql = "Insert into habitacion (nombre, descripcion, minHuesped, maxHuesped, tamanno, idcategoriaHabitacion, idbarco, foto, estado) 
+        VALUES ('$objeto->nombre', '$objeto->descripcion', '$objeto->minhuesped', '$objeto->maxhuesped', '$objeto->tamanno', '$objeto->idcategoriaHabitacion', 
+        '$objeto->idbarco', LOAD_FILE('$objeto->fotoRuta'),'$objeto->estado')";
+
+            // Ejecutar la consulta y obtener el ID de la habitacion insertada
+            $idHabitacion = $this->enlace->executeSQL_DML_last($sql);
+
+            // Retornar la habitacion creada
+            return $this->get($idHabitacion);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    public function update($objeto)
+    {
+        try {
+            // Consulta SQL para actualizar una habitacion
+
+            $sql = "UPDATE habitacion 
+            SET nombre = '$objeto->nombre',
+                descripcion = '$objeto->descripcion',
+                minHuesped = '$objeto->minHuesped',
+                maxHuesped = '$objeto->maxHuesped',
+                tamanno = '$objeto->tamanno',
+                idcategoriaHabitacion = '$objeto->idcategoriaHabitacion',
+                idbarco = '$objeto->idbarco',
+                foto = LOAD_FILE('$objeto->fotoRuta'),
+                estado = '$objeto->estado'
+            WHERE idHabitacion = '$objeto->idHabitacion'";
+
+            // Ejecutar la consulta
+            $cResults = $this->enlace->executeSQL_DML($sql);
+
+            // Retornar habitacion actualizado
+            return $this->get($objeto->idHabitacion);
+        } catch (Exception $e) {
+            handleException($e);
+        }
     }
 }
