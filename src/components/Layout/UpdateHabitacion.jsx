@@ -107,7 +107,7 @@ export function UpdateHabitacion() {
         setValue("tamanno", habitacion.tamanno);
 
         setCatHabitacion(habitacion.idcategoriaHabitacion)
-        setBarco(habitacion.barco)
+        setBarco(habitacion.idbarco)
 
         const estadoValue = habitacion.estado === 1 || habitacion.estado === null ? 1 : 0;
         setValue("estado", estadoValue);
