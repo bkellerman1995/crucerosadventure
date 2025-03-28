@@ -11,8 +11,6 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import HabitacionService from "../../services/HabitacionService";
-import CatHabitacionService from "../../services/CatHabitacionService";
-import BarcoService from "../../services/BarcoService";
 import toast from "react-hot-toast";
 
 export function UpdateHabitacion() {
@@ -89,10 +87,6 @@ export function UpdateHabitacion() {
     resolver: yupResolver(habitacionSchema),
   });
 
-  const estadoValues = [
-    { value: 1, label: "Activo" },
-    { value: 2, label: "Inactivo" },
-  ];
 
   // ✅ Obtener habitacion por ID (query param)
   useEffect(() => {
