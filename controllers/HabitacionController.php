@@ -33,4 +33,39 @@ class habitacion
             handleException($e);
         }
     }
+
+    public function create()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $habitacion = new HabitacionModel();
+            //Acción del modelo a ejecutar
+            $result = $habitacion->create($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $habitacion = new HabitacionModel();
+            //Acción del modelo a ejecutar
+            $result = $habitacion->update($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

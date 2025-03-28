@@ -15,15 +15,74 @@ import BarcoService from "../../services/BarcoService";
 import HabitacionService from "../../services/HabitacionService";
 import CatHabitacionService from "../../services/CatHabitacionService";
 import toast from "react-hot-toast";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
+import { ForkRight } from "@mui/icons-material";
 
 export function CreateHabitacion() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [habitacionDetails, setHabitacionDetails] = useState(null);
-  const [file, setFile] = useState(null);
-  const [fileURL, setFileURL] = useState(null);
+  const rutaArchivo =
+    "C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\habitaciones\\\\";
+
+  const habitacionSchema = yup.object({
+    nombre: yup
+      .string()
+      .required("El nombre es requerido")
+      .min(2, "Debe tener al menos 2 caracteres"),
+
+    descripcion: yup.string().required("La descripción es requerida"),
+
+    minHuesped: yup
+      .number()
+      .typeError("Debe ser un número")
+      .required("La cantidad mínima es requerida")
+      .positive("Debe ser un número positivo"),
+
+    maxHuesped: yup
+      .number()
+      .typeError("Debe ser un número")
+      .required("La capacidad máxima es requerida")
+      .positive("Debe ser un número positivo"),
+
+    tamanno: yup
+      .number()
+      .typeError("Debe ser un número")
+      .required("El tamaño es requerido")
+      .positive("Debe ser un número positivo"),
+
+    foto: yup
+              .mixed()
+              .required("La imagen es obligatoria")
+              .test("fileType", "Debe cargar una imagen (jpg, png, jpeg)", (value) => {
+                return (
+                  value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+                );
+              })
+              .test(
+                "fileSize",
+                "El tamaño debe ser menor a 500MB",
+                (value) => value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
+              ),
+    estado: yup.number().required("El estado es requerido"),
+  });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm({
+    defaultValues: {
+      nombre: "",
+      descripcion: "",
+      minHuesped: "",
+      maxHuesped: "",
+      tamanno: "",
+      categoriaHabitacion: null,
+      barco: null,
+      foto: null,
+      estado: 1,
+    },
+    resolver: yupResolver(habitacionSchema),
+  });
 
   const estadoValues = [
     { value: 1, label: "Activo" },
@@ -59,103 +118,7 @@ export function CreateHabitacion() {
     }),
   };
 
-  const habitacionSchema = yup.object({
-    nombre: yup
-      .string()
-      .required("El nombre es requerido")
-      .min(2, "Debe tener al menos 2 caracteres"),
-
-    descripcion: yup.string().required("La descripción es requerida"),
-
-    minHuesped: yup
-      .number()
-      .typeError("Debe ser un número")
-      .required("La cantidad mínima es requerida")
-      .positive("Debe ser un número positivo"),
-
-    maxHuesped: yup
-      .number()
-      .typeError("Debe ser un número")
-      .required("La capacidad máxima es requerida")
-      .positive("Debe ser un número positivo"),
-
-    tamanno: yup
-      .number()
-      .typeError("Debe ser un número")
-      .required("El tamaño es requerido")
-      .positive("Debe ser un número positivo"),
-
-    categoriaHabitacion: yup
-      .string()
-      .required("La categoría de la habitacion es requerida"),
-
-    barco: yup.string().required("El barco es requerido"),
-
-    foto: yup
-      .mixed()
-      .test(
-        "fileRequired",
-        "La foto es requerida",
-        (value) => value instanceof File
-      ),
-    estado: yup.number().required("El estado es requerido"),
-  });
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm({
-    defaultValues: {
-      nombre: "",
-      descripcion: "",
-      minHuesped: "",
-      maxHuesped: "",
-      tamanno: "",
-      categoriaHabitacion: "",
-      barco: "",
-      foto: null,
-      estado: 1,
-    },
-    resolver: yupResolver(habitacionSchema),
-  });
-
-  //Hooks de control de errores
   const [error, setError] = useState("");
-  const onError = (errors, e) => console.log(errors, e);
-
-  //Hooks de datos de barco de barcos
-  const [selectedBarco, setSelectedBarco] = useState(null);
-  const [dataBarco, setDataBarco] = useState({});
-  const [loadedBarco, setLoadedBarco] = useState(false);
-
-  if (error) return <p>Error: {error.message}</p>;
-
-  useEffect(() => {
-    BarcoService.getBarcos()
-      .then((response) => {
-        console.log(response);
-        setDataBarco(response.data);
-
-        setLoadedBarco(true);
-      })
-      .catch((error) => {
-        if (error instanceof SyntaxError) {
-          console.log(error);
-          setError(error);
-          setLoadedBarco(false);
-          throw new Error("Respuesta no válida del servidor");
-        }
-      });
-  }, []);
-
-  function incrementValue() {
-    var value = parseInt(document.getElementsByName("minHuesped").value, 10);
-    value = isNaN(value) ? 0 : value;
-    value++;
-    return value;
-  }
 
   //Hooks de datos de categoria habitacion
   const [selectedCatHabitacion, setSelectedCatHabitacion] = useState(null);
@@ -182,53 +145,109 @@ export function CreateHabitacion() {
       });
   }, []);
 
-  function handleChangeImage(e) {
-    if (e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setFileURL(URL.createObjectURL(file));
-      setFile(file);
-      setValue("foto", file); // Actualiza el campo en react-hook-form
-    }
-  }
+  //Hooks de datos de barco de barcos
+  const [selectedBarco, setSelectedBarco] = useState(null);
+  const [dataBarco, setDataBarco] = useState({});
+  const [loadedBarco, setLoadedBarco] = useState(false);
 
-  const onSubmit = (DataForm) => {
-    const formData = new FormData();
-    formData.append("nombre", DataForm.nombre);
-    formData.append("descripcion", DataForm.descripcion);
-    formData.append("minHuesped", DataForm.minHuesped);
-    formData.append("maxHuesped", DataForm.maxHuesped);
-    formData.append("tamanno", DataForm.tamanno);
-    formData.append("categoriaHabitacion", DataForm.categoriaHabitacion);
-    formData.append("barco", DataForm.barco);
-    formData.append("estado", DataForm.estado);
-    if (file) {
-      formData.append("foto", file);
-    }
+  if (error) return <p>Error: {error.message}</p>;
 
-    HabitacionService.createHabitacion(formData)
+  useEffect(() => {
+    BarcoService.getBarcos()
       .then((response) => {
-        if (response.data) {
-          setHabitacionDetails(response.data);
-          setOpen(true);
-          toast.success(
-            `Habitacion creada #${response.data.idHabitacion} - ${response.data.nombre}`,
-            {
-              duration: 4000,
-              position: "top-center",
-            }
-          );
-        }
+        console.log(response);
+        setDataBarco(response.data);
+
+        setLoadedBarco(true);
       })
-      .catch((error) => console.error(error.message));
+      .catch((error) => {
+        if (error instanceof SyntaxError) {
+          console.log(error);
+          setError(error);
+          setLoadedBarco(false);
+          throw new Error("Respuesta no válida del servidor");
+        }
+      });
+  }, []);
+
+
+  const [file, setFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
+
+  const onSubmit = async (DataForm) => {
+    try {
+      const isValid = await habitacionSchema.isValid(DataForm);
+
+      if (isValid) {
+        //Acceder al nombre del archivo de la foto
+        const fotoNombre = DataForm.foto
+          ? DataForm.foto.name
+          : "No hay foto cargada";
+
+        console.log("Nombre del archivo cargado:", fotoNombre);
+        //Extraer la categoriahabitacion y el barco del objeto DataForm
+        const { categoriaHabitacion, barco, ...restoDeDataForm } = DataForm;
+
+        //adjuntar el nombre de la imagen a la ruta por defecto
+        const archivoRuta = rutaArchivo + fotoNombre;
+
+        // Agregar la ruta al objeto DataForm como un campo adicional
+        const dataConRuta = {
+          ...restoDeDataForm,
+          // DataForm, // Copiar todos los demás datos
+          fotoRuta: archivoRuta,
+          idcategoriaHabitacion: categoriaHabitacion?.value,
+          idbarco: barco?.value,
+        };
+
+        console.log("Enviando datos del crucero al form: ", dataConRuta);
+
+        HabitacionService.createHabitacion(dataConRuta)
+          .then((response) => {
+            setError(response.error);
+            if (response.data != null) {
+              //Obtener el valor del id de la habitacion creado
+              // setIdHabitacion(response.data.idHabitacion);
+
+              toast.success(
+                `Habitacion # ${response.data.idHabitacion} - ${response.data.nombre} 
+                Añadida correctamente`,
+                {
+                  duration: 3000,
+                  position: "top-center",
+                }
+              );
+              //Configurar el estado de crucero creado a true
+              //setCruceroCreado(true);
+            }
+          })
+          .catch((error) => {
+            if (error instanceof SyntaxError) {
+              console.log(error);
+              setError(error);
+              throw new Error("Respuesta no válida del servidor");
+            }
+          });
+      } else {
+        //Configurar el estado de crucero creado a false
+        //setCruceroCreado(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleChangeImage = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+    setFileURL(URL.createObjectURL(selectedFile));
+    setValue("foto", selectedFile); // Pasar el archivo a react-hook-form
   };
 
   return (
     <>
       <form
-        onSubmit={handleSubmit(onSubmit, onError)}
-        noValidate
-        encType="multipart/form-data"
-      >
+        onSubmit={handleSubmit(onSubmit)} noValidate>
         <Grid
           container
           spacing={2}
@@ -272,30 +291,41 @@ export function CreateHabitacion() {
               />
             </FormControl>
           </Grid>
-          <Grid container spacing={2}>
+          <Grid container spacing={16.5}>
             <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Mínimo de Huéspedes"
-                type="number"
-                InputProps={{ inputProps: { min: 1 } }}
-                variant="outlined"
+              <Controller 
                 name="minHuesped"
-                onChange={incrementValue()}
-                error={Boolean(errors.descripcion)}
-                helperText={errors.descripcion?.message}
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Mínimo de Huéspedes"
+                    type="number"
+                    InputProps={{ inputProps: { min: 1 } }}
+                    variant="outlined"
+                    error={Boolean(errors.minHuesped)}
+                    helperText={errors.minHuesped?.message}
+                  />            
+                )}
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Máximo de Huéspedes"
-                type="number"
-                InputProps={{ inputProps: { min: incrementValue + 1 } }}
-                variant="outlined"
+              <Controller 
                 name="maxHuesped"
-                error={Boolean(errors.descripcion)}
-                helperText={errors.descripcion?.message}
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Máximo de Huéspedes"
+                    type="number"
+                    InputProps={{ inputProps: { min: 2 } }}
+                    variant="outlined"
+                    error={Boolean(errors.maxHuesped)}
+                    helperText={errors.maxHuesped?.message}
+                  />            
+                )}
               />
             </Grid>
           </Grid>
@@ -322,28 +352,30 @@ export function CreateHabitacion() {
             <FormControl fullWidth>
               {loadedCatHabitacion && (
                 <Select
-                options={dataCatHabitacion.map((categoriaHabitacion) => ({
-                  label: (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      {categoriaHabitacion.nombre}
-                    </div>
-                  ),
-                  value: categoriaHabitacion.id,
-                }))}
-                placeholder="Seleccione una Categoria de Habitacion"
-                onChange={(selectedOption) => {
-                  setSelectedCatHabitacion(selectedOption);
-                  setValue("CategoriaHabitacion", selectedOption);
-                }}
-                value={selectedCatHabitacion}
-                styles={customStyles}
-              />
+                  options={dataCatHabitacion.map((categoriaHabitacion) => ({
+                    label: (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        {categoriaHabitacion.nombre}
+                      </div>
+                    ),
+                    value: categoriaHabitacion.idcategoriaHabitacion,
+                  }))}
+                  placeholder="Seleccione una Categoria de Habitacion"
+                  onChange={(selectedOption) => {
+                    setSelectedCatHabitacion(selectedOption);
+                    setValue("categoriaHabitacion", selectedOption);
+                  }}
+                  value={selectedCatHabitacion}
+                  styles={customStyles}
+                  error={Boolean(errors.categoriaHabitacion)}
+                  helperText={errors.categoriaHabitacion?.message}
+                />
               )}
             </FormControl>
           </Grid>
@@ -390,18 +422,11 @@ export function CreateHabitacion() {
             </FormControl>
           </Grid>
           <Grid item>
-            <Typography variant="h6">Foto</Typography>
-            <input type="file" accept="image/*" onChange={handleChangeImage} />
+            <FormControl fullWidth>
+              <input type="file" onChange={handleChangeImage} />
+            </FormControl>
             {fileURL && (
-              <img
-                src={fileURL}
-                alt="Vista previa"
-                width={150}
-                style={{ marginTop: "10px" }}
-              />
-            )}
-            {errors.foto && (
-              <Typography color="error">{errors.foto.message}</Typography>
+              <img src={fileURL} alt="Previsualización" width={300} />
             )}
           </Grid>
           <Grid item>
@@ -416,6 +441,8 @@ export function CreateHabitacion() {
                     isDisabled
                     placeholder="Seleccione un estado"
                     value={estadoValues[0]}
+                    error={Boolean(errors.estado)}
+                    helperText={errors.estado?.message}
                   />
                 )}
               />
@@ -428,55 +455,6 @@ export function CreateHabitacion() {
           </Grid>
         </Grid>
       </form>
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            p: 4,
-            boxShadow: 24,
-            borderRadius: 2,
-          }}
-        >
-          {habitacionDetails && (
-            <>
-              <Typography variant="h6" gutterBottom>
-                ¡Habitacion Creada Exitosamente!
-              </Typography>
-              <Typography>Nombre: {habitacionDetails.nombre}</Typography>
-              <Typography>
-                Descripción: {habitacionDetails.descripcion}
-              </Typography>
-              <Typography>
-                Mínimo de Huéspedes: {habitacionDetails.minHuesped}
-              </Typography>
-              <Typography>
-                Máximo de Huéspedes: {habitacionDetails.maxHuesped}
-              </Typography>
-              <Typography>
-                Tamaño: {habitacionDetails.tamanno} + m<sup>2</sup>
-              </Typography>
-              <Typography>
-                Categoría de la Habitacion:{" "}
-                {habitacionDetails.categoriaHabitacion}
-              </Typography>
-              <Typography>Barco: {habitacionDetails.barco}</Typography>
-              <Typography>Estado: Activo</Typography>
-              <Button
-                onClick={() => navigate("/admin/barco")}
-                variant="contained"
-                sx={{ mt: 2 }}
-              >
-                Ir a Barcos
-              </Button>
-            </>
-          )}
-        </Box>
-      </Modal>
     </>
   );
 }
