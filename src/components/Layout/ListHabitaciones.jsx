@@ -25,10 +25,11 @@ import { useNavigate, Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 
 ListHabitaciones.propTypes = {
-  data: PropTypes.array
+  data: PropTypes.array,
 };
 // Función para extraer el número de un string (ejemplo: "Habitacion10" -> 10)
 function extractNumber(text) {
@@ -86,7 +87,6 @@ function stableSort(array, comparator) {
 
 //--- Encabezados de la tabla ---
 const headCells = [
-  
   {
     id: "nombre",
     numeric: false,
@@ -145,6 +145,7 @@ function TableHabitacionesHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
+        
       </TableRow>
     </TableHead>
   );
@@ -200,23 +201,14 @@ function TableHabitacionesToolbar(props) {
         </Typography>
       )}
       <Button
-    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
-    component={Link}
-    to="/admin/habitacion/crear"
-    variant="contained"
-    endIcon={<AddIcon />}
->
-  Crear
-</Button>
-<Button
-    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
-    component={Link}
-    to="/admin/habitacion/crear"
-    variant="contained"
-    endIcon={<AddIcon />}
->
-  Editar
-</Button>
+        style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+        component={Link}
+        to="/admin/habitacion/crear"
+        variant="contained"
+        endIcon={<AddIcon />}
+      >
+        Crear
+      </Button>
     </Toolbar>
   );
 }
@@ -231,7 +223,7 @@ TableHabitacionesToolbar.propTypes = {
 export function ListHabitaciones() {
   //Datos a cargar en la tabla
   const [data, setData] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
 
   //Obtener lista del API (useEffect)
@@ -261,8 +253,8 @@ export function ListHabitaciones() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
@@ -296,7 +288,8 @@ export function ListHabitaciones() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Evita un salto de diseño al llegar a la última página con datos vacíos.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -341,6 +334,8 @@ export function ListHabitaciones() {
                           selected={isItemSelected}
                           sx={{ cursor: "pointer" }}
                         >
+                          
+
                           {/* Contenido de la tabla */}
                           <TableCell
                             component="th"
@@ -348,10 +343,26 @@ export function ListHabitaciones() {
                             scope="data"
                             padding="none"
                           >
+                            {/* ICONO EDITAR */}
+                          <TableCell>
+                            <IconButton
+                              component={Link}
+                              to={`/admin/habitacion/editar?id=${row.idHabitacion}`}
+                              aria-label="Editar"
+                              sx={{
+                                backgroundColor: "#00304E",
+                                color: "white",
+                              }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </TableCell>
                             {row.title}
                           </TableCell>
                           <TableCell align="left">{row.nombre}</TableCell>
-                          <TableCell align="left">{row.categoriaHabitacion}</TableCell>
+                          <TableCell align="left">
+                            {row.categoriaHabitacion}
+                          </TableCell>
                           <TableCell align="left">{row.maxHuesped}</TableCell>
 
                           {/*<sup> para los metros cuadrados</sup> */}

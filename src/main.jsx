@@ -19,6 +19,7 @@ import { CreateBarco } from "./components/Layout/CreateBarco";
 import { CreateCrucero } from "./components/Layout/CreateCrucero";
 import { CreateHabitacion } from "./components/Layout/CreateHabitacion";
 import { UpdateBarco } from "./components/Layout/UpdateBarco";
+import { UpdateHabitacion } from "./components/Layout/UpdateHabitacion";
 // import "bootstrap/dist/css/bootstrap.min.css";
 
 const rutas = createBrowserRouter([
@@ -106,6 +107,7 @@ const rutas = createBrowserRouter([
         children: [
           { path: "habitacion", element: <ListHabitaciones /> },
           { path: "habitacion/crear", element: <CreateHabitacion /> },
+          { path: "habitacion/editar", element: <UpdateHabitacion /> },
           
           { path: "barco", element: <ListBarcos /> },
           { path: "barco/crear", element: <CreateBarco /> },
