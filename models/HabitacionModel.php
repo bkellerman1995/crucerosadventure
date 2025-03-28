@@ -169,9 +169,14 @@ class HabitacionModel
     {
         try {
 
-            $sql = "Insert into habitacion (nombre, descripcion, minHuesped, maxHuesped, tamanno, idcategoriaHabitacion, idbarco, foto, estado) 
-        VALUES ('$objeto->nombre', '$objeto->descripcion', '$objeto->minhuesped', '$objeto->maxhuesped', '$objeto->tamanno', '$objeto->idcategoriaHabitacion', 
-        '$objeto->idbarco', LOAD_FILE('$objeto->fotoRuta'),'$objeto->estado')";
+            $sql = "INSERT INTO habitacion (nombre, descripcion, minHuesped, maxHuesped, tamanno, idcategoriaHabitacion, idbarco, foto, estado) 
+            VALUES ('$objeto->nombre', '$objeto->descripcion', $objeto->minHuesped, $objeto->maxHuesped, $objeto->tamanno, $objeto->idcategoriaHabitacion, 
+            $objeto->idbarco, LOAD_FILE('$objeto->fotoRuta'), '$objeto->estado')";
+
+
+        //   $sql = "Insert into habitacion (nombre, descripcion, minHuesped, maxHuesped, tamanno, idcategoriaHabitacion, idbarco, foto, estado) 
+        //  VALUES ('$objeto->nombre', '$objeto->descripcion', '$objeto->minHuesped', '$objeto->maxHuesped', '$objeto->tamanno', '$objeto->idcategoriaHabitacion', 
+        // '$objeto->idbarco', LOAD_FILE('$objeto->fotoRuta'),'$objeto->estado')";
 
             // Ejecutar la consulta y obtener el ID de la habitacion insertada
             $idHabitacion = $this->enlace->executeSQL_DML_last($sql);
