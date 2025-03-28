@@ -12,6 +12,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
 import BarcoService from '../../services/BarcoService';
 import toast from 'react-hot-toast';
+import BarcoService from '../../services/HabitacionService';
+
 //import ImageService from '../../services/ImageService';
 
 export function CreateBarco() {
@@ -39,6 +41,22 @@ export function CreateBarco() {
             (value) => value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
           ),
     estado: yup.number().required('El estado es requerido'),
+
+    Habitaciones: yup
+  .array()
+  .of(
+    yup.object().shape({
+      IdHabitacion: yup.string().required("La habitación es obligatoria"),
+      CantidadDisponible: yup
+        .number()
+        .required("La cantidad disponible es obligatoria")
+        .positive("La cantidad disponible debe ser un número positivo")
+        .integer("La cantidad disponible debe ser un número entero")
+        .min(1, "La cantidad mínima debe ser de al menos 1")
+        .max(10, "La cantidad máxima no puede exceder 10"),
+    })
+  )
+  .min(1, "Debe registrar al menos una habitación"),
     
 
   });
