@@ -16,9 +16,10 @@ import toast from 'react-hot-toast';
 export function UpdateBarco() {
   const navigate = useNavigate();
 
-  // ✅ Ahora obtenemos el ID desde el query param ?id=...
+  // Ahora obtenemos el ID desde el query param ?id=...
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const [fileName, setFileName] = useState('');
 
   const rutaArchivo = "C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\barcos\\\\";
 
@@ -70,7 +71,11 @@ export function UpdateBarco() {
         setValue('capacidadHuesped', barco.capacidadHuesped);
         const estadoValue = (barco.estado === 1 || barco.estado === null) ? 1 : 0;
         setValue('estado', estadoValue);
-        setFileURL(barco.foto);
+        if (barco.foto) {
+          const nombreArchivo = barco.foto.split("/").pop();
+          setFileURL(barco.foto);
+          setFileName(nombreArchivo);
+        };
         
       })
       .catch((err) => {
