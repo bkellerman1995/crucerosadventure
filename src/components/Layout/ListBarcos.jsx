@@ -22,8 +22,9 @@ import BarcoService from '../../services/BarcoService';
 import { useNavigate, Link } from 'react-router-dom';
 import { IconButton } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from "@mui/icons-material/Add";
 
 // Ordenar descendente
 function descendingComparator(a, b, orderBy) {
@@ -84,7 +85,6 @@ const headCells = [
   },
 ];
 
-
 // Encabezado tabla
 function TableHabitacionesHead(props) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -93,11 +93,9 @@ function TableHabitacionesHead(props) {
   };
 
   return (
-    
-    
     <TableHead>
       <TableRow>
-        <TableCell></TableCell>
+        <TableCell /> {/* espacio para el icono de editar */}
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -118,6 +116,7 @@ function TableHabitacionesHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell /> {/* espacio para el icono de ver */}
       </TableRow>
     </TableHead>
   );
@@ -136,7 +135,7 @@ function TableHabitacionesToolbar(props) {
   const { numSelected, idSelected } = props;
   const navigate = useNavigate();
   const update = () => {
-    return navigate(`/barco/update/${idSelected}`);
+    return navigate(`/admin/barco/editar/${idSelected}`);
   };
   return (
     <Toolbar
@@ -170,29 +169,17 @@ function TableHabitacionesToolbar(props) {
         >
           Lista de Barcos
         </Typography>
-        
-        
       )}
       <Button
-    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
-    component={Link}
-    to="/admin/barco/crear"
-    variant="contained"
-    endIcon={<AddIcon />}
->
-  Crear
-</Button>
-<Button
-    style={{ marginRight: "15px", backgroundColor: "#16537e" }}
-    component={Link}
-    to="/admin/barco/editar"
-    variant="contained"
-    endIcon={<AddIcon />}
->
-  Editar
-</Button>
+        style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+        component={Link}
+        to="/admin/barco/crear"
+        variant="contained"
+        endIcon={<AddIcon />}
+      >
+        Crear
+      </Button>
     </Toolbar>
-    
   );
 }
 
@@ -203,16 +190,13 @@ TableHabitacionesToolbar.propTypes = {
 
 // Componente tabla con hooks
 export function ListBarcos() {
-  // Datos a cargar en la tabla
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
-  
-  // Obtener lista del API
+
   useEffect(() => {
     BarcoService.getBarcos()
       .then((response) => {
-        console.log(response);
         setData(response.data);
         setError(response.error);
         setLoaded(true);
@@ -240,35 +224,29 @@ export function ListBarcos() {
     setOrderBy(property);
   };
 
-  // Seleccionar solo un elemento de la tabla
   const handleClick = (event, name) => {
     let newSelected = [name];
     const selectedIndex = selected.indexOf(name);
     if (selectedIndex === 0) {
       newSelected = [];
-    } 
+    }
     setSelected(newSelected);
   };
 
-  // Cambiar de página
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  // Cambiar cantidad de filas por página
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  
-  // Cambiar densidad
+
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
-  // Evitar salto de diseño al llegar a la última página
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   if (!loaded) return <p>Cargando...</p>;
@@ -312,15 +290,21 @@ export function ListBarcos() {
                       selected={isItemSelected}
                       sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="data"
-                        padding="none"
-                      >
-                        {row.title}
+                      {/* ICONO EDITAR */}
+                      <TableCell>
+                        <IconButton
+                          component={Link}
+                          to={`/admin/barco/editar?id=${row.idbarco}`}
+                          aria-label="Editar"
+                          sx={{ backgroundColor: "#00304E", color: "white" }}
+                        >
+                          <EditIcon />
+                        </IconButton>
                       </TableCell>
-                      <TableCell align="left">{row.idbarco}</TableCell>
+
+                      <TableCell component="th" id={labelId} scope="data" padding="none">
+                        {row.idbarco}
+                      </TableCell>
                       <TableCell align="left">{row.nombre}</TableCell>
                       <TableCell align="left">{row.capacidadHuesped}</TableCell>
                       <TableCell align="left">{row.cantHabitaciones}</TableCell>
@@ -346,7 +330,6 @@ export function ListBarcos() {
           </Table>
         </TableContainer>
 
-        {/* Paginación */}
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
@@ -362,7 +345,6 @@ export function ListBarcos() {
         />
       </Paper>
 
-      {/* Control de espaciado */}
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Espaciado"

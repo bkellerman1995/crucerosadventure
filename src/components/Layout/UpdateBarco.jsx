@@ -9,14 +9,18 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import BarcoService from '../../services/BarcoService';
 import toast from 'react-hot-toast';
 
 export function UpdateBarco() {
   const navigate = useNavigate();
-  const { id } = useParams();
-  
+
+  // Ahora obtenemos el ID desde el query param ?id=...
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [fileName, setFileName] = useState('');
+
   const rutaArchivo = "C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\barcos\\\\";
 
   const [fileURL, setFileURL] = useState(null);
@@ -46,32 +50,38 @@ export function UpdateBarco() {
       descripcion: '',
       capacidadHuesped: '',
       foto: null,
-      estado: 1,
+      estado: '',
     },
     resolver: yupResolver(barcoSchema),
   });
 
-  //Obtener el Barco API
-
+  // ✅ Obtener barco por ID (query param)
   useEffect(() => {
-    if (id) {
-      BarcoService.getBarcoById(id)
-        .then((res) => {
-          const barco = res.data;
-          setValue('nombre', barco.nombre);
-          setValue('descripcion', barco.descripcion);
-          setValue('capacidadHuesped', barco.capacidadHuesped);
-          setValue('estado', barco.estado);
-          if (barco.fotoRuta) {
-            const nombreArchivo = barco.fotoRuta.split("\\").pop();
-            setFileURL(`/uploads/barcos/${nombreArchivo}`);
-          }
-        })
-        .catch((err) => {
-          setError(err);
-          toast.error('Error al cargar el barco');
-        });
+    if (!id) {
+      toast.error("No se proporcionó ID de barco");
+      navigate('/barco-table');
+      return;
     }
+
+    BarcoService.getBarcobyId(id)
+      .then((res) => {
+        const barco = res.data;
+        setValue('nombre', barco.nombre);
+        setValue('descripcion', barco.descripcion);
+        setValue('capacidadHuesped', barco.capacidadHuesped);
+        const estadoValue = (barco.estado === 1 || barco.estado === null) ? 1 : 0;
+        setValue('estado', estadoValue);
+        if (barco.foto) {
+          const nombreArchivo = barco.foto.split("/").pop();
+          setFileURL(barco.foto);
+          setFileName(nombreArchivo);
+        };
+        
+      })
+      .catch((err) => {
+        setError(err);
+        toast.error('Error al cargar el barco');
+      });
   }, [id]);
 
   const onSubmit = async (dataForm) => {
@@ -92,7 +102,7 @@ export function UpdateBarco() {
           duration: 3000,
           position: 'top-center',
         });
-        navigate('/barco-table');
+        navigate('/admin/barco');
       }
     } catch (err) {
       console.error(err);
