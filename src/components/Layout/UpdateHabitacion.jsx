@@ -19,6 +19,8 @@ export function UpdateHabitacion() {
   // Ahora obtenemos el ID desde el query param ?id=...
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const catHabitacion = searchParams.get("idcategoriaHabitacion");
+  const barco = searchParams.get("idbarco");
   const [fileName, setFileName] = useState("");
 
   const rutaArchivo =
@@ -87,7 +89,6 @@ export function UpdateHabitacion() {
     resolver: yupResolver(habitacionSchema),
   });
 
-
   // ✅ Obtener habitacion por ID (query param)
   useEffect(() => {
     if (!id) {
@@ -128,6 +129,8 @@ export function UpdateHabitacion() {
         ...dataForm,
         fotoRuta,
         idHabitacion: id,
+        idcategoriaHabitacion: catHabitacion,
+        idbarco: barco,
       };
 
       const response = await HabitacionService.updateHabitacion(dataConRuta);
