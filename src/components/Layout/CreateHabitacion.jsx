@@ -15,7 +15,6 @@ import BarcoService from "../../services/BarcoService";
 import HabitacionService from "../../services/HabitacionService";
 import CatHabitacionService from "../../services/CatHabitacionService";
 import toast from "react-hot-toast";
-import { SelectCatHabitacion } from "./SelectCatHabitacion";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 
@@ -151,15 +150,15 @@ export function CreateHabitacion() {
       });
   }, []);
 
-  function incrementValue()
-  {
-    var value = parseInt(document.getElementsByName('minHuesped').value, 10);
+  function incrementValue() {
+    var value = parseInt(document.getElementsByName("minHuesped").value, 10);
     value = isNaN(value) ? 0 : value;
     value++;
-    document.getElementsByName('maxHuesped').value = value;
+    return value;
   }
 
   //Hooks de datos de categoria habitacion
+  const [selectedCatHabitacion, setSelectedCatHabitacion] = useState(null);
   const [dataCatHabitacion, setDataCatHabitacion] = useState({});
   const [loadedCatHabitacion, setLoadedCatHabitacion] = useState(false);
 
@@ -279,10 +278,12 @@ export function CreateHabitacion() {
                 fullWidth
                 label="Mínimo de Huéspedes"
                 type="number"
-                minValue="1"
+                InputProps={{ inputProps: { min: 1 } }}
                 variant="outlined"
                 name="minHuesped"
-                onclick={incrementValue()}
+                onChange={incrementValue()}
+                error={Boolean(errors.descripcion)}
+                helperText={errors.descripcion?.message}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -290,9 +291,11 @@ export function CreateHabitacion() {
                 fullWidth
                 label="Máximo de Huéspedes"
                 type="number"
-                minValue = {incrementValue}
+                InputProps={{ inputProps: { min: incrementValue + 1 } }}
                 variant="outlined"
                 name="maxHuesped"
+                error={Boolean(errors.descripcion)}
+                helperText={errors.descripcion?.message}
               />
             </Grid>
           </Grid>
@@ -318,16 +321,29 @@ export function CreateHabitacion() {
             </Typography>
             <FormControl fullWidth>
               {loadedCatHabitacion && (
-                <Controller
-                  name="categoriaHabitacion"
-                  control={control}
-                  render={({ field }) => (
-                    <SelectCatHabitacion
-                      field={field}
-                      data={dataCatHabitacion}
-                    />
-                  )}
-                />
+                <Select
+                options={dataCatHabitacion.map((categoriaHabitacion) => ({
+                  label: (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      {categoriaHabitacion.nombre}
+                    </div>
+                  ),
+                  value: categoriaHabitacion.id,
+                }))}
+                placeholder="Seleccione una Categoria de Habitacion"
+                onChange={(selectedOption) => {
+                  setSelectedCatHabitacion(selectedOption);
+                  setValue("CategoriaHabitacion", selectedOption);
+                }}
+                value={selectedCatHabitacion}
+                styles={customStyles}
+              />
               )}
             </FormControl>
           </Grid>
@@ -390,13 +406,19 @@ export function CreateHabitacion() {
           </Grid>
           <Grid item>
             <FormControl fullWidth disabled>
-            <Controller
-              name="estado"
-              control={control}
-              render={({ field }) => (
-                <Select {...field} options={estadoValues} isDisabled placeholder="Seleccione un estado" value={estadoValues[0]} />
-              )}
-            />
+              <Controller
+                name="estado"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={estadoValues}
+                    isDisabled
+                    placeholder="Seleccione un estado"
+                    value={estadoValues[0]}
+                  />
+                )}
+              />
             </FormControl>
           </Grid>
           <Grid item>
