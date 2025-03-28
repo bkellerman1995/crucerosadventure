@@ -70,10 +70,8 @@ export function UpdateBarco() {
         setValue('capacidadHuesped', barco.capacidadHuesped);
         const estadoValue = (barco.estado === 1 || barco.estado === null) ? 1 : 0;
         setValue('estado', estadoValue);
-        if (barco.fotoRuta) {
-          const nombreArchivo = barco.fotoRuta.split("\\").pop();
-          setFileURL(`/uploads/barcos/${nombreArchivo}`);
-        }
+        setFileURL(barco.foto);
+        
       })
       .catch((err) => {
         setError(err);
