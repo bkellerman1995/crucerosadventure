@@ -8,9 +8,9 @@ class cruceroFecha
         try {
             $response = new Response();
             //Instancia modelo
-            $cruceroModel = new CruceroModel();
+            $cruceroFechaModel = new CruceroFechaModel();
             //Método del modelo
-            $result = $cruceroModel->all();
+            $result = $cruceroFechaModel->all();
             //Dar respuesta
             $response->toJSON($result);
 
@@ -25,9 +25,9 @@ class cruceroFecha
         try {
             $response = new Response();
             //Instancia del modelo
-            $cruceroModel = new CruceroModel();
+            $cruceroFechaModel = new CruceroFechaModel();
             //Acción del modelo a ejecutar
-            $result = $cruceroModel->get($id);
+            $result = $cruceroFechaModel->get($id);
             //Dar respuesta
             $response->toJSON($result);
             
@@ -51,6 +51,25 @@ class cruceroFecha
             //Dar respuesta
             $response->toJSON($result);
             
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    //Actualizar cruceroFecha
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $crucero = new cruceroFechaModel();
+            //Acción del modelo a ejecutar
+            $result = $crucero->updateCruceroFecha($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);
         }

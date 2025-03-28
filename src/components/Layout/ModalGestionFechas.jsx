@@ -24,6 +24,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import toast from "react-hot-toast";
 import BarcoService from "../../services/BarcoService";
 import CruceroFechaService from "../../services/CruceroFechaService";
+import CrucerosService from "../../services/CrucerosService";
+import PrecioHabitacionFechaService from "../../services/PrecioHabitacionFechaService";
 
 import PropTypes from "prop-types";
 
@@ -56,14 +58,14 @@ export function ModalGestionFechas({
   // Crear cruceroFecha al abrir modal
   useEffect(() => {
     if (open && !idCruceroFecha) {
-      const nuevo = { estado: 1 };
-      CruceroFechaService.createFechaCrucero(nuevo)
-        .then((res) => {
-          if (res?.data?.idCruceroFecha) {
-            setidCruceroFecha(res.data.idCruceroFecha);
-          }
-        })
-        .catch((err) => console.error("Error al crear fecha del crucero:", err));
+    const nuevo = { estado: 1 };
+    CruceroFechaService.createFechaCrucero(nuevo)
+      .then((res) => {
+        if (res?.data?.idCruceroFecha) {
+          setidCruceroFecha(res.data.idCruceroFecha);
+        }
+      })
+      .catch((err) => console.error("Error al crear fecha del crucero:", err));
     }
   }, [open]);
 
@@ -115,61 +117,92 @@ export function ModalGestionFechas({
   if (error) return <p>Error: {error.message}</p>;
 
   // Accion submit del botón confirmar
-  const onSubmit = (data) => {
-    // e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
+  const onSubmit = async (data) => {
     console.log("Dato recibido del form:", data);
-
+  
     const cruceroID = parseInt(idCrucero, 10);
     const fechaInicioFormateada = data.fechaSalida
       ? dayjs(data.fechaSalida).format("YYYY-MM-DD")
       : null;
-
+  
     const fechaLimitePagosFormateada = data.fechaLimitePagos
       ? dayjs(data.fechaLimitePagos).format("YYYY-MM-DD")
       : null;
-
+  
     const estado = 1;
-
+  
     const formData = {
+      idCruceroFecha,
       cruceroID,
       fechaInicioFormateada,
       fechaLimitePagosFormateada,
-      // dia,
-      // idPuerto,
-      ...data, // descripción del textField
       estado,
+      habitacionesPrecios: [], // Almacenar los datos (idHabitacion y precio) de las habitaciones
     };
+  
+    // Recorrer las habitaciones y agregar los precios a formData
+    barcoData.habitaciones.forEach((habitacion) => {
+      const precio = data[`precio-${habitacion.idHabitacion}`]; // obtener el precio de cada habitacion
+  
+      if (precio) {
+        formData.habitacionesPrecios.push({
+          idPrecioHabitacion: null, // precioHabitacion
+          idCruceroFecha,
+          idHabitacion: habitacion.idHabitacion,
+          precio: precio,
+        });
+      }
+    });
+  
+    // Verificar que haya habitaciones con precios válidos
+    if (formData.habitacionesPrecios.length === 0) {
+      toast.error("Debe ingresar precios válidos para las habitaciones.");
+      return;
+    }
+  
     console.log("Enviando datos:", formData);
     try {
-      CruceroFechaService.agregarFechaCrucero(formData)
-        .then((response) => {
-          setError(response.error);
-          if (response.data != null) {
-            console.log("objeto Puerto Itinerario:", response.data);
-            toast.success(`Gestión de puerto exitosa`, {
+      // Validar que no haya conflicto de fechas
+      const responseCrucero = await CrucerosService.getCrucerobyId(cruceroID);
+      setError(responseCrucero.error);
+  
+      if (responseCrucero.data != null) {
+        if (responseCrucero.data.fechaAsignada === fechaInicioFormateada) {
+          toast.error(`La fecha de inicio ${fechaInicioFormateada} ya se asignó al crucero # ${cruceroID}. 
+            Por favor seleccione otra fecha`);
+          return;
+        }
+  
+        // Guardar los precios de las habitaciones
+        const preciosResponse = await PrecioHabitacionFechaService.agregarPrecioHabitacionFecha(formData.habitacionesPrecios);
+  
+        if (preciosResponse.data != null) {
+          toast.success("Precios de habitaciones guardados correctamente.", {
+            duration: 2000,
+            position: "top-center",
+          });
+  
+          // Actualizar la fecha del crucero
+          const fechaCruceroResponse = await CruceroFechaService.updateFechaCrucero(formData);
+  
+          if (fechaCruceroResponse.data != null) {
+            toast.success(`Fechas y habitaciones agregadas correctamente`, {
               duration: 1500,
               position: "top-center",
             });
-            setPuertosDeshabilitados((prev) => ({
-              ...prev,
-              [diaIndex - 1]: true,
-            })); // Deshabilitar el select y el botón de ese día
-            setPuertosContador((prevCount) => prevCount + 1); // Incrementar el contador de puertos
+  
+            // Actualizar el estado y cerrar el modal
+            setFechasCrucero(true); 
+            handleClose(); // Cerrar el modal
           }
-        })
-        .catch((error) => {
-          if (error instanceof SyntaxError) {
-            console.log(error);
-            setError(error);
-            throw new Error("Respuesta no válida del servidor");
-          }
-        });
-
-      handleClose();
+        }
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error al enviar los datos:", error);
+      toast.error("Hubo un error al guardar los precios.");
     }
   };
+  
 
   return (
     <>
@@ -239,9 +272,10 @@ export function ModalGestionFechas({
                             label="Seleccione una fecha válida"
                             value={field.value} //Valor por defecto: hoy
                             onChange={(newValue) => {
-                              const fechaFormateada = newValue
-                                ? newValue.format("YYYY-MM-DD")
-                                : null;
+                              const fechaFormateada = newValue;
+                              // && newValue.isValid()
+                              // ? newValue.format("YYYY-MM-DD")
+                              // : null;
                               field.onChange(fechaFormateada);
                             }}
                             slotProps={{
@@ -293,9 +327,10 @@ export function ModalGestionFechas({
                             label="Seleccione una fecha válida"
                             value={field.value} //Valor por defecto: hoy
                             onChange={(newValue) => {
-                              const fechaFormateada = newValue
-                                ? newValue.format("YYYY-MM-DD")
-                                : null;
+                              const fechaFormateada = newValue;
+                              // && newValue.isValid()
+                              // ? newValue.format("YYYY-MM-DD")
+                              // : null;
                               field.onChange(fechaFormateada);
                             }}
                             slotProps={{

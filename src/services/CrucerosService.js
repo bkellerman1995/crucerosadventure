@@ -30,7 +30,7 @@ class CruceroService {
     return axios({
       method: "put",
       url: BASE_URL,
-      data: JSON.stringify(crucero), 
+      data: JSON.stringify(crucero),
     });
   }
 }

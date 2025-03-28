@@ -118,4 +118,25 @@ class cruceroFechaModel
         }
     }
 
+    public function updateCruceroFecha($cruceroFecha)
+    {
+        try {
+            //Consulta sql
+            $sql = "Update crucero_fecha SET idCrucero =$cruceroFecha->cruceroID, 
+            fechaSalida = '$cruceroFecha->fechaInicioFormateada', 
+            fechaLimitePagos = '$cruceroFecha->fechaLimitePagosFormateada', 
+            estado = $cruceroFecha->estado
+            Where idCruceroFecha = $cruceroFecha->idCruceroFecha;";
+
+            //Ejecutar la consulta
+            $cResults = $this->enlace->executeSQL_DML($sql);
+
+            //Retornar crucero
+            return $this->getCruceroFecha($cruceroFecha->idCruceroFecha);
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
 }

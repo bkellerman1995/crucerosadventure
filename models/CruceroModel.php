@@ -130,7 +130,13 @@ class CruceroModel
 
                     // Asignar el valor correctamente
                     $habitacion->cantHuespedes = $cantHuespedes;
+
+
                 }
+
+                //Chequear si el crucero tiene fechaSalida asignada
+                $vResultado->fechaAsignada = $this->chequearCruceroFechaByCrucero($id);
+
 
                 //Retornar la respuesta
                 return $vResultado;
@@ -141,6 +147,25 @@ class CruceroModel
 
     }
 
+    //Chequear si el crucero tiene fechaSalida asignada
+    public function chequearCruceroFechaByCrucero($idCrucero)
+    {
+        try {
+
+            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero = $idCrucero;";
+
+            //Ejecutar la consulta sql
+            $vResultado = $this->enlace->executeSQL($vSql);
+            if (!empty($vResultado)) {
+                $vResultado = $vResultado[0]->fechaSalida;
+                return $vResultado;
+            }
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+
+    }
     public function getFechasPreciosHabitaciones($id)
     {
         try {

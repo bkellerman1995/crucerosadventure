@@ -37,6 +37,8 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control, setC
     }
   }, [open]);
 
+  //Obtener los puertos de la base de datos
+  //para cargarlos al select de puertos
   useEffect(() => {
     PuertoService.getPuertos()
       .then((response) => {
