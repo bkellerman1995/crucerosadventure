@@ -76,8 +76,8 @@ export function CreateHabitacion() {
       minHuesped: "",
       maxHuesped: "",
       tamanno: "",
-      categoriaHabitacion: null,
-      barco: null,
+      categoriaHabitacion: ' ',
+      barco: ' ',
       foto: null,
       estado: 1,
     },
@@ -196,8 +196,8 @@ export function CreateHabitacion() {
           ...restoDeDataForm,
           // DataForm, // Copiar todos los demás datos
           fotoRuta: archivoRuta,
-          idcategoriaHabitacion: categoriaHabitacion?.value,
-          idbarco: barco?.value,
+          idcategoriaHabitacion: parseInt(categoriaHabitacion?.value),
+          idbarco: parseInt(barco?.value),
         };
 
         console.log("Enviando datos del crucero al form: ", dataConRuta);
