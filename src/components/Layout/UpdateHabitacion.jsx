@@ -19,8 +19,8 @@ export function UpdateHabitacion() {
   // Ahora obtenemos el ID desde el query param ?id=...
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const catHabitacion = searchParams.get("idcategoriaHabitacion");
-  const barco = searchParams.get("idbarco");
+  const [catHabitacion, setCatHabitacion] = useState();
+  const [barco, setBarco] = useState();
   const [fileName, setFileName] = useState("");
 
   const rutaArchivo =
@@ -106,6 +106,9 @@ export function UpdateHabitacion() {
         setValue("maxHuesped", habitacion.maxHuesped);
         setValue("tamanno", habitacion.tamanno);
 
+        setCatHabitacion(habitacion.idcategoriaHabitacion)
+        setBarco(habitacion.barco)
+
         const estadoValue = habitacion.estado === 1 || habitacion.estado === null ? 1 : 0;
         setValue("estado", estadoValue);
         if (habitacion.foto) {
@@ -129,7 +132,7 @@ export function UpdateHabitacion() {
         ...dataForm,
         fotoRuta,
         idHabitacion: id,
-        idcategoriaHabitacion: catHabitacion,
+        idcategoriaHabitacion: catHabitacion, 
         idbarco: barco,
       };
 
