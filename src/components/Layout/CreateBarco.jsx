@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
 import BarcoService from '../../services/BarcoService';
 import toast from 'react-hot-toast';
-import BarcoService from '../../services/HabitacionService';
+//import BarcoService from '../../services/HabitacionService';
 
 //import ImageService from '../../services/ImageService';
 
