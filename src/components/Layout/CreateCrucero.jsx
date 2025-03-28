@@ -496,7 +496,7 @@ export function CreateCrucero() {
                         position: "top-center",
                       }
                     );
-                    navigate("/app/cruceros");
+                    navigate("/admin/crucero");
                   }
                 }}
               >
