@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
@@ -55,8 +55,6 @@ export function UpdateHabitacion() {
       .required("El tamaño es requerido")
       .positive("Debe ser un número positivo"),
 
-    categoriaHabitacion: yup.string().required("La categoría es requerida"),
-
     foto: yup
       .mixed()
       .test("fileType", "Debe cargar una imagen (jpg, png, jpeg)", (value) => {
@@ -80,42 +78,21 @@ export function UpdateHabitacion() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      nombre: "",
-      descripcion: "",
-      minHuesped: "",
-      maxHuesped: "",
-      tamanno: "",
-      categoriaHabitacion: null,
+      nombre: '',
+      descripcion: '',
+      minHuesped: '',
+      maxHuesped: '',
+      tamanno: '',
       foto: null,
-      estado: "",
+      estado: '',
     },
     resolver: yupResolver(habitacionSchema),
   });
 
-  //Hooks de datos de categoria habitacion
-    const [selectedCatHabitacion, setSelectedCatHabitacion] = useState(null);
-    const [dataIDCatHabitacion, setIDDataCatHabitacion] = useState({});
-    const [loadedCatHabitacion, setLoadedCatHabitacion] = useState(false);
-  
-    if (error) return <p>Error: {error.message}</p>;
-  
-    useEffect(() => {
-      CatHabitacionService.getCatHabitacionById(selectedCatHabitacion.id)
-        .then((response) => {
-          console.log(response);
-          setIDDataCatHabitacion(response.data);
-  
-          setLoadedCatHabitacion(true);
-        })
-        .catch((error) => {
-          if (error instanceof SyntaxError) {
-            console.log(error);
-            setError(error);
-            setLoadedCatHabitacion(false);
-            throw new Error("Respuesta no válida del servidor");
-          }
-        });
-    }, []);
+  const estadoValues = [
+    { value: 1, label: "Activo" },
+    { value: 2, label: "Inactivo" },
+  ];
 
   // ✅ Obtener habitacion por ID (query param)
   useEffect(() => {
@@ -125,7 +102,7 @@ export function UpdateHabitacion() {
       return;
     }
 
-    HabitacionService.getHabitacionbyId(id)
+    HabitacionService.getHabitacionById(id)
       .then((res) => {
         const habitacion = res.data;
         setValue("nombre", habitacion.nombre);
@@ -133,9 +110,6 @@ export function UpdateHabitacion() {
         setValue("minHuesped", habitacion.minHuesped);
         setValue("maxHuesped", habitacion.maxHuesped);
         setValue("tamanno", habitacion.tamanno);
-
-        setSelectedCatHabitacion(habitacion.categoriaHabitacion);
-        setValue("categoriaHabitacion", dataIDCatHabitacion);
 
         const estadoValue = habitacion.estado === 1 || habitacion.estado === null ? 1 : 0;
         setValue("estado", estadoValue);
@@ -160,21 +134,20 @@ export function UpdateHabitacion() {
         ...dataForm,
         fotoRuta,
         idHabitacion: id,
-        categoriaHabitacion: dataIDCatHabitacion
       };
 
-      const response = await BarcoService.updateBarco(dataConRuta);
+      const response = await HabitacionService.updateHabitacion(dataConRuta);
 
       if (response.data) {
-        toast.success(`Barco actualizado: ${response.data.nombre}`, {
+        toast.success(`Habitacion actualizada: ${response.data.nombre}`, {
           duration: 3000,
           position: "top-center",
         });
-        navigate("/admin/barco");
+        navigate("/admin/habitacion");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Error actualizando barco");
+      toast.error("Error actualizando habitacion");
     }
   };
 
@@ -194,60 +167,99 @@ export function UpdateHabitacion() {
       >
         <Grid item>
           <Typography variant="h5" gutterBottom>
-            Editar Barco
+            Editar Habitacion
           </Typography>
         </Grid>
 
-        <Grid item>
-          <FormControl fullWidth>
-            <Controller
-              name="nombre"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Nombre"
-                  error={Boolean(errors.nombre)}
-                  helperText={errors.nombre?.message}
-                />
-              )}
-            />
-          </FormControl>
-        </Grid>
+          <Grid item>
+            <FormControl fullWidth>
+              <Controller
+                name="nombre"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Nombre"
+                    error={Boolean(errors.nombre)}
+                    helperText={errors.nombre?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          </Grid>
 
-        <Grid item>
-          <FormControl fullWidth>
-            <Controller
-              name="descripcion"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Descripción"
-                  error={Boolean(errors.descripcion)}
-                  helperText={errors.descripcion?.message}
-                />
-              )}
-            />
-          </FormControl>
-        </Grid>
+          <Grid item>
+            <FormControl fullWidth>
+              <Controller
+                name="descripcion"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Descripción"
+                    error={Boolean(errors.descripcion)}
+                    helperText={errors.descripcion?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          </Grid>
 
-        <Grid item>
-          <FormControl fullWidth>
-            <Controller
-              name="capacidadHuesped"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Capacidad de Huéspedes"
-                  error={Boolean(errors.capacidadHuesped)}
-                  helperText={errors.capacidadHuesped?.message}
-                />
-              )}
-            />
-          </FormControl>
-        </Grid>
+          <Grid container spacing={15}>
+            <Grid item xs={12} md={6}>
+              <Controller 
+                name="minHuesped"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Mínimo de Huéspedes"
+                    type="number"
+                    InputProps={{ inputProps: { min: 1 } }}
+                    variant="outlined"
+                    error={Boolean(errors.minHuesped)}
+                    helperText={errors.minHuesped?.message}
+                  />            
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Controller 
+                name="maxHuesped"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Máximo de Huéspedes"
+                    type="number"
+                    InputProps={{ inputProps: { min: 2 } }}
+                    variant="outlined"
+                    error={Boolean(errors.maxHuesped)}
+                    helperText={errors.maxHuesped?.message}
+                  />            
+                )}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid item>
+            <FormControl fullWidth>
+              <Controller
+                name="tamanno"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Tamaño de la habitacion en metros cuadrados"
+                    error={Boolean(errors.tamanno)}
+                    helperText={errors.tamanno?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          </Grid>
 
         <Grid item>
           <FormControl fullWidth>
@@ -257,7 +269,7 @@ export function UpdateHabitacion() {
         </Grid>
 
         <Grid item>
-          <FormControl fullWidth>
+        <FormControl fullWidth>
             <Controller
               name="estado"
               control={control}
@@ -269,7 +281,7 @@ export function UpdateHabitacion() {
               )}
             />
           </FormControl>
-        </Grid>
+          </Grid>
 
         <Grid item>
           <Button type="submit" variant="contained" color="primary">

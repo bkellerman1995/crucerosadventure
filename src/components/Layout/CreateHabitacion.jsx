@@ -291,7 +291,7 @@ export function CreateHabitacion() {
               />
             </FormControl>
           </Grid>
-          <Grid container spacing={16.5}>
+          <Grid container spacing={15}>
             <Grid item xs={12} md={6}>
               <Controller 
                 name="minHuesped"
