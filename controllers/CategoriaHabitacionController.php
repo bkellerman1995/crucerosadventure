@@ -33,4 +33,6 @@ class categoriahabitacion
             handleException($e);
         }
     }
+
+    
 }

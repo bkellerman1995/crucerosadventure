@@ -54,4 +54,29 @@ class CategoriaHabitacionModel
         }
     }
  
+    public function getCantidadHabitacionesxCategoria()
+    {
+        try {
+            // Consulta para obtener todas las categorías y su conteo de habitaciones
+            $vSql = "
+                SELECT c.idCategoriaHabitacion,
+                       c.nombre AS nombreCategoria,
+                       COUNT(h.idHabitacion) AS cantidadHabitaciones
+                FROM categoriahabitacion c
+                LEFT JOIN habitacion h
+                       ON c.idCategoriaHabitacion = h.idCategoriaHabitacion
+                GROUP BY c.idCategoriaHabitacion, c.nombre
+            ";
+    
+            // Ejecutar la consulta
+            $vResultado = $this->enlace->executeSQL($vSql);
+    
+            // Retornar todos los registros obtenidos
+            return $vResultado;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    
+
 }
