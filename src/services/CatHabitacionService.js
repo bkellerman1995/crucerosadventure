@@ -33,6 +33,11 @@ class CatHabitacionService {
     
     //     })
     //   }
+
+    getCatHabitaciones() {
+        return axios.get(BASE_URL);
+    }
+
     
 }
 
