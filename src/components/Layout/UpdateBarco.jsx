@@ -46,7 +46,7 @@ export function UpdateBarco() {
       descripcion: '',
       capacidadHuesped: '',
       foto: null,
-      estado: 1,
+      estado:'',
     },
     resolver: yupResolver(barcoSchema),
   });
