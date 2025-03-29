@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import { ForkRight } from "@mui/icons-material";
 
 export function CreateHabitacion() {
+
   const navigate = useNavigate();
   const rutaArchivo =
     "C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\habitaciones\\\\";
@@ -217,6 +218,7 @@ export function CreateHabitacion() {
                   position: "top-center",
                 }
               );
+              navigate("/admin/habitacion");
               //Configurar el estado de crucero creado a true
               //setCruceroCreado(true);
             }

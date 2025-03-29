@@ -287,7 +287,7 @@ export function CreateCrucero() {
                 onChange={handleChangeImage}
                 disabled={cruceroCreado}
               />
-              {fileURL && <img src={fileURL} alt="preview" width={150} />}
+              {fileURL && <img src={fileURL} alt="preview" width={300} />}
               {errors.foto && (
                 <FormHelperText error>{errors.foto.message}</FormHelperText>
               )}
