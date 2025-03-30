@@ -2,6 +2,7 @@ import React from "react";
 import Container from "@mui/material/Container";
 // Importaciones de Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
+import { format } from 'date-fns';
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
@@ -30,7 +31,8 @@ export function DetailCrucero() {
   //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
 
-  //Estado para
+
+  //Estado para cargar el crucero por medio de su id
   useEffect(() => {
     //Llamar al API y obtener una crucero
     CrucerosService.getCrucerobyId(routeParams.id)
@@ -111,7 +113,7 @@ export function DetailCrucero() {
                             <StarIcon />
                           </ListItemIcon>
                           <ListItemText
-                            primary={`Fecha de salida: ${item.fechaSalida}`}
+                            primary={`${format(new Date(item.fechaSalida), 'dd/MM/yyyy')}`}
                           />
                         </ListItemButton>
 

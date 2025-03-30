@@ -99,16 +99,27 @@ class CruceroModel
                     $vResultado->puertos = "";
                 }
 
-
-                //Extraer las diferentes fechas en las que se oferta el crucero
-                //junto con el precio de las habitaciones
-                $fechasPreciosHabitaciones = $this->getFechasPreciosHabitaciones($vResultado->idCrucero);
-                $vResultado->fechasPreciosHabitaciones = $fechasPreciosHabitaciones;
-
                 //Extraer las habitaciones que estan ligadas al crucero (barco)
                 $habitacionModel = new HabitacionModel();
                 $habitacionesCrucero = $habitacionModel->getHabitacionesCrucero($vResultado->idbarco);
                 $vResultado->habitaciones = $habitacionesCrucero;
+
+                //Extraer las diferentes fechas en las que se oferta el crucero
+                //junto con el precio de las habitaciones
+                foreach ($vResultado->habitaciones as &$habitacion) { // Referencia para modificar el objeto
+                    $vSql = "SELECT COUNT(idHuesped) AS cantHuesped FROM huesped WHERE idHabitacion = $habitacion->idHabitacion;";
+                    $resultado = $this->enlace->executeSQL($vSql);
+
+                    // Verificar que la consulta devolvió resultados válidos
+                    $cantHuespedes = (!empty($resultado) && isset($resultado[0]->cantHuesped)) ? $resultado[0]->cantHuesped : 0;
+
+                    // Asignar el valor correctamente
+                    $habitacion->cantHuespedes = $cantHuespedes;
+
+
+                }
+                $fechasPreciosHabitaciones = $this->getFechasPreciosHabitaciones($vResultado->idCrucero, $vResultado->habitaciones);
+                $vResultado->fechasPreciosHabitaciones = $fechasPreciosHabitaciones;
 
                 //Recorrer la lista de habitaciones ($vResultado->habitaciones) para asignarle la
                 //cantidad de huespedes que tiene cada habitacion. Por medio de un ciclo for 
@@ -163,7 +174,8 @@ class CruceroModel
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
             if (!empty($vResultado)) {
-                $vResultado = $vResultado[0]->fechaSalida;
+                $vResultado = $vResultado[0]->idCruceroFecha;
+
                 return $vResultado;
             }
 
@@ -172,23 +184,38 @@ class CruceroModel
         }
 
     }
-    public function getFechasPreciosHabitaciones($id)
+    public function getFechasPreciosHabitaciones($id, $habitaciones)
     {
         try {
 
-            //Obtener las fechas y precios de las habitaciones
+            //Consulta sql
             $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero=$id order by idCruceroFecha desc;";
 
-            //Ejecutar la consulta sql
-            $vResultado = $this->enlace->executeSQL($vSql);
+            // Ejecutar la consulta
+            $vResultado = $this->enlace->ExecuteSQL($vSql);
 
-            // Si hay resultados, recorrerlos y extrear la información de cada
-            // fecha relacionada al crucero
+            //Recorrer la tabla de precio_habitacion con todas las coincidencias
+            //de idCruceroFecha asignadas al crucero
             if (!empty($vResultado) && is_array($vResultado)) {
+                //Recorrer todas las habitaciones del crucero e ir mapeando los 
+                //precios asignados según la fecha 
+                //Extraer las habitaciones que estan ligadas al crucero (barco)
 
+                foreach ($habitaciones as &$habitacion) {
+                    $vSql = "SELECT * FROM precio_habitacion_fecha WHERE idHabitacion = $habitacion->idHabitacion";
+                    $vResultado = $this->enlace->executeSQL($vSql);
+
+                    // Verificar que la consulta devolvió resultados válidos
+                    $habitacion->precios = (!empty($resultado) && isset($resultado[0]->precio)) ? $resultado[0]->precio : 0;
+
+                }
                 //Retornar la respuesta
                 return $vResultado;
             }
+
+
+
+
 
         } catch (Exception $e) {
             handleException($e);
