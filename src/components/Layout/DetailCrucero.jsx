@@ -113,7 +113,7 @@ export function DetailCrucero() {
                             <StarIcon />
                           </ListItemIcon>
                           <ListItemText
-                            primary={`${format(new Date(item.fechaSalida), 'dd/MM/yyyy')}`}
+                            // primary={`${format(new Date(item.fechaSalida), 'dd/MM/yyyy')}`}
                           />
                         </ListItemButton>
 
