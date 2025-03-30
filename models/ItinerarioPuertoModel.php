@@ -58,7 +58,7 @@ class ItinerarioPuertoModel
             $puertoModel = new PuertoModel();
 
             $vSql = "SELECT * FROM itinerario_puerto
-                    where idItinerario=$id;";
+                    where idItinerario=$id order by dia desc;";
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
 
@@ -69,6 +69,8 @@ class ItinerarioPuertoModel
                     $puerto = $puertoModel->get($row->idPuerto);
                     $row->puerto = $puerto;
                 }
+
+
             }
 
             //Retornar la respuesta

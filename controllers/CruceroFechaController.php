@@ -27,7 +27,7 @@ class cruceroFecha
             //Instancia del modelo
             $cruceroFechaModel = new CruceroFechaModel();
             //Acción del modelo a ejecutar
-            $result = $cruceroFechaModel->get($id);
+            $result = $cruceroFechaModel->getCruceroFecha($id);
             //Dar respuesta
             $response->toJSON($result);
             

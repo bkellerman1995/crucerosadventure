@@ -58,6 +58,10 @@ class PuertoModel
             $vResultado = $this->enlace->executeSQL($vSql);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
+                // Convertir el BLOB en base64 si tiene contenido
+                if (!empty($vResultado->foto)) {
+                    $vResultado->foto = "data:image/jpeg;base64," . base64_encode($vResultado->foto);
+                }
             }
 
             //Extrar el objeto pais relacionado a este puerto

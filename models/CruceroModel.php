@@ -63,6 +63,9 @@ class CruceroModel
             //Obtener el itinerario
             $itinerarioModel = new ItinerarioModel();
 
+            //Variable para obtener los puertos del itinerari
+            $itinerarioPuertosModel = new ItinerarioPuertoModel();
+
             $vSql = "SELECT * FROM crucero WHERE idCrucero=$id;";
 
             //Ejecutar la consulta sql
@@ -80,19 +83,22 @@ class CruceroModel
                 $barco = $barcoModel->get($vResultado->idbarco);
                 $vResultado->barco = $barco;
 
+                //Revisar los puertos asignados al itinerario (si existe)
+
                 if ($vResultado->idItinerario != null) {
                     //Extrar el objeto itinerario relacionado a este crucero
                     $itinerario = $itinerarioModel->get($vResultado->idItinerario);
-                    $vResultado->itinerario = $itinerario;  
+                    $vResultado->itinerario = $itinerario;
+
+                    //Extraer la información de los puertos del itinerario
+                    $puertosItinerario = $itinerarioPuertosModel->getPuertosItinerario($vResultado->idItinerario);
+                    $vResultado->puertosItinerario = $puertosItinerario;
                 }
                 else {
                     $vResultado->itinerario = "";
+                    $vResultado->puertos = "";
                 }
 
-
-                //Extraer la información de los puertos del itinerario
-                // $puertos = $itinerarioModel->getPuertosItinerario($vResultado->idItinerario);
-                // $vResultado->puertos = $puertos;
 
                 //Extraer las diferentes fechas en las que se oferta el crucero
                 //junto con el precio de las habitaciones

@@ -36,20 +36,19 @@ class PrecioHabitacionFechaModel
             $vSql = "SELECT * FROM precio_habitacion_fecha WHERE idPrecioHabitacion=$idPrecioHabitacion";
 
             //Ejecutar la consulta
-            //Obtener ultimo insert
-            $idItinerario=$this->enlace->executeSQL_DML_last($vSql);
+            $vResultado = $this->enlace->executeSQL($vSql);
 
-            //Retornar itinerario
-            return $this->get($idPrecioHabitacion);
+            //Retornar la respuesta
+            return $vResultado;
 
         } catch (Exception $e) {
             handleException($e);
         }
     }    /**
-     * Crear itinerario
-     * @param $objeto itinerario a insertar
-     * @return $this->get($idItinerario) - Objeto itinerario
-     */
+         * Crear itinerario
+         * @param $objeto itinerario a insertar
+         * @return $this->get($idItinerario) - Objeto itinerario
+         */
     //
     public function create($objeto)
     {
