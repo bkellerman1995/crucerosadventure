@@ -105,41 +105,69 @@ export function DetailCrucero() {
                 >
                   {data.fechasPreciosHabitaciones &&
                   data.fechasPreciosHabitaciones.length > 0 ? (
-                    data.fechasPreciosHabitaciones.map((item) => (
-                      <React.Fragment key={item.id}>
-                        {/* Elemento principal: Fecha de salida */}
-                        <ListItemButton>
-                          <ListItemIcon>
-                            <StarIcon />
-                          </ListItemIcon>
-                          <ListItemText
-                            // primary={`${format(new Date(item.fechaSalida), 'dd/MM/yyyy')}`}
-                          />
-                        </ListItemButton>
+                    data.fechasPreciosHabitaciones
+                      .reduce((acc, fecha) => {
+                        // Agrupar precios de habitaciones por fechaSalida
+                        const fechaExistente = acc.find(
+                          (item) => item.fechaSalida === fecha.fechaSalida
+                        );
 
-                        {/* Sublista de habitaciones con su precio correspondiente */}
-                        <List component="div" disablePadding>
-                          {data.habitaciones.map((habitacion) => {
-                            // Buscar el precio correspondiente en fechasPreciosHabitaciones
-                            const precioHabitacion = item.precioHabitacion;
+                        if (fechaExistente) {
+                          fechaExistente.precios.push(fecha); // Si la fecha ya existe, añadir los precios de habitaciones
+                        } else {
+                          acc.push({
+                            fechaSalida: fecha.fechaSalida,
+                            precios: [fecha], // Si no existe, crear nueva entrada para la fecha con sus precios
+                          });
+                        }
 
-                            return (
-                              <ListItemButton
-                                key={habitacion.id}
-                                sx={{ pl: 10 }}
-                              >
-                                <ListItemIcon>
-                                  <ArrowRightIcon />
-                                </ListItemIcon>
-                                <ListItemText
-                                  secondary={`${habitacion.nombre} - Precio: $${precioHabitacion}`}
-                                />
-                              </ListItemButton>
-                            );
-                          })}
-                        </List>
-                      </React.Fragment>
-                    ))
+                        return acc;
+                      }, [])
+                      .map((fechaGroup, index) => (
+                        <React.Fragment key={index}>
+                          {/* Mostrar la fecha de salida */}
+                          <ListItemButton>
+                            <ListItemIcon>
+                              <StarIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={`${format(new Date(fechaGroup.fechaSalida), "dd/MM/yyyy")}`}
+                            />
+                          </ListItemButton>
+
+                          {/* Sublista de habitaciones con su precio correspondiente */}
+                          <List component="div" disablePadding>
+                            {fechaGroup.precios.map((precio) => {
+                              const habitacion = data.habitaciones.find(
+                                (h) => h.idHabitacion === precio.idHabitacion
+                              );
+
+                              return (
+                                <ListItemButton
+                                  key={precio.idHabitacion}
+                                  sx={{ pl: 10 }}
+                                >
+                                  <ListItemIcon>
+                                    <ArrowRightIcon />
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    primary={
+                                      habitacion
+                                        ? habitacion.nombre
+                                        : "No disponible"
+                                    }
+                                    secondary={
+                                      precio
+                                        ? `$${precio.precio}`
+                                        : "No disponible"
+                                    }
+                                  />
+                                </ListItemButton>
+                              );
+                            })}
+                          </List>
+                        </React.Fragment>
+                      ))
                   ) : (
                     <Typography variant="body2">
                       No hay fechas disponibles
@@ -148,6 +176,8 @@ export function DetailCrucero() {
                 </List>
               </Typography>
             </Grid>
+
+            
           </Grid>
           <br></br>
 

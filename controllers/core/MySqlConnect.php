@@ -119,8 +119,8 @@ class MySqlConnect {
 		}
 	}
 	public function escape_string($cadena)
-{
-    return $this->enlace->real_escape_string($cadena);
-}
+	{
+		return $this->enlace->real_escape_string($cadena);
+	}
 
 }

@@ -57,16 +57,19 @@ export function ModalGestionFechas({
 
   // Crear cruceroFecha al abrir modal
   useEffect(() => {
-    if (open && !idCruceroFecha) {
-    const nuevo = { estado: 1 };
-    CruceroFechaService.createFechaCrucero(nuevo)
-      .then((res) => {
-        if (res?.data?.idCruceroFecha) {
-          setidCruceroFecha(res.data.idCruceroFecha);
-        }
-      })
-      .catch((err) => console.error("Error al crear fecha del crucero:", err));
-    }
+    // if (open && !idCruceroFecha) {
+      if (open) {
+        const nuevo = { estado: 1 };
+        CruceroFechaService.createFechaCrucero(nuevo)
+          .then((res) => {
+            if (res?.data?.idCruceroFecha) {
+              setidCruceroFecha(res.data.idCruceroFecha);
+            }
+          })
+          .catch((err) =>
+            console.error("Error al crear fecha del crucero:", err)
+          );
+      }
   }, [open]);
 
   // Generación dinámica del esquema de validación
@@ -165,36 +168,38 @@ export function ModalGestionFechas({
       // Validar que no haya conflicto de fechas
       const responseCrucero = await CrucerosService.getCrucerobyId(cruceroID);
       setError(responseCrucero.error);
-  
-      if (responseCrucero.data != null) {
+
+      if (
+        responseCrucero.data != null &&
+        responseCrucero.data.fechaAsignada != null
+      ) {
         if (responseCrucero.data.fechaAsignada === fechaInicioFormateada) {
           toast.error(`La fecha de inicio ${fechaInicioFormateada} ya se asignó al crucero # ${cruceroID}. 
             Por favor seleccione otra fecha`);
           return;
         }
-  
-        // Guardar los precios de las habitaciones
-        const preciosResponse = await PrecioHabitacionFechaService.agregarPrecioHabitacionFecha(formData.habitacionesPrecios);
-  
-        if (preciosResponse.data != null) {
-          toast.success("Precios de habitaciones guardados correctamente.", {
-            duration: 2000,
-            position: "top-center",
-          });
-  
-          // Actualizar la fecha del crucero
-          const fechaCruceroResponse = await CruceroFechaService.updateFechaCrucero(formData);
-  
-          if (fechaCruceroResponse.data != null) {
-            toast.success(`Fechas y habitaciones agregadas correctamente`, {
-              duration: 1500,
-              position: "top-center",
-            });
-  
-            // Actualizar el estado y cerrar el modal
-            setFechasCrucero(true); 
-            handleClose(); // Cerrar el modal
-          }
+      }
+
+      // Guardar los precios de las habitaciones
+      const preciosResponse =
+        await PrecioHabitacionFechaService.agregarPrecioHabitacionFecha(
+          formData.habitacionesPrecios
+        );
+
+      if (preciosResponse.data != null) {
+        toast.success("Precios de habitaciones guardados correctamente.", {
+          duration: 2000,
+          position: "top-center",
+        });
+
+        // Actualizar la fecha del crucero
+        const fechaCruceroResponse =
+          await CruceroFechaService.updateFechaCrucero(formData);
+
+        if (fechaCruceroResponse.data != null) {
+          // Actualizar el estado y cerrar el modal
+          setFechasCrucero(true);
+          handleClose(); // Cerrar el modal// Cerrar el modal
         }
       }
     } catch (error) {

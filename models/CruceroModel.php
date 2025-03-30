@@ -118,6 +118,9 @@ class CruceroModel
 
 
                 }
+
+                // Obtener las fechas y precios de las habitaciones
+
                 $fechasPreciosHabitaciones = $this->getFechasPreciosHabitaciones($vResultado->idCrucero, $vResultado->habitaciones);
                 $vResultado->fechasPreciosHabitaciones = $fechasPreciosHabitaciones;
 
@@ -174,7 +177,7 @@ class CruceroModel
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
             if (!empty($vResultado)) {
-                $vResultado = $vResultado[0]->idCruceroFecha;
+                $vResultado = $vResultado[0]->fechaSalida;
 
                 return $vResultado;
             }
@@ -188,35 +191,38 @@ class CruceroModel
     {
         try {
 
-            //Consulta sql
-            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero=$id order by idCruceroFecha desc;";
+            // Consulta SQL para obtener las fechas y los precios de las habitaciones
+            $vSql = "SELECT cf.idCruceroFecha, cf.fechaSalida, phf.idHabitacion, phf.precio
+                 FROM crucero_fecha cf
+                 LEFT JOIN precio_habitacion_fecha phf ON cf.idCruceroFecha = phf.idCruceroFecha
+                 WHERE cf.idCrucero = $id
+                 ORDER BY cf.fechaSalida DESC";
 
             // Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSql);
 
+            return $vResultado;
+
             //Recorrer la tabla de precio_habitacion con todas las coincidencias
             //de idCruceroFecha asignadas al crucero
-            if (!empty($vResultado) && is_array($vResultado)) {
-                //Recorrer todas las habitaciones del crucero e ir mapeando los 
-                //precios asignados según la fecha 
-                //Extraer las habitaciones que estan ligadas al crucero (barco)
+            // if (!empty($vResultado) && is_array($vResultado)) {
 
-                foreach ($habitaciones as &$habitacion) {
-                    $vSql = "SELECT * FROM precio_habitacion_fecha WHERE idHabitacion = $habitacion->idHabitacion";
-                    $vResultado = $this->enlace->executeSQL($vSql);
+            //     //Recorrer todas las habitaciones del crucero e ir mapeando los 
+            //     //precios asignados según la fecha 
+            //     //Extraer las habitaciones que estan ligadas al crucero (barco)
+            //     foreach ($habitaciones as &$habitacion) {
+            //         // Buscar el precio correspondiente para cada habitación en cada fecha
+            //         foreach ($vResultado as $fechaPrecio) {
+            //             if ($habitacion->idHabitacion == $fechaPrecio->idHabitacion) {
+            //                 // Asignar el precio a la propiedad 'precios' de la habitación
+            //                 $habitacion->precios[$fechaPrecio->idCruceroFecha] = $fechaPrecio->precio;
+            //             }
+            //         }
 
-                    // Verificar que la consulta devolvió resultados válidos
-                    $habitacion->precios = (!empty($resultado) && isset($resultado[0]->precio)) ? $resultado[0]->precio : 0;
-
-                }
-                //Retornar la respuesta
-                return $vResultado;
-            }
-
-
-
-
-
+            //         //Retornar la respuesta
+            //         return $vResultado;
+            //     }
+            // }
         } catch (Exception $e) {
             handleException($e);
         }
