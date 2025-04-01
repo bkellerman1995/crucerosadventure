@@ -103,7 +103,7 @@ const headCells = [
   {
     id: "maxHuesped",
     numeric: true,
-    disablePadding: false,
+    disablePadding: true,
     label: "Máximo de huéspedes",
   },
   {
@@ -361,7 +361,7 @@ export function ListHabitaciones() {
                           <TableCell align="left">
                             {row.categoriaHabitacion}
                           </TableCell>
-                          <TableCell align="left">{row.maxHuesped}</TableCell>
+                          <TableCell sx={{ textAlign: "center" }}>{row.maxHuesped}</TableCell>
 
                           {/*<sup> para los metros cuadrados</sup> */}
 
