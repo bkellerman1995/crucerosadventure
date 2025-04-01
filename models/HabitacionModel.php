@@ -40,9 +40,9 @@ class HabitacionModel
                         $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
                     }
 
-                    // if (!empty($row->idcategoriaHabitacion)) {
-                    //     $row->categoriaHabitacion = $catHabitacionModel->get($row->idcategoriaHabitacion)->nombre;
-                    // }
+                    if (!empty($row->idcategoriaHabitacion)) {
+                        $row->categoriaHabitacion = $catHabitacionModel->get($row->idcategoriaHabitacion)->nombre;
+                    }
 
                 }
             }

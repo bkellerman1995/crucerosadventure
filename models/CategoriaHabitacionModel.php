@@ -20,6 +20,7 @@ class CategoriaHabitacionModel
             $vSQL = "SELECT * FROM categoriahabitacion order by idcategoriaHabitacion desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
             //Retornar la respuesta
 
             return $vResultado;

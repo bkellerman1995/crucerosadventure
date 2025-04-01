@@ -96,7 +96,7 @@ const headCells = [
   {
     id: "categoriaHabitacion",
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: "Categoría",
   },
 
@@ -334,8 +334,6 @@ export function ListHabitaciones() {
                           selected={isItemSelected}
                           sx={{ cursor: "pointer" }}
                         >
-                          
-
                           {/* Contenido de la tabla */}
                           <TableCell
                             component="th"
@@ -344,19 +342,19 @@ export function ListHabitaciones() {
                             padding="none"
                           >
                             {/* ICONO EDITAR */}
-                          <TableCell>
-                            <IconButton
-                              component={Link}
-                              to={`/admin/habitacion/editar?id=${row.idHabitacion}`}
-                              aria-label="Editar"
-                              sx={{
-                                backgroundColor: "#00304E",
-                                color: "white",
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </TableCell>
+                            <TableCell>
+                              <IconButton
+                                component={Link}
+                                to={`/admin/habitacion/editar?id=${row.idHabitacion}`}
+                                aria-label="Editar"
+                                sx={{
+                                  backgroundColor: "#00304E",
+                                  color: "white",
+                                }}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </TableCell>
                             {row.title}
                           </TableCell>
                           <TableCell align="left">{row.nombre}</TableCell>
