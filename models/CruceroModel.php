@@ -172,7 +172,7 @@ class CruceroModel
     {
         try {
 
-            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero = $idCrucero order by idCruceroFecha desc;";
+            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero = $idCrucero order by fechaSalida desc;";
 
             //Ejecutar la consulta sql
             // Ejecutar la consulta
