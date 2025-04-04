@@ -23,7 +23,7 @@ class ReservaModel
             $cruceroModel = new CruceroModel();
 
             //Obtener el itinerario
-            $itinerarioModel = new ItinerarioModel();
+            $itinerarioPuestoModel = new ItinerarioPuertoModel();
 
             // Consulta SQL
             $vSQL = "SELECT * FROM reserva ORDER BY idReserva DESC;";
@@ -37,7 +37,7 @@ class ReservaModel
             if (!empty($vResultado) && is_array($vResultado)) {
                 foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
 
-                    if (!empty($row->idCruceroFecha) && !empty($row->idCruceroFecha)) {
+                    if (!empty($row->idCruceroFecha)) {
 
                         //Extraer el crucero basado en la fecha de la reserva ()
                         $cruceroFecha = $cruceroFechaModel->getCruceroFecha($row->idCruceroFecha);
@@ -53,7 +53,7 @@ class ReservaModel
 
                         //Extraer la información de los puertos
                         // del itinerario
-                        $puertos = $itinerarioModel->getPuertosItinerario($crucero->idItinerario);
+                        $puertos = $itinerarioPuestoModel->getPuertosItinerario($crucero->idItinerario);
                         $row->puertos = $puertos;
 
                         

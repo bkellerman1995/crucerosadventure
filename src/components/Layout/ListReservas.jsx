@@ -22,12 +22,14 @@ import { useEffect } from "react";
 import ReservaService from "../../services/ReservaService";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Button from "@mui/material/Button";
 import { IconButton } from "@mui/material";
-
+import AddIcon from "@mui/icons-material/Add";
 
 ListReservas.propTypes = {
   data: PropTypes.array,
 };
+
 // Función para extraer el número de un string (ejemplo: "Habitacion10" -> 10)
 function extractNumber(text) {
   const match = text.match(/\d+/); // Busca números en el string
@@ -196,10 +198,20 @@ function TableHabitacionesToolbar(props) {
           Lista de reservas
         </Typography>
       )}
+      <Button
+        style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+        component={Link}
+        to="/Reserva/"
+        variant="contained"
+        endIcon={<AddIcon />}
+      >
+        Reservar
+      </Button>
+      
     </Toolbar>
   );
 }
-//Propieades Barra de opciones
+//Propiedades Barra de opciones
 TableHabitacionesToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
   idSelected: PropTypes.number.isRequired,

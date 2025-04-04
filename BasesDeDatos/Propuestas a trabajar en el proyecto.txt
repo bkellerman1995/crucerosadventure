@@ -1,0 +1,21 @@
+DetalleCrucero - incluir proxima fecha de salida y los campos (habitaciones) disponibles en la parte inferior del card. 
+
+Propuesta 1 - agregar el drop down (pais) con un boton de busqueda a la par para filtrar los puertos por pais. 
+
+Propuesta 2 - hacer un "map" de las habitaciones disponibles/no disponibles en el crucero. 
+
+Filtrar las secciones del crucero (lateral, frontal,etc.) - Con un drop down menu y cargar una lista de habitaciones que están en cada sección - OPCIONAL
+
+Cargar las habitaciones con cards (parecido a detailcrucero) más pequeñas y en la seccion inferior marcar el color de disponible/no disponible con una ternaria (si esta asociada a una reserva, pintar la parte inferior rojo si no está disponible y verded si no está asociada a una reserva)
+
+Propuesta 3 - (10 USD de multa por dia - constante) Si la reserva no se paga hoy, otorgar un máximo de "X" días. 
+
+ejemplo de salida: octubre. 
+Fecha X: no hay recargos - ejemplo:  desde hoy hasta primer dia de Julio. 
+Fecha Y: hay cargos por cada día que se atrase el pago - ejemplo: entre Julio y Agosto. 
+Fecha Y deberia ser antes de la fecha de salida. 
+
+En setiembre se cancela la reserva (queda nula) si no se pago y se pone la habitacion en promocion.
+
+
+
