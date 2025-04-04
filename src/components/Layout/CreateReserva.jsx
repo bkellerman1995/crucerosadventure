@@ -8,10 +8,10 @@ import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import * as yup from "yup";
+import { format,addDays } from 'date-fns';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
-import BarcoService from "../../services/BarcoService";
-import CrucerosService from "../../services/CrucerosService";
+import CruceroService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
@@ -19,8 +19,7 @@ import { ModalGestionFechas } from './ModalGestionFechas';
 import ItinerarioService from "../../services/ItinerarioService";
 
 
-export function Reserva() {
-
+export function CreateReserva() {
   const navigate = useNavigate();
 
   //Estilos personalizados para el select
@@ -101,10 +100,6 @@ export function Reserva() {
     resolver: yupResolver(cruceroSchema),
   });
 
-  // Estado para almacenar el valor de cantidad de días
-  const [cantDias, setCantDias] = useState(7); // Valor mínimo predeterminado
-  console.log("Cant Dias cargados", cantDias);
-
   // Estado para controlar la apertura del modal de Gestion Cruceros
   const [openModalGestPuertos, setOpenModalGestPuertos] = useState(false);
 
@@ -115,16 +110,16 @@ export function Reserva() {
   const [error, setError] = useState("");
   const onError = (errors, e) => console.log(errors, e);
 
-  //Estado de barcos Cargados en el select
-  const [selectedBarco, setSelectedBarco] = useState(null);
-  const [dataBarco, setDataBarco] = useState([]);
-  const [loadedBarco, setLoadedBarco] = useState(false);
-
-  //Estado del crucero creado
-  const [cruceroCreado, setCruceroCreado] = useState(false);
+  //Estado de cruceros cargados en el select
+  const [selectedCrucero, setSelectedCrucero] = useState(null);
+  const [dataCrucero, setDataCrucero] = useState([]);
+  const [loadedCrucero, setLoadedCrucero] = useState(false);
 
   // Estado para almacenar el id del crucero
   const [idCrucero, setIdCrucero] = useState(null);
+
+  // Estado para las fechas asignadas al crucero seleccionado
+  const [fechasSalida, setFechasSalida] = useState(false);
 
   //Estado de los puertos añadidos al itinerario
   const [puertosItinerario, setPuertosItinerario] = useState(false);
@@ -132,26 +127,23 @@ export function Reserva() {
   //Estado de las fecas añadidas al crucero
   const [fechasCrucero, setFechasCrucero] = useState(false);
 
-  //Hooks y funcion para gestionar imagen
-  const [fileURL, setFileURL] = useState(null);
-  const [file, setFile] = useState(null);
-
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
+  //Cargar los cruceros al iniciar el componente
   useEffect(() => {
-    BarcoService.getBarcos()
+    CruceroService.getCruceros()
       .then((response) => {
-        console.log(response);
-        setDataBarco(response.data);
+        console.log("Cruceros cargados", response);
+        setDataCrucero(response.data);
 
-        setLoadedBarco(true);
+        setLoadedCrucero(true);
       })
       .catch((error) => {
         if (error instanceof SyntaxError) {
           console.log(error);
           setError(error);
-          setLoadedBarco(false);
+          setLoadedCrucero(false);
           throw new Error("Respuesta no válida del servidor");
         }
       });
@@ -161,10 +153,10 @@ export function Reserva() {
   const onSubmit = async (DataForm) => {
     //Validar si se ha seleccionado un barco
 
-    if (!selectedBarco) {
+    if (!selectedCrucero) {
       setTimeout(() => {
-        if (!selectedBarco) {
-          alert("Debe seleccionar un barco para el crucero.");
+        if (!selectedCrucero) {
+          alert("Debe seleccionar un crucero");
         }
       }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
       return;
@@ -192,49 +184,12 @@ export function Reserva() {
         };
 
         console.log("Enviando datos del crucero al form: ", dataConRuta);
-
-        CrucerosService.createCrucero(dataConRuta)
-          .then((response) => {
-            setError(response.error);
-            if (response.data != null) {
-              //Obtener el valor del id del crucero creado
-              setIdCrucero(response.data.idCrucero);
-
-              toast.success(
-                `Crucero # ${response.data.idCrucero} - ${response.data.nombre} 
-                Añadido correctamente 
-                Proceda a añadir el itinerario y las fechas del crucero`,
-                {
-                  duration: 3000,
-                  position: "top-center",
-                }
-              );
-              //Configurar el estado de crucero creado a true
-              setCruceroCreado(true);
-            }
-          })
-          .catch((error) => {
-            if (error instanceof SyntaxError) {
-              console.log(error);
-              setError(error);
-              throw new Error("Respuesta no válida del servidor");
-            }
-          });
       } else {
         //Configurar el estado de crucero creado a false
-        setCruceroCreado(false);
       }
     } catch (error) {
       console.error(error);
     }
-  };
-
-  //Gestion de la imagen
-  const handleChangeImage = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-    setFileURL(URL.createObjectURL(selectedFile));
-    setValue("foto", selectedFile); // Pasar el archivo a react-hook-form
   };
 
   //Cargar el grid del componente.
@@ -244,92 +199,24 @@ export function Reserva() {
         <Grid container spacing={3}>
           <Grid size={12} sm={12}>
             <Typography variant="h5" gutterBottom>
-              <b>Crear Crucero</b>
+              <b>Generar reserva</b>
             </Typography>
           </Grid>
 
-          {/* Datos del crucero (lado izquierdo) */}
+          {/* Datos de la reserva (lado izquierdo) */}
           <Grid size={6} sm={6}>
-            {/*Nombre */}
-            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              <Controller
-                name="nombre"
-                control={control}
-                style={{ backgroundColor: "#16537e" }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    id="nombre"
-                    label="Nombre"
-                    error={Boolean(errors.nombre)}
-                    helperText={errors.nombre ? errors.nombre.message : " "}
-                    disabled={cruceroCreado}
-                  />
-                )}
-              />
-            </FormControl>
-            <br></br>
-            <FormControl
-              variant="standard"
-              fullWidth
-              sx={{ m: 1 }}
-              style={{ disabled: cruceroCreado }}
-            >
-              <Typography variant="subtitle1">
-                <b>Foto</b>
-              </Typography>
-              <input
-                type="file"
-                onChange={handleChangeImage}
-                disabled={cruceroCreado}
-              />
-              {fileURL && <img src={fileURL} alt="preview" width={300} />}
-              {errors.foto && (
-                <FormHelperText error>{errors.foto.message}</FormHelperText>
-              )}
-              <br></br>
-            </FormControl>
-            {/* <img src={fileURL} width={100} /> */}
-
-            {/* Cantidad de días */}
-            <Grid size={4} sm={6} spacing={2}>
-              <Typography variant="subtitle1">
-                <b>Cantidad de días</b>
-              </Typography>
-              <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-                <Controller
-                  name="cantDias"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Seleccione un valor"
-                      type="number"
-                      variant="outlined"
-                      onChange={(e) => {
-                        let value = parseInt(e.target.value, 10);
-                        if (isNaN(value) || value < 7) value = 7;
-                        else if (value > 14) value = 14;
-                        setCantDias(value); // ACTUALIZA el estado cantDias con el valor seleccionado
-                        field.onChange(value); // ACTUALIZA el valor en react-hook-form
-                      }}
-                      value={cantDias} // SE ASIGNA EL VALOR ACTUAL
-                      disabled={cruceroCreado}
-                    />
-                  )}
-                />
-              </FormControl>
-            </Grid>
-            <br></br>
-            {/* Barco */}
+            {/* Crucero */}
             <Grid size={12} sm={4}>
               <Typography variant="subtitle1">
-                <b>Barco</b>
+                <b>Crucero</b>
               </Typography>
+
+              <br></br>
+
               <FormControl fullWidth>
-                {loadedBarco && (
+                {loadedCrucero && (
                   <Select
-                    options={dataBarco.map((barco) => ({
+                    options={dataCrucero.map((crucero) => ({
                       label: (
                         <div
                           style={{
@@ -338,11 +225,11 @@ export function Reserva() {
                             alignItems: "center",
                           }}
                         >
-                          {barco.nombre} / Capacidad: {barco.capacidadHuesped}{" "}
-                          pasajeros
+                          {crucero.nombre}
+
                           <img
-                            src={barco.foto}
-                            alt={barco.nombre}
+                            src={crucero.foto}
+                            alt={crucero.nombre}
                             style={{
                               width: 30,
                               height: 30,
@@ -351,38 +238,58 @@ export function Reserva() {
                           />
                         </div>
                       ),
-                      value: barco.idbarco,
+                      value: crucero.idCrucero,
                     }))}
                     onChange={(selectedOption) => {
-                      setSelectedBarco(selectedOption);
-                      setValue("barco", selectedOption);
+                      setSelectedCrucero(selectedOption);
+                      setValue("crucero", selectedOption);
+
+                      //Obtener las fechas asignadas al crucero seleccionado
+                      if (selectedOption){
+                        setIdCrucero(selectedOption.value); //Actualizar el idCrucero
+                        CruceroService.getCrucerobyId(selectedOption.value)
+                        .then((response) => {
+                          setFechasSalida(response.data.fechasAsignadas || []);
+                        })
+                        .catch((error) => {
+                          console.error("Error al cargar las fechas del crucero:", error);
+                        });
+                      }
                     }}
-                    value={selectedBarco}
+                    value={selectedCrucero}
                     styles={customStyles}
-                    placeholder="Seleccione un barco"
-                    isDisabled={cruceroCreado}
+                    placeholder="Seleccione un crucero"
                   />
                 )}
               </FormControl>
             </Grid>
             <br></br>
-            <br></br>
 
-            {/* Botón Crear Crucero*/}
-            <Grid size={4} sm={4} spacing={1}>
-              <Button
-                variant="contained"
-                type="submit"
-                style={{
-                  backgroundColor: "#16537e",
-                  display: !cruceroCreado ? "block" : "none",
-                }}
-                onClick={() => {
-                  console.log("Estado actual de selectedBarco:", selectedBarco);
-                }}
-              >
-                Crear crucero
-              </Button>
+            {/* Fecha del Crucero */}
+            <Grid size={12} sm={4}>
+              <Typography variant="subtitle1">
+                <b>Fecha del crucero</b>
+              </Typography>
+
+              <br></br>
+
+              <FormControl fullWidth>
+                {loadedCrucero && fechasSalida.length > 0 && (
+                  <Select
+                    options={fechasSalida.map((fecha) => ({
+                      label: `${format(addDays (new Date(fecha),1), "dd/MM/yyyy")}`, //Mostrar la fecha en formato dd/MM/yyyy
+                      value: fecha, //Usar la fecha como valor
+                    }))}
+                    onChange={(selectedOption) => {
+
+                      setValue ("fechaSalida", selectedOption); // Establecer la fecha seleccionada
+                    }}
+                    // value={selectedCrucero}
+                    styles={customStyles}
+                    placeholder="Seleccione una fecha de salida"
+                  />
+                )}
+              </FormControl>
             </Grid>
           </Grid>
 
@@ -412,7 +319,6 @@ export function Reserva() {
                   <Button
                     variant="contained"
                     style={{ backgroundColor: "#50C878" }}
-                    disabled={!cruceroCreado} // Deshabilita el botón si el crucero no ha sido creado
                     onClick={async () => {
                       try {
                         // Llamada al servicio para crear el itinerario
@@ -426,10 +332,6 @@ export function Reserva() {
                           );
 
                         console.log("Itinerario creado:", response.data);
-
-                        // Abrir el modal después de crear el itinerario:
-                        setOpenModalGestPuertos(true);
-                        setCruceroCreado(false);
                       } catch (error) {
                         console.error("Error al crear el itinerario:", error);
                       }
@@ -438,36 +340,6 @@ export function Reserva() {
                     Gestionar itinerarios
                   </Button>
                 </Grid>
-
-                <Button
-                  variant="contained"
-                  style={{ backgroundColor: "#50C878" }}
-                  disabled={!cruceroCreado} // Deshabilita el botón si el crucero no ha sido creado
-                  onClick={() => {
-                    console.log(
-                      "Estado actual de selectedBarco:",
-                      selectedBarco
-                    );
-
-                    if (!selectedBarco) {
-                      setTimeout(() => {
-                        if (!selectedBarco) {
-                          alert(
-                            "Debe seleccionar un barco antes de gestionar fechas."
-                          );
-                        } else {
-                          setOpenModalGestFechas(true);
-                          setCruceroCreado(false);
-                        }
-                      }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
-                      return;
-                    }
-
-                    setOpenModalGestFechas(true);
-                  }}
-                >
-                  Gestionar fechas y precios
-                </Button>
               </Grid>
             </Grid>
 
@@ -483,15 +355,15 @@ export function Reserva() {
                     puertosItinerario && fechasCrucero ? "block" : "none",
                 }}
                 onClick={() => {
-                  console.log("Estado actual de selectedBarco:", selectedBarco);
+                  console.log(
+                    "Estado actual de selectedCrucero:",
+                    selectedCrucero
+                  );
                   if (puertosItinerario && fechasCrucero) {
-                    toast.success(
-                      `Gestión de crucero exitosa`,
-                      {
-                        duration: 2000,
-                        position: "top-center",
-                      }
-                    );
+                    toast.success(`Gestión de crucero exitosa`, {
+                      duration: 2000,
+                      position: "top-center",
+                    });
                     navigate("/admin/crucero");
                   }
                 }}
@@ -507,10 +379,7 @@ export function Reserva() {
       <ModalGestionPuertos
         open={openModalGestPuertos}
         handleClose={() => setOpenModalGestPuertos(false)}
-        //pasar la cantidad de dias
-        cantDias={cantDias}
         control={{ ...control, setValue }}
-        setCruceroCreado={setCruceroCreado}
         setPuertosItinerario={setPuertosItinerario}
         idCrucero={idCrucero} // Pasar el id del crucero
       />
@@ -519,7 +388,6 @@ export function Reserva() {
       <ModalGestionFechas
         open={openModalGestFechas}
         handleClose={() => setOpenModalGestFechas(false)}
-        barco={selectedBarco}
         setFechasCrucero={setFechasCrucero}
         idCrucero={idCrucero} // Pasar el id del crucero
       />

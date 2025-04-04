@@ -99,7 +99,7 @@ class ReservaModel
             $cruceroModel = new CruceroModel();
 
             //Obtener el itinerario
-            $itinerarioModel = new ItinerarioModel();
+            $itinerarioPuertoModel = new ItinerarioPuertoModel();
 
             //Obtener informacion de habitacion por fecha
             $cruceroFechaModel = new CruceroFechaModel();
@@ -119,7 +119,7 @@ class ReservaModel
 
             //Extraer la información de los puertos
             // del itinerario
-            $puertos = $itinerarioModel->getPuertosItinerario($crucero->idItinerario);
+            $puertos = $itinerarioPuertoModel->getPuertosItinerario($crucero->idItinerario);
             $vResultado->itinerarioPuertos = $puertos;
 
             //Extraer la fecha de inicio del crucero

@@ -20,7 +20,7 @@ import { CreateCrucero } from "./components/Layout/CreateCrucero";
 import { CreateHabitacion } from "./components/Layout/CreateHabitacion";
 import { UpdateBarco } from "./components/Layout/UpdateBarco";
 import { UpdateHabitacion } from "./components/Layout/UpdateHabitacion";
-import { Reserva } from "./components/Layout/Reserva";	
+import { CreateReserva } from "./components/Layout/CreateReserva";	
 // import "bootstrap/dist/css/bootstrap.min.css";
 
 const rutas = createBrowserRouter([
@@ -122,8 +122,8 @@ const rutas = createBrowserRouter([
 
       {
         //Página Reservar
-        path: "/CreateReserva/",
-        element: <Reserva />,
+        path: "/reserva/crear",
+        element: <CreateReserva />,
       },
     ],
   },

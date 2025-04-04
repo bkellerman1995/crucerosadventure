@@ -55,7 +55,7 @@ class cruceroFechaModel
 
     }
 
-    public function getFechaDeCruceroFecha($idCruceroFecha)
+    public function getFechaDeCrucero($idCruceroFecha)
     {
         try {
 
@@ -76,7 +76,7 @@ class cruceroFechaModel
 
     }
 
-    public function getFechasPreciosHabitaciones($id)
+    public function getFechasPorCrucero ($id)
     {
         try {
 

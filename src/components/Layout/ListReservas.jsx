@@ -201,7 +201,7 @@ function TableHabitacionesToolbar(props) {
       <Button
         style={{ marginRight: "15px", backgroundColor: "#16537e" }}
         component={Link}
-        to="/Reserva/"
+        to="/reserva/crear"
         variant="contained"
         endIcon={<AddIcon />}
       >

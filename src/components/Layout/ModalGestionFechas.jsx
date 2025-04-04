@@ -173,7 +173,7 @@ export function ModalGestionFechas({
         responseCrucero.data != null &&
         responseCrucero.data.fechaAsignada != null
       ) {
-        if (responseCrucero.data.fechaAsignada === fechaInicioFormateada) {
+        if (responseCrucero.data.fechasAsignadas.includes(fechaInicioFormateada)) {
           toast.error(`La fecha de inicio ${fechaInicioFormateada} ya se asignó al crucero # ${cruceroID}. 
             Por favor seleccione otra fecha`);
           return;

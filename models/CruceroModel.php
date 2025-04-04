@@ -154,8 +154,8 @@ class CruceroModel
 
                 }
 
-                //Chequear si el crucero tiene fechaSalida asignada
-                $vResultado->fechaAsignada = $this->chequearCruceroFechaByCrucero($id);
+                //Chequear si el crucero tiene fechas de salida asignadas
+                $vResultado->fechasAsignadas = $this->chequearCruceroFechaByCrucero($id);
 
 
                 //Retornar la respuesta
@@ -172,14 +172,22 @@ class CruceroModel
     {
         try {
 
-            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero = $idCrucero;";
+            $vSql = "SELECT * FROM crucero_fecha WHERE idCrucero = $idCrucero order by idCruceroFecha desc;";
 
             //Ejecutar la consulta sql
-            $vResultado = $this->enlace->executeSQL($vSql);
-            if (!empty($vResultado)) {
-                $vResultado = $vResultado[0]->fechaSalida;
+            // Ejecutar la consulta
+            $vResultado = $this->enlace->ExecuteSQL($vSql);
 
-                return $vResultado;
+            // Comprobar que el resultado no esté vacío y sea un array
+            if (!empty($vResultado) && is_array($vResultado)) {
+            // if (!empty($vResultado)) {
+
+                // Crear un nuevo array con solo las fechas de salida
+                $fechasSalida = array_map(function ($registro) {
+                    return $registro->fechaSalida; // Suponiendo que cada registro tiene la propiedad 'fechaSalida'
+                }, $vResultado);
+
+                return $fechasSalida; // Devuelve el array de fechas de salida
             }
 
         } catch (Exception $e) {
