@@ -18,7 +18,6 @@ import toast from "react-hot-toast";
 import { ForkRight } from "@mui/icons-material";
 
 export function CreateHabitacion() {
-
   const navigate = useNavigate();
   const rutaArchivo =
     "C:\\\\xampp\\\\htdocs\\\\crucerosadventure\\\\uploads\\\\habitaciones\\\\";
@@ -49,19 +48,25 @@ export function CreateHabitacion() {
       .required("El tamaño es requerido")
       .positive("Debe ser un número positivo"),
 
+    cantHabitaciones: yup
+    .number()
+    .typeError("Debe ser un número")
+    .required("El tamaño es requerido")
+    .positive("Debe ser un número positivo"),
+  
     foto: yup
-              .mixed()
-              .required("La imagen es obligatoria")
-              .test("fileType", "Debe cargar una imagen (jpg, png, jpeg)", (value) => {
-                return (
-                  value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
-                );
-              })
-              .test(
-                "fileSize",
-                "El tamaño debe ser menor a 500MB",
-                (value) => value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
-              ),
+      .mixed()
+      .required("La imagen es obligatoria")
+      .test("fileType", "Debe cargar una imagen (jpg, png, jpeg)", (value) => {
+        return (
+          value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+        );
+      })
+      .test(
+        "fileSize",
+        "El tamaño debe ser menor a 500MB",
+        (value) => value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
+      ),
     estado: yup.number().required("El estado es requerido"),
   });
 
@@ -76,14 +81,18 @@ export function CreateHabitacion() {
       descripcion: "",
       minHuesped: "",
       maxHuesped: "",
-      tamanno: "",
-      categoriaHabitacion: ' ',
-      barco: ' ',
+      tamanno: 10,
+      cantidadHabitaciones: "",
+      categoriaHabitacion: " ",
+      barco: " ",
       foto: null,
       estado: 1,
     },
     resolver: yupResolver(habitacionSchema),
   });
+
+  // Estado para almacenar el valor de tamaño (m2) de una habitación
+  const [tammano, setTamanno] = useState(10); // Valor mínimo predeterminado
 
   const estadoValues = [
     { value: 1, label: "Activo" },
@@ -146,7 +155,7 @@ export function CreateHabitacion() {
       });
   }, []);
 
-  //Hooks de datos de barco de barcos
+  //Hooks de datos de barcos
   const [selectedBarco, setSelectedBarco] = useState(null);
   const [dataBarco, setDataBarco] = useState({});
   const [loadedBarco, setLoadedBarco] = useState(false);
@@ -170,7 +179,6 @@ export function CreateHabitacion() {
         }
       });
   }, []);
-
 
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
@@ -201,14 +209,38 @@ export function CreateHabitacion() {
           idbarco: parseInt(barco?.value),
         };
 
-        console.log("Enviando datos del crucero al form: ", dataConRuta);
+        //Enviar cantidad de habitaciones y pasajeros al barco
+        const dataBarcoCantHabCantPasajeros = {
+          idbarco: dataConRuta.idbarco,
+          cantidadHabitaciones: DataForm.cantHabitaciones,
+          capacidadHuesped: DataForm.maxHuesped * DataForm.cantHabitaciones,
+        }
+
+        console.log("Enviando datos de la habitación para crearla: ", dataConRuta);
+        console.log("Enviando datos para actualizar el barco: ", dataBarcoCantHabCantPasajeros);
 
         HabitacionService.createHabitacion(dataConRuta)
           .then((response) => {
             setError(response.error);
             if (response.data != null) {
-              //Obtener el valor del id de la habitacion creado
-              // setIdHabitacion(response.data.idHabitacion);
+              BarcoService.updateBarco(dataBarcoCantHabCantPasajeros)
+                .then((response) => {
+                  setError(response.error);
+                  if (response.data != null) {
+                    console.log(
+                      "Barco con id: ",
+                      dataConRuta.idbarco,
+                      " actualizado correctamente"
+                    );
+                  }
+                })
+                .catch((error) => {
+                  if (error instanceof SyntaxError) {
+                    console.log(error);
+                    setError(error);
+                    throw new Error("Respuesta no válida del servidor");
+                  }
+                });
 
               toast.success(
                 `Habitacion # ${response.data.idHabitacion} - ${response.data.nombre} 
@@ -248,8 +280,7 @@ export function CreateHabitacion() {
 
   return (
     <>
-      <form
-        onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Grid
           container
           spacing={2}
@@ -272,6 +303,9 @@ export function CreateHabitacion() {
                     label="Nombre"
                     error={Boolean(errors.nombre)}
                     helperText={errors.nombre?.message}
+                    fullWidth
+                    variant="outlined"
+                    size="small" //Asgurarse que los campos sean consistentes en tamaño
                   />
                 )}
               />
@@ -293,9 +327,9 @@ export function CreateHabitacion() {
               />
             </FormControl>
           </Grid>
-          <Grid container spacing={15}>
+          <Grid container spacing={10} justifyContent="space-between">
             <Grid item xs={12} md={6}>
-              <Controller 
+              <Controller
                 name="minHuesped"
                 control={control}
                 render={({ field }) => (
@@ -308,12 +342,13 @@ export function CreateHabitacion() {
                     variant="outlined"
                     error={Boolean(errors.minHuesped)}
                     helperText={errors.minHuesped?.message}
-                  />            
+                    size="small"
+                  />
                 )}
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <Controller 
+              <Controller
                 name="maxHuesped"
                 control={control}
                 render={({ field }) => (
@@ -326,27 +361,61 @@ export function CreateHabitacion() {
                     variant="outlined"
                     error={Boolean(errors.maxHuesped)}
                     helperText={errors.maxHuesped?.message}
-                  />            
+                    size="small"
+                  />
                 )}
               />
             </Grid>
           </Grid>
-          <Grid item>
-            <FormControl fullWidth>
+
+          {/* Tamanno de la habitacion */}
+          <Grid container spacing={10} justifyContent="space-between">
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <Controller
+                  name="tamanno"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Tamaño (m2)"
+                      type="number"
+                      variant="outlined"
+                      onChange={(e) => {
+                        let value = parseInt(e.target.value, 10);
+                        if (isNaN(value) || value < 10) value = 10;
+                        else if (value > 50) value = 50;
+                        setTamanno(value); // ACTUALIZA el valor de tamaño con el valor seleccionado
+                        field.onChange(value); // ACTUALIZA el valor en react-hook-form
+                      }}
+                      value={tammano || null} // SE ASIGNA EL VALOR ACTUAL
+                    />
+                  )}
+                />
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={6} style={{width: "20%"}}>
               <Controller
-                name="tamanno"
+                name="cantHabitaciones"
                 control={control}
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Tamaño de la habitacion en metros cuadrados"
-                    error={Boolean(errors.tamanno)}
-                    helperText={errors.tamanno?.message}
+                    fullWidth
+                    label="Cantidad"
+                    type="number"
+                    InputProps={{ inputProps: { min: 1, max:10 } }}
+                    variant="outlined"
+                    error={Boolean(errors.maxHuesped)}
+                    helperText={errors.maxHuesped?.message}
+                    
                   />
                 )}
               />
-            </FormControl>
+            </Grid>
           </Grid>
+
           <Grid item>
             <Typography variant="subtitle1">
               <b>Categoría de habitacion</b>
@@ -397,8 +466,8 @@ export function CreateHabitacion() {
                           alignItems: "center",
                         }}
                       >
-                        {barco.nombre} / Capacidad: {barco.capacidadHuesped}{" "}
-                        pasajeros
+                        {barco.nombre} / Habitaciones: {barco.cantHabitaciones}{" "}
+                        
                         <img
                           src={barco.foto}
                           alt={barco.nombre}
@@ -416,7 +485,7 @@ export function CreateHabitacion() {
                     setSelectedBarco(selectedOption);
                     setValue("barco", selectedOption);
                   }}
-                  value={selectedBarco}
+                  value={selectedBarco || null}
                   styles={customStyles}
                   placeholder="Seleccione un barco"
                 />

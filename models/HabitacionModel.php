@@ -23,7 +23,7 @@ class HabitacionModel
             $catHabitacionModel = new CategoriaHabitacionModel();
 
             //Procedimiento almacenado ObtenerHabitaciones
-            $vSQL = "CALL ObtenerHabitaciones()";
+            $vSQL = "SELECT * FROM habitacion where estado = 1 order by idHabitacion asc;";
             
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
@@ -68,7 +68,7 @@ class HabitacionModel
 
             // $vSql = "SELECT * FROM habitacion where idHabitacion='$id'";
             
-            $vSql = "CALL ObtenerHabitacionPorID($id)";
+            $vSql = "SELECT * FROM habitacion where estado = 1 and idHabitacion='$id'";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);

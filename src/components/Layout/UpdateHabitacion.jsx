@@ -89,7 +89,7 @@ export function UpdateHabitacion() {
     resolver: yupResolver(habitacionSchema),
   });
 
-  // ✅ Obtener habitacion por ID (query param)
+  // Obtener habitacion por ID (query param)
   useEffect(() => {
     if (!id) {
       toast.error("No se proporcionó ID de habitacion");

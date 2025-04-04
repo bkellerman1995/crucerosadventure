@@ -18,7 +18,7 @@ class BarcoModel
         try {
             //Consulta SQL
             $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones,
-            b.foto FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco GROUP BY b.idbarco
+            b.foto FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.estado = 1 GROUP BY b.idbarco
             order by b.idbarco desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
@@ -141,22 +141,30 @@ class BarcoModel
     public function update($objeto)
     {
         try {
+
+            //Revisar si el objeto trae foto
+            //Si no trae foto eso significa que 
+            //solo se va a actualizar la cantidad de habitaciones
+            // y la cantidad de pasajeros del barco 
+
+            if ($objeto->foto = null) {
+                $sql = "UPDATE barco 
+                SET capacidadHuesped = '$objeto->capacidadHuesped',
+                    estado = '$objeto->estado'
+                WHERE idbarco = '$objeto->idbarco'";
+
+            } else {
+                //Si trae foto, se actualiza la foto
+                //junto con los demás valores
+                $sql = "UPDATE barco 
+                SET nombre = '$objeto->nombre',
+                    descripcion = '$objeto->descripcion',
+                    capacidadHuesped = '$objeto->capacidadHuesped',
+                    foto = LOAD_FILE('$objeto->fotoRuta'),
+                    estado = '$objeto->estado'
+                WHERE idbarco = '$objeto->idbarco'";
+            }
             // Consulta SQL para actualizar un barco
-
-            $sql = "UPDATE barco 
-            SET nombre = '$objeto->nombre',
-                descripcion = '$objeto->descripcion',
-                capacidadHuesped = '$objeto->capacidadHuesped',
-                foto = LOAD_FILE('$objeto->fotoRuta'),
-                estado = '$objeto->estado'
-            WHERE idbarco = '$objeto->idbarco'";
-    
-
-
-           // $sql = "UPDATE barco SET nombre='$objeto->nombre'," .
-               // "descripcion='$objeto->descripcion', capacidadHuesped=$objeto->capacidadHuesped, " .
-               // "foto='$objeto->foto', estado='$objeto->estado' " .
-               // "WHERE idbarco=$objeto->idbarco";
 
             // Ejecutar la consulta
             $cResults = $this->enlace->executeSQL_DML($sql);

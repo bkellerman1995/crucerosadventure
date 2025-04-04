@@ -127,6 +127,9 @@ export function CreateReserva() {
   //Estado de las fecas añadidas al crucero
   const [fechasCrucero, setFechasCrucero] = useState(false);
 
+  // Estado para la fecha seleccionada
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(null); 
+
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
@@ -244,6 +247,9 @@ export function CreateReserva() {
                       setSelectedCrucero(selectedOption);
                       setValue("crucero", selectedOption);
 
+                      //Restablecer el valor de fechaSalida al cambiar el crucero
+                      setFechaSeleccionada(null);
+
                       //Obtener las fechas asignadas al crucero seleccionado
                       if (selectedOption){
                         setIdCrucero(selectedOption.value); //Actualizar el idCrucero
@@ -282,9 +288,10 @@ export function CreateReserva() {
                     }))}
                     onChange={(selectedOption) => {
 
-                      setValue ("fechaSalida", selectedOption); // Establecer la fecha seleccionada
+                      //Actualizar la fecha seleccionada
+                      setFechaSeleccionada (selectedOption); 
                     }}
-                    // value={selectedCrucero}
+                    value={fechaSeleccionada} // Asegurarse de que el valor del select se restablezca para que se muestre el placeholder
                     styles={customStyles}
                     placeholder="Seleccione una fecha de salida"
                   />
