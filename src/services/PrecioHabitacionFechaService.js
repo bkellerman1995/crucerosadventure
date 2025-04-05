@@ -6,8 +6,6 @@ console.log ('BASE_URL: ', BASE_URL);
 
 
 class PrecioHabitacionFechaService {
-  //Definición para llamar al API y obtener el listado de los itinerarios
-
   //Lista de todos los precios de las habitacions
   //por fecha
   //localhost:81/crucerosadventure/preciohabitacionfecha
@@ -17,9 +15,9 @@ class PrecioHabitacionFechaService {
 
   //Obtener la informacion de un precio de habitación por fecha
   //localhost:81/crucerosadventure/preciohabitacionfecha/{id}
-  getItinerarioByID(preciohabitacionfechaID) {
-    console.log("BASE_URL ITINERARIO: ", BASE_URL + "/" + preciohabitacionfechaID);
-    console.log("itinerario ID: ", preciohabitacionfechaID);
+  getPrecioHabitacionFechaByID(preciohabitacionfechaID) {
+    console.log("BASE_URL precioHabitación: ", BASE_URL + "/" + preciohabitacionfechaID);
+    console.log("precioHabitación ID: ", preciohabitacionfechaID);
     return axios.get(BASE_URL + "/" + preciohabitacionfechaID);
   }
 

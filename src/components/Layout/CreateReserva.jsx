@@ -7,6 +7,9 @@ import Typography from "@mui/material/Typography";
 import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { Tooltip } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import IconButton from "@mui/material/IconButton";
 import * as yup from "yup";
 import { format,addDays } from 'date-fns';
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -272,7 +275,7 @@ export function CreateReserva() {
             <br></br>
 
             {/* Fecha del Crucero */}
-            <Grid size={12} sm={4}>
+            <Grid size={6} sm={4}>
               <Typography variant="subtitle1">
                 <b>Fecha del crucero</b>
               </Typography>
@@ -298,6 +301,43 @@ export function CreateReserva() {
                 )}
               </FormControl>
             </Grid>
+
+            <br></br>
+
+            {/* Agregar habitaciones */}
+            <Grid size={12} sm={6}>
+            <Typography variant="subtitle1">
+              Habitaciones
+              <Tooltip title="Agregar Habitación">
+                <span>
+                  {/* <IconButton color="secondary" onClick={addNewActor}>
+                    <AddIcon />
+                  </IconButton> */}
+                </span>
+              </Tooltip>
+            </Typography>
+            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+              {/* Array de controles de actor
+              {loadedActors && 
+                fields.map((field,index)=>(
+                  <div key={index}>
+                    <ActorsForm
+                    name='actors'
+                    data={dataActors}
+                    key={field.id}
+                    index={index}
+                    onRemove={removeActor}
+                    control={control}
+                    disableRemoveButton={fields.length === 1}
+                     />
+                  </div>
+                ))
+              } */}
+            </FormControl>
+          </Grid>
+
+
+
           </Grid>
 
           {/*Datos del crucero (lado derecho) */}

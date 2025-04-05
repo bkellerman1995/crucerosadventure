@@ -199,7 +199,7 @@ export function ModalGestionFechas({
         if (fechaCruceroResponse.data != null) {
           // Actualizar el estado y cerrar el modal
           setFechasCrucero(true);
-          handleClose(); // Cerrar el modal// Cerrar el modal
+          handleClose(); // Cerrar el modal
         }
       }
     } catch (error) {
