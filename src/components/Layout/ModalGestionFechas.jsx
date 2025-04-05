@@ -28,6 +28,7 @@ import CrucerosService from "../../services/CrucerosService";
 import PrecioHabitacionFechaService from "../../services/PrecioHabitacionFechaService";
 
 import PropTypes from "prop-types";
+import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
 
 export function ModalGestionFechas({
   open,
@@ -58,18 +59,18 @@ export function ModalGestionFechas({
   // Crear cruceroFecha al abrir modal
   useEffect(() => {
     // if (open && !idCruceroFecha) {
-      if (open) {
-        const nuevo = { estado: 1 };
-        CruceroFechaService.createFechaCrucero(nuevo)
-          .then((res) => {
-            if (res?.data?.idCruceroFecha) {
-              setidCruceroFecha(res.data.idCruceroFecha);
-            }
-          })
-          .catch((err) =>
-            console.error("Error al crear fecha del crucero:", err)
-          );
-      }
+    if (open) {
+      const nuevo = { estado: 1 };
+      CruceroFechaService.createFechaCrucero(nuevo)
+        .then((res) => {
+          if (res?.data?.idCruceroFecha) {
+            setidCruceroFecha(res.data.idCruceroFecha);
+          }
+        })
+        .catch((err) =>
+          console.error("Error al crear fecha del crucero:", err)
+        );
+    }
   }, [open]);
 
   // Generación dinámica del esquema de validación
@@ -122,18 +123,18 @@ export function ModalGestionFechas({
   // Accion submit del botón confirmar
   const onSubmit = async (data) => {
     console.log("Dato recibido del form:", data);
-  
+
     const cruceroID = parseInt(idCrucero, 10);
     const fechaInicioFormateada = data.fechaSalida
       ? dayjs(data.fechaSalida).format("YYYY-MM-DD")
       : null;
-  
+
     const fechaLimitePagosFormateada = data.fechaLimitePagos
       ? dayjs(data.fechaLimitePagos).format("YYYY-MM-DD")
       : null;
-  
+
     const estado = 1;
-  
+
     const formData = {
       idCruceroFecha,
       cruceroID,
@@ -142,11 +143,11 @@ export function ModalGestionFechas({
       estado,
       habitacionesPrecios: [], // Almacenar los datos (idHabitacion y precio) de las habitaciones
     };
-  
+
     // Recorrer las habitaciones y agregar los precios a formData
     barcoData.habitaciones.forEach((habitacion) => {
       const precio = data[`precio-${habitacion.idHabitacion}`]; // obtener el precio de cada habitacion
-  
+
       if (precio) {
         formData.habitacionesPrecios.push({
           idPrecioHabitacion: null, // precioHabitacion
@@ -156,13 +157,13 @@ export function ModalGestionFechas({
         });
       }
     });
-  
+
     // Verificar que haya habitaciones con precios válidos
     if (formData.habitacionesPrecios.length === 0) {
       toast.error("Debe ingresar precios válidos para las habitaciones.");
       return;
     }
-  
+
     console.log("Enviando datos:", formData);
     try {
       // Validar que no haya conflicto de fechas
@@ -173,7 +174,9 @@ export function ModalGestionFechas({
         responseCrucero.data != null &&
         responseCrucero.data.fechaAsignada != null
       ) {
-        if (responseCrucero.data.fechasAsignadas.includes(fechaInicioFormateada)) {
+        if (
+          responseCrucero.data.fechasAsignadas.includes(fechaInicioFormateada)
+        ) {
           toast.error(`La fecha de inicio ${fechaInicioFormateada} ya se asignó al crucero # ${cruceroID}. 
             Por favor seleccione otra fecha`);
           return;
@@ -192,6 +195,32 @@ export function ModalGestionFechas({
           position: "top-center",
         });
 
+        //Agregar las habitaciones a la tabla habitacion_disponible
+        const disponbilidadData = formData.habitacionesPrecios.map(
+          (habitacion) => ({
+            idHabitacion: habitacion.idHabitacion,
+            idCruceroFecha,
+            disponible: 1,
+          })
+        );
+
+        //Llamar al servicio habitacionDisponibleFecha para agregar la disponibilidad de las habitaciones
+        const disponibilidadResponse =
+          await HabitacionDisponibleFechaService.agregarDisponibilidadHabitacionFecha(
+            disponbilidadData
+          );
+
+        if (disponibilidadResponse.data != null) {
+          console.log(
+            "Disponibilidad de habitaciones gestionada correctamente."
+          );
+        } else {
+          toast.error(
+            "Hubo un problema al gestionar la disponibilidad de habitaciones."
+          );
+          return;
+        }
+
         // Actualizar la fecha del crucero
         const fechaCruceroResponse =
           await CruceroFechaService.updateFechaCrucero(formData);
@@ -207,7 +236,6 @@ export function ModalGestionFechas({
       toast.error("Hubo un error al guardar los precios.");
     }
   };
-  
 
   return (
     <>

@@ -49,10 +49,14 @@ class BarcoModel
         try {
 
             //Consulta sql               
-            $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones,
-                b.foto FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.idbarco = $id
-                GROUP BY b.idbarco
-                order by b.idbarco desc;";
+            $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion,COUNT(h.idHabitacion) AS cantHabitaciones,SUM(h.maxHuesped) 
+            AS capacidadHuesped, b.foto 
+            FROM barco b 
+            LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.idbarco = $id ";
+            // GROUP BY b.idbarco
+            // order by b.idbarco desc;";
+
+
 
             // Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);

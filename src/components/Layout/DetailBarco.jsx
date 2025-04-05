@@ -117,7 +117,7 @@ export function DetailBarco() {
             </Box>
 
             <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-              Cantidad de Habitaciones Disponibles: {data.cantHabitaciones}
+              Cantidad de Habitaciones: {data.cantHabitaciones}
             </Typography>
           </Grid>
         </Grid>

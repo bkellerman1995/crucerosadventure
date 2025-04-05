@@ -28,12 +28,12 @@ class HabitacionDisponibleFechaModel
         }
     }
 
-    public function get($idPrecioHabitacion)
+    public function get($idHabitacionDisponible)
     {
         try {
             //Consulta sql
             //Identificador autoincrementable
-            $vSql = "SELECT * FROM precio_habitacion_fecha WHERE idPrecioHabitacion=$idPrecioHabitacion";
+            $vSql = "SELECT * FROM habitacion_disponible WHERE idHabitacionDisponible=$idHabitacionDisponible";
 
             //Ejecutar la consulta
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -54,13 +54,13 @@ class HabitacionDisponibleFechaModel
     {
         try {
 
-            $sql = "INSERT INTO precio_habitacion_fecha (idCruceroFecha, idHabitacion, precio) 
-                        VALUES ('$objeto->idCruceroFecha', '$objeto->idHabitacion', '$objeto->precio')";
+            $sql = "INSERT INTO habitacion_disponible (idHabitacion, idCruceroFecha, disponible) 
+                        VALUES ('$objeto->idHabitacion', '$objeto->idCruceroFecha', '$objeto->disponible')";
             //Ejecutar la consulta
-            $idPrecioHabitacion = $this->enlace->executeSQL_DML_last($sql);
+            $idHabitacionDisponible = $this->enlace->executeSQL_DML_last($sql);
 
-            //Retornar precio
-            return $this->get($idPrecioHabitacion);
+            //Retornar disponibilidad habitacion
+            return $this->get($idHabitacionDisponible);
 
         } catch (Exception $e) {
             handleException($e);
