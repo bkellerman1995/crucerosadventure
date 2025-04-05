@@ -17,9 +17,11 @@ class BarcoModel
     {
         try {
             //Consulta SQL
-            $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion, b.capacidadHuesped,COUNT(h.idHabitacion) AS cantHabitaciones,
-            b.foto FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.estado = 1 GROUP BY b.idbarco
+            $vSQL = "SELECT b.idbarco,b.nombre,b.descripcion,COUNT(h.idHabitacion) AS cantHabitaciones,
+            SUM(h.maxHuesped) AS capacidadHuesped, b.foto FROM barco b LEFT JOIN habitacion h ON b.idbarco = h.idbarco where b.estado = 1 and h.estado = 1 GROUP BY b.idbarco
             order by b.idbarco desc;";
+
+            // $vSQL = "select * from barco order by idbarco desc;";
             //Ejecutar la consulta
             $vResultado = $this->enlace->ExecuteSQL($vSQL);
 
@@ -147,10 +149,10 @@ class BarcoModel
             //solo se va a actualizar la cantidad de habitaciones
             // y la cantidad de pasajeros del barco 
 
-            if ($objeto->foto = null) {
+            if (!property_exists($objeto,'foto')) {
                 $sql = "UPDATE barco 
                 SET capacidadHuesped = '$objeto->capacidadHuesped',
-                    estado = '$objeto->estado'
+                    cantHabitaciones = '$objeto->cantHabitaciones'
                 WHERE idbarco = '$objeto->idbarco'";
 
             } else {

@@ -103,7 +103,13 @@ export function ListCardCruceros({ data }) {
                         fontWeight: "bold",
                       }}
                     >
-                      Próxima salida:
+                      {/* Verificación de que hayan fechas asignadas
+                      antes de acceder al primer elemento */}
+                      Próxima salida:{" "}
+                      {item.fechasAsignadas && item.fechasAsignadas.length > 0
+                        ? item.fechasAsignadas[0]
+                        : "No hay fechas asignadas"}
+                    
                     </Typography>
                     <IconButton
                       component={Link}

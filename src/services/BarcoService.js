@@ -20,12 +20,15 @@ class BarcoService {
     console.log('BASE_URL BARCO: ', BASE_URL+ '/'+ barcoId);
     console.log('barco ID: ', barcoId);
     return axios.get(BASE_URL + "/" + barcoId);
-    
+  
+  //Crear un barco
+  //localhost:81/crucerosadventure/barco
   }
   createBarco(barco) {
     return axios.post(BASE_URL, JSON.stringify(barco));
   }
   
+  //Actualizar un barco
   updateBarco(barco) {
     return axios({
       method: 'put',

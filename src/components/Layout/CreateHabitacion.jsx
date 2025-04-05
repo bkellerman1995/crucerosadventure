@@ -186,90 +186,99 @@ export function CreateHabitacion() {
   const onSubmit = async (DataForm) => {
     try {
       const isValid = await habitacionSchema.isValid(DataForm);
-
+  
       if (isValid) {
-        //Acceder al nombre del archivo de la foto
-        const fotoNombre = DataForm.foto
-          ? DataForm.foto.name
-          : "No hay foto cargada";
-
+        // Acceder al nombre del archivo de la foto
+        const fotoNombre = DataForm.foto ? DataForm.foto.name : "No hay foto cargada";
         console.log("Nombre del archivo cargado:", fotoNombre);
-        //Extraer la categoriahabitacion y el barco del objeto DataForm
-        const { categoriaHabitacion, barco, ...restoDeDataForm } = DataForm;
-
-        //adjuntar el nombre de la imagen a la ruta por defecto
+  
+        // Extraer la categoriahabitacion y el barco del objeto DataForm
+        const { categoriaHabitacion, barco, cantHabitaciones, ...restoDeDataForm } = DataForm;
+  
+        // Adjuntar el nombre de la imagen a la ruta por defecto
         const archivoRuta = rutaArchivo + fotoNombre;
-
-        // Agregar la ruta al objeto DataForm como un campo adicional
-        const dataConRuta = {
-          ...restoDeDataForm,
-          // DataForm, // Copiar todos los demás datos
-          fotoRuta: archivoRuta,
-          idcategoriaHabitacion: parseInt(categoriaHabitacion?.value),
-          idbarco: parseInt(barco?.value),
-        };
-
-        //Enviar cantidad de habitaciones y pasajeros al barco
-        const dataBarcoCantHabCantPasajeros = {
-          idbarco: dataConRuta.idbarco,
-          cantidadHabitaciones: DataForm.cantHabitaciones,
-          capacidadHuesped: DataForm.maxHuesped * DataForm.cantHabitaciones,
+  
+        // Crear las habitaciones basadas en `cantHabitaciones`
+        const habitaciones = [];
+        for (let i = 0; i < cantHabitaciones; i++) {
+          // Crear cada habitación con un id único o lo que sea necesario
+          const dataConRuta = {
+            ...restoDeDataForm,
+            fotoRuta: archivoRuta,
+            idcategoriaHabitacion: parseInt(categoriaHabitacion?.value),
+            idbarco: parseInt(barco?.value),
+            // Puedes agregar un campo único para identificar cada habitación si lo necesitas
+            nombre: `${restoDeDataForm.nombre} ${i + 1}`, // Ejemplo para diferenciar las habitaciones
+          };
+  
+          habitaciones.push(dataConRuta); // Almacenar la habitación para enviarla luego
         }
-
-        console.log("Enviando datos de la habitación para crearla: ", dataConRuta);
-        console.log("Enviando datos para actualizar el barco: ", dataBarcoCantHabCantPasajeros);
-
-        HabitacionService.createHabitacion(dataConRuta)
-          .then((response) => {
-            setError(response.error);
-            if (response.data != null) {
-              BarcoService.updateBarco(dataBarcoCantHabCantPasajeros)
-                .then((response) => {
-                  setError(response.error);
-                  if (response.data != null) {
-                    console.log(
-                      "Barco con id: ",
-                      dataConRuta.idbarco,
-                      " actualizado correctamente"
-                    );
+  
+        // Enviar cada habitación al servicio
+        for (const habitacion of habitaciones) {
+          console.log("Enviando datos de la habitación para crearla: ", habitacion);
+  
+          // Crear la habitación
+          await HabitacionService.createHabitacion(habitacion)
+            .then((response) => {
+              setError(response.error);
+              if (response.data != null) {
+                console.log("Habitación creada:", response.data);
+  
+                // Si todas las habitaciones se crearon correctamente, actualizamos el barco
+                const dataBarcoCantHabCantPasajeros = {
+                  idbarco: habitacion.idbarco,
+                  cantHabitaciones: cantHabitaciones,
+                  capacidadHuesped: DataForm.maxHuesped * cantHabitaciones,
+                };
+  
+                BarcoService.updateBarco(dataBarcoCantHabCantPasajeros)
+                  .then((response) => {
+                    setError(response.error);
+                    if (response.data != null) {
+                      console.log(
+                        "Barco con id: ",
+                        habitacion.idbarco,
+                        " actualizado correctamente"
+                      );
+                    }
+                  })
+                  .catch((error) => {
+                    if (error instanceof SyntaxError) {
+                      console.log(error);
+                      setError(error);
+                      throw new Error("Respuesta no válida del servidor");
+                    }
+                  });
+  
+                toast.success(
+                  `Habitación # ${response.data.idHabitacion} - ${response.data.nombre} Añadida correctamente`,
+                  {
+                    duration: 3000,
+                    position: "top-center",
                   }
-                })
-                .catch((error) => {
-                  if (error instanceof SyntaxError) {
-                    console.log(error);
-                    setError(error);
-                    throw new Error("Respuesta no válida del servidor");
-                  }
-                });
-
-              toast.success(
-                `Habitacion # ${response.data.idHabitacion} - ${response.data.nombre} 
-                Añadida correctamente`,
-                {
-                  duration: 3000,
-                  position: "top-center",
-                }
-              );
-              navigate("/admin/habitacion");
-              //Configurar el estado de crucero creado a true
-              //setCruceroCreado(true);
-            }
-          })
-          .catch((error) => {
-            if (error instanceof SyntaxError) {
-              console.log(error);
-              setError(error);
-              throw new Error("Respuesta no válida del servidor");
-            }
-          });
+                );
+              }
+            })
+            .catch((error) => {
+              if (error instanceof SyntaxError) {
+                console.log(error);
+                setError(error);
+                throw new Error("Respuesta no válida del servidor");
+              }
+            });
+        }
+  
+        navigate("/admin/habitacion");
       } else {
-        //Configurar el estado de crucero creado a false
-        //setCruceroCreado(false);
+        // Si los datos no son válidos
+        console.log("Formulario no válido");
       }
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   const handleChangeImage = (e) => {
     const selectedFile = e.target.files[0];
@@ -405,7 +414,7 @@ export function CreateHabitacion() {
                     fullWidth
                     label="Cantidad"
                     type="number"
-                    InputProps={{ inputProps: { min: 1, max:10 } }}
+                    InputProps={{ inputProps: { min: 1, max:200 } }}
                     variant="outlined"
                     error={Boolean(errors.maxHuesped)}
                     helperText={errors.maxHuesped?.message}
