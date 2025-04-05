@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Tooltip } from "@mui/material";
@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import CruceroService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
+import {HabitacionesForm} from "./HabitacionesForm";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
 import { ModalGestionFechas } from './ModalGestionFechas';
 import ItinerarioService from "../../services/ItinerarioService";
@@ -131,7 +132,19 @@ export function CreateReserva() {
   const [fechasCrucero, setFechasCrucero] = useState(false);
 
   // Estado para la fecha seleccionada
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(null); 
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
+
+  // Estado de lista de habitaciones disponibles
+  const [dataHabitaciones, setDataHabitaciones] = useState({});
+  const [loadedHabitaciones, setLoadedHabitaciones] = useState(false);
+
+  // useFieldArray:
+  // relaciones de muchos a muchos, con más campos además
+  // de las llaves primaras
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "actors",
+  });
 
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
@@ -254,15 +267,20 @@ export function CreateReserva() {
                       setFechaSeleccionada(null);
 
                       //Obtener las fechas asignadas al crucero seleccionado
-                      if (selectedOption){
+                      if (selectedOption) {
                         setIdCrucero(selectedOption.value); //Actualizar el idCrucero
                         CruceroService.getCrucerobyId(selectedOption.value)
-                        .then((response) => {
-                          setFechasSalida(response.data.fechasAsignadas || []);
-                        })
-                        .catch((error) => {
-                          console.error("Error al cargar las fechas del crucero:", error);
-                        });
+                          .then((response) => {
+                            setFechasSalida(
+                              response.data.fechasAsignadas || []
+                            );
+                          })
+                          .catch((error) => {
+                            console.error(
+                              "Error al cargar las fechas del crucero:",
+                              error
+                            );
+                          });
                       }
                     }}
                     value={selectedCrucero}
@@ -286,13 +304,12 @@ export function CreateReserva() {
                 {loadedCrucero && fechasSalida.length > 0 && (
                   <Select
                     options={fechasSalida.map((fecha) => ({
-                      label: `${format(addDays (new Date(fecha),1), "dd/MM/yyyy")}`, //Mostrar la fecha en formato dd/MM/yyyy
+                      label: `${format(addDays(new Date(fecha), 1), "dd/MM/yyyy")}`, //Mostrar la fecha en formato dd/MM/yyyy
                       value: fecha, //Usar la fecha como valor
                     }))}
                     onChange={(selectedOption) => {
-
                       //Actualizar la fecha seleccionada
-                      setFechaSeleccionada (selectedOption); 
+                      setFechaSeleccionada(selectedOption);
                     }}
                     value={fechaSeleccionada} // Asegurarse de que el valor del select se restablezca para que se muestre el placeholder
                     styles={customStyles}
@@ -306,38 +323,35 @@ export function CreateReserva() {
 
             {/* Agregar habitaciones */}
             <Grid size={12} sm={6}>
-            <Typography variant="subtitle1">
-              Habitaciones
-              <Tooltip title="Agregar Habitación">
-                <span>
-                  {/* <IconButton color="secondary" onClick={addNewActor}>
+              <Typography variant="subtitle1">
+                <b>Habitaciones</b>
+                <Tooltip title="Agregar Habitación">
+                  <span>
+                    {/* <IconButton color="secondary" onClick={addNewActor}>
                     <AddIcon />
                   </IconButton> */}
-                </span>
-              </Tooltip>
-            </Typography>
-            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Array de controles de actor
-              {loadedActors && 
-                fields.map((field,index)=>(
-                  <div key={index}>
-                    <ActorsForm
-                    name='actors'
-                    data={dataActors}
-                    key={field.id}
-                    index={index}
-                    onRemove={removeActor}
-                    control={control}
-                    disableRemoveButton={fields.length === 1}
-                     />
-                  </div>
-                ))
-              } */}
-            </FormControl>
-          </Grid>
-
-
-
+                  </span>
+                </Tooltip>
+              </Typography>
+              <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+                {/* Array de controles de actor */}
+                {loadedHabitaciones &&
+                  fields.map((field, index) => (
+                    <div key={index}>
+                      <HabitacionesForm
+                        name="habitaciones"
+                        // data={dataHabitaciones}
+                        // data={dataActors}
+                        key={field.id}
+                        index={index}
+                        // onRemove={removeActor}
+                        control={control}
+                        disableRemoveButton={fields.length === 1}
+                      />
+                    </div>
+                  ))}
+              </FormControl>
+            </Grid>
           </Grid>
 
           {/*Datos del crucero (lado derecho) */}
