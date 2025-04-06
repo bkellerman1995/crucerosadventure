@@ -30,4 +30,19 @@
   .imagen:hover {
     transform: scale(1.20); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
   }
+
+    /* Estilo para las opciones seleccionadas del listbox de habitaciones
+    disponibles en "Crear Reserva"*/
+
+    .p-listbox .p-listbox-item.p-highlight {
+      background-color: #ADD8E6;
+      /* Cambiar el color de fondo de la opción seleccionada */
+      color: black;
+      /* Cambiar el color del texto */
+    }
+  
+    .p-listbox-item {
+      cursor: pointer;
+      /* Mostrar el puntero al pasar el mouse */
+    }
   

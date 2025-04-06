@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import CruceroService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
+import { ListBox } from 'primereact/listbox';
 import { ModalGestionPuertos } from './ModalGestionPuertos';
 import { ModalGestionFechas } from './ModalGestionFechas';
 import ItinerarioService from "../../services/ItinerarioService";
@@ -137,6 +138,9 @@ export function CreateReserva() {
   // Estado para almacenar las habitaciones disponibles
   const [habitacionesDisponibles, setHabitacionesDisponibles] = useState([]);
 
+  // Estado para almacenar la habitación seleccionada
+  const [selectedHabitacion, setSelectedHabitacion] = useState([]);
+
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
@@ -216,7 +220,7 @@ export function CreateReserva() {
           {/* Datos de la reserva (lado izquierdo) */}
           <Grid size={6} sm={6}>
             {/* Crucero */}
-            <Grid size={12} sm={4}>
+            <Grid size={6} sm={4}>
               <Typography variant="subtitle1">
                 <b>Crucero</b>
               </Typography>
@@ -313,7 +317,7 @@ export function CreateReserva() {
                         //Verificar si hay habitaciones disponibles
                         if (response.data && response.data.length > 0) {
                           setHabitacionesDisponibles(response.data); // Establecer habitaciones disponibles
-                        } else if (response.data === null){
+                        } else if (response.data === null) {
                           toast.error(
                             "No hay habitaciones disponibles para esta fecha.",
                             { duration: 1500 }
@@ -345,24 +349,30 @@ export function CreateReserva() {
               <Typography variant="subtitle1">
                 <b>Habitaciones Disponibles</b>
               </Typography>
+              <br></br>
               <FormControl fullWidth>
                 {habitacionesDisponibles.length > 0 ? (
-                  <Select
+                  <ListBox
+                    multiple
                     options={habitacionesDisponibles.map((habitacion) => ({
-                      label: `${habitacion.nombre} / Precio unitario: $${habitacion.precio}`, // Mostrar información relevante
+                      label: `${habitacion.nombre}/ $${habitacion.precio}`, // Mostrar información relevante
                       value: habitacion.idHabitacion,
                     }))}
-                    onChange={(selectedOption) => {
+                    className="w-full md:w-14rem"
+                    onChange={(e) => {
+                      console.log("Habitaciones seleccionadas:", e.value); // Muestra los ids de las habitaciones seleccionadas
                       // Acciones cuando se selecciona una habitación
-                      // setSelectedHabitacion(selectedOption);
-                      setValue("habitacion", selectedOption);
+                      setSelectedHabitacion(e.value); // Actualizar el estado de la habitación seleccionada
+                      setValue("habitacion", e.value); //'e.value' tiene el id de las habitaciones seleccionadas
                     }}
-                    // value={selectedHabitacion}
-                    styles={customStyles}
+                    value={selectedHabitacion}
+                    // styles={customStyles}
                     placeholder="Seleccione una habitación"
                   />
                 ) : (
-                  <Typography></Typography>
+                  <Typography>
+                    No hay habitaciones disponibles para esta fecha
+                  </Typography>
                 )}
               </FormControl>
             </Grid>
