@@ -7,10 +7,43 @@ class habitacionDisponibleFecha
     {
         try {
             $response = new Response();
+
             //Instancia modelo
             $habitacionDisponibleFecha = new HabitacionDisponibleFechaModel();
+
             //Método del modelo
             $result = $habitacionDisponibleFecha->all();
+
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    public function obtenerHabitacionesDisponibles()
+    {
+        try {
+            $response = new Response();
+
+            //Obtener los parámetros de la solicitud GET
+            $idCrucero = isset($_GET['idCrucero']) ? $_GET['idCrucero'] : null;
+            $fechaSeleccionada = isset($_GET['fechaSeleccionada']) ? $_GET['fechaSeleccionada'] : null;
+            //Instancia modelo
+            $habitacionDisponibleFecha = new HabitacionDisponibleFechaModel();
+            
+            //Método del modelo
+            //Si los parámetros idCrucero y fecha están presentes, pasarlos al método del modelo
+            if ($idCrucero && $fechaSeleccionada){
+                $result = $habitacionDisponibleFecha -> getDisponibilidadPorFecha ($idCrucero, $fechaSeleccionada);
+            }
+
+            //Si los parámetros idCrucero y fecha no están presentes en el GET, simplemente ejecutar 
+            //llamar al método all del modelo
+            else {
+                $result = $habitacionDisponibleFecha->all();
+            }
+
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {

@@ -67,4 +67,35 @@ class HabitacionDisponibleFechaModel
         }
     }
 
+    //Obtener las fechas disponibles por fecha del crucero
+    public function getDisponibilidadPorFecha($idCrucero, $fecha)
+    {
+        try {
+            //Consulta sql
+            $vSql = "SELECT 
+                        h.idHabitacion, 
+                        h.nombre, 
+                        h.descripcion,
+                        phf.precio    
+                    FROM habitacion h
+                    JOIN habitacion_disponible hd ON h.idHabitacion = hd.idHabitacion
+                    JOIN precio_habitacion_fecha phf ON h.idHabitacion = phf.idHabitacion
+                    JOIN crucero_fecha cf ON phf.idCruceroFecha = cf.idCruceroFecha
+                    WHERE hd.idCruceroFecha = cf.idCruceroFecha
+                        AND cf.idCrucero = $idCrucero            -- Filtra por el ID del crucero
+                        AND cf.fechaSalida = '$fecha'          -- Filtra por la fecha de salida
+                        AND hd.disponible = 1;";
+
+            //Ejecutar la consulta
+            // $vResultado = $this->enlace->executeSQL($vSql, [$idCrucero, $fecha]);
+            $vResultado = $this->enlace->executeSQL($vSql);
+
+            //Retornar la respuesta
+            return $vResultado;
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
 }

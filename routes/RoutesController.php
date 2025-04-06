@@ -30,10 +30,50 @@ class RoutesController
                     echo 'Archivo no encontrado.';
                 }
             }
-             //FIN Gestion de imagenes
-            $routesArray = explode("/", $_SERVER['REQUEST_URI']);
-            // Eliminar elementos vacíos del array
-            $routesArray = array_filter($routesArray);
+            //FIN Gestion de imagenes
+
+            // CÓDIGO ESPECÍFICO PARA HABITACIONDISPONIBLE FECHA
+            // Obtener la URL completa
+            $requestUri = $_SERVER['REQUEST_URI'];
+
+            // Separar la ruta de los parámetros de la URL usando parse_url
+            $parsedUrl = parse_url($requestUri);
+            $path = $parsedUrl['path'];  // resultado '/crucerosadventure/habitaciondisponiblefecha'
+            $query = isset($parsedUrl['query']) ? $parsedUrl['query'] : '';  // Los parámetros de la consulta
+
+            // Convertir los parámetros de la consulta en un array
+            parse_str($query, $queryParams);  // $queryParams es un array con 'idCrucero' y 'fechaSeleccionada'
+
+            // Verificar la ruta y procesar los parámetros
+            $routesArray = explode("/", $path);
+            $routesArray = array_filter($routesArray);  // Limpiar el array de posibles valores vacíos
+
+            // Verificar si la ruta es 'habitaciondisponiblefecha'
+            if (count($routesArray) >= 2 && $routesArray[2] == 'habitaciondisponiblefecha') {
+
+                //Verificar si el método es GET
+                if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+                    $controller = 'habitacionDisponibleFecha';  // Especificar el controlador
+                    $action = 'obtenerHabitacionesDisponibles';  // Especificar la acción para obtener las habitaciones
+                    $idCrucero = isset($queryParams['idCrucero']) ? $queryParams['idCrucero'] : null;
+                    $fechaSeleccionada = isset($queryParams['fechaSeleccionada']) ? $queryParams['fechaSeleccionada'] : null;
+
+                    // Si los parámetros están presentes, se ejecuta la acción
+                    if ($idCrucero && $fechaSeleccionada) {
+                        $response = new $controller();
+                        $response->$action($idCrucero, $fechaSeleccionada);  // Pasar los parámetros al controlador
+                    } else {
+                        // Si faltan parámetros
+                        $json = array(
+                            'status' => 400,
+                            'result' => 'Faltan parámetros (idCrucero, fechaSeleccionada)'
+                        );
+                        echo json_encode($json, http_response_code($json["status"]));
+                    }
+                    return;
+                }
+
+            }
 
             if (count($routesArray) < 2) {
                 $json = array(
@@ -43,6 +83,9 @@ class RoutesController
                 echo json_encode($json, http_response_code($json["status"]));
                 return;
             }
+
+            
+            //CÓDIGO PARA EL RESTO DE LAS RUTAS DINÁMICAS
 
             if (isset($_SERVER['REQUEST_METHOD'])) {
                 $controller = $routesArray[2] ?? null;

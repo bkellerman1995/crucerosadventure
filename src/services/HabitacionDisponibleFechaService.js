@@ -7,10 +7,20 @@ console.log ('BASE_URL: ', BASE_URL);
 
 class HabitacionDisponibleFecha {
   //Lista de disponibilidad de todas las habitaciones por fecha
-  //por fecha
   //localhost:81/crucerosadventure/habitaciondisponiblefecha
   getDisponibilidadHabitacionPorFecha() {
     return axios.get(BASE_URL);
+  }
+
+  getDisponibilidadHabitacionPorFechaByCrucero(idCrucero, fechaSeleccionada) {
+    console.log("BASE_URL habitacionDisponible: ", BASE_URL);
+    console.log("idCrucero: ", idCrucero, "fecha: ", fechaSeleccionada);
+    return axios.get(BASE_URL, {
+      params: {
+        idCrucero: idCrucero,
+        fechaSeleccionada: fechaSeleccionada
+      }
+    });
   }
 
   //Obtener la informacion de la disponibilidad de habitación por fecha

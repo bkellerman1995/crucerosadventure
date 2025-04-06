@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm, Controller} from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Tooltip } from "@mui/material";
@@ -17,10 +17,10 @@ import { useNavigate } from "react-router-dom";
 import CruceroService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
-import {HabitacionesForm} from "./HabitacionesForm";
 import { ModalGestionPuertos } from './ModalGestionPuertos';
 import { ModalGestionFechas } from './ModalGestionFechas';
 import ItinerarioService from "../../services/ItinerarioService";
+import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
 
 
 export function CreateReserva() {
@@ -134,17 +134,8 @@ export function CreateReserva() {
   // Estado para la fecha seleccionada
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
 
-  // Estado de lista de habitaciones disponibles
-  const [dataHabitaciones, setDataHabitaciones] = useState({});
-  const [loadedHabitaciones, setLoadedHabitaciones] = useState(false);
-
-  // useFieldArray:
-  // relaciones de muchos a muchos, con más campos además
-  // de las llaves primaras
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "actors",
-  });
+  // Estado para almacenar las habitaciones disponibles
+  const [habitacionesDisponibles, setHabitacionesDisponibles] = useState([]);
 
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
@@ -230,8 +221,6 @@ export function CreateReserva() {
                 <b>Crucero</b>
               </Typography>
 
-              <br></br>
-
               <FormControl fullWidth>
                 {loadedCrucero && (
                   <Select
@@ -298,8 +287,6 @@ export function CreateReserva() {
                 <b>Fecha del crucero</b>
               </Typography>
 
-              <br></br>
-
               <FormControl fullWidth>
                 {loadedCrucero && fechasSalida.length > 0 && (
                   <Select
@@ -307,9 +294,41 @@ export function CreateReserva() {
                       label: `${format(addDays(new Date(fecha), 1), "dd/MM/yyyy")}`, //Mostrar la fecha en formato dd/MM/yyyy
                       value: fecha, //Usar la fecha como valor
                     }))}
-                    onChange={(selectedOption) => {
+                    onChange={async (selectedOption) => {
                       //Actualizar la fecha seleccionada
                       setFechaSeleccionada(selectedOption);
+
+                      //Realizar una consulta para obtener las habitaciones disponibles
+                      //para la fecha seleccionada
+
+                      try {
+                        const fechaSeleccionada = selectedOption.value;
+
+                        const response =
+                          await HabitacionDisponibleFechaService.getDisponibilidadHabitacionPorFechaByCrucero(
+                            idCrucero,
+                            fechaSeleccionada
+                          );
+
+                        //Verificar si hay habitaciones disponibles
+                        if (response.data && response.data.length > 0) {
+                          setHabitacionesDisponibles(response.data); // Establecer habitaciones disponibles
+                        } else if (response.data === null){
+                          toast.error(
+                            "No hay habitaciones disponibles para esta fecha.",
+                            { duration: 1500 }
+                          );
+                          setHabitacionesDisponibles([]); // Limpiar habitaciones si no hay disponibles
+                        }
+                      } catch (error) {
+                        console.error(
+                          "Error al obtener las habitaciones disponibles:",
+                          error
+                        );
+                        toast.error(
+                          "Hubo un error al obtener las habitaciones disponibles."
+                        );
+                      }
                     }}
                     value={fechaSeleccionada} // Asegurarse de que el valor del select se restablezca para que se muestre el placeholder
                     styles={customStyles}
@@ -321,35 +340,30 @@ export function CreateReserva() {
 
             <br></br>
 
-            {/* Agregar habitaciones */}
-            <Grid size={12} sm={6}>
+            {/* Mostrar habitaciones disponibles */}
+            <Grid size={8} sm={6}>
               <Typography variant="subtitle1">
-                <b>Habitaciones</b>
-                <Tooltip title="Agregar Habitación">
-                  <span>
-                    {/* <IconButton color="secondary" onClick={addNewActor}>
-                    <AddIcon />
-                  </IconButton> */}
-                  </span>
-                </Tooltip>
+                <b>Habitaciones Disponibles</b>
               </Typography>
-              <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-                {/* Array de controles de actor */}
-                {loadedHabitaciones &&
-                  fields.map((field, index) => (
-                    <div key={index}>
-                      <HabitacionesForm
-                        name="habitaciones"
-                        // data={dataHabitaciones}
-                        // data={dataActors}
-                        key={field.id}
-                        index={index}
-                        // onRemove={removeActor}
-                        control={control}
-                        disableRemoveButton={fields.length === 1}
-                      />
-                    </div>
-                  ))}
+              <FormControl fullWidth>
+                {habitacionesDisponibles.length > 0 ? (
+                  <Select
+                    options={habitacionesDisponibles.map((habitacion) => ({
+                      label: `${habitacion.nombre} / Precio unitario: $${habitacion.precio}`, // Mostrar información relevante
+                      value: habitacion.idHabitacion,
+                    }))}
+                    onChange={(selectedOption) => {
+                      // Acciones cuando se selecciona una habitación
+                      // setSelectedHabitacion(selectedOption);
+                      setValue("habitacion", selectedOption);
+                    }}
+                    // value={selectedHabitacion}
+                    styles={customStyles}
+                    placeholder="Seleccione una habitación"
+                  />
+                ) : (
+                  <Typography></Typography>
+                )}
               </FormControl>
             </Grid>
           </Grid>
