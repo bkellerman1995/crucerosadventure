@@ -76,11 +76,16 @@ class HabitacionDisponibleFechaModel
                         h.idHabitacion, 
                         h.nombre, 
                         h.descripcion,
+                        h.minHuesped,
+                        h.maxHuesped,
+                        h.idCategoriaHabitacion,
+                        ch.nombre as nombreCategoria,
                         phf.precio    
                     FROM habitacion h
                     JOIN habitacion_disponible hd ON h.idHabitacion = hd.idHabitacion
                     JOIN precio_habitacion_fecha phf ON h.idHabitacion = phf.idHabitacion
                     JOIN crucero_fecha cf ON phf.idCruceroFecha = cf.idCruceroFecha
+                    JOIN categoriahabitacion ch ON h.idcategoriaHabitacion = ch.idcategoriaHabitacion
                     WHERE hd.idCruceroFecha = cf.idCruceroFecha
                         AND cf.idCrucero = $idCrucero            -- Filtra por el ID del crucero
                         AND cf.fechaSalida = '$fecha'          -- Filtra por la fecha de salida

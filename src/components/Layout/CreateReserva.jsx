@@ -1,28 +1,27 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
-import FormHelperText from '@mui/material/FormHelperText';
+import FormHelperText from "@mui/material/FormHelperText";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
-import { useForm, Controller} from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import * as yup from "yup";
-import { format,addDays } from 'date-fns';
+import { format, addDays } from "date-fns";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import CruceroService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
-import { ListBox } from 'primereact/listbox';
-import { ModalGestionPuertos } from './ModalGestionPuertos';
-import { ModalGestionFechas } from './ModalGestionFechas';
+import { ListBox } from "primereact/listbox";
+import { ModalGestionPuertos } from "./ModalGestionPuertos";
+import { ModalGestionFechas } from "./ModalGestionFechas";
 import ItinerarioService from "../../services/ItinerarioService";
 import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
-
 
 export function CreateReserva() {
   const navigate = useNavigate();
@@ -141,6 +140,11 @@ export function CreateReserva() {
   // Estado para almacenar la habitación seleccionada
   const [selectedHabitacion, setSelectedHabitacion] = useState([]);
 
+  // Estado para controlar las habitaciones seleccionadas del listbox
+  const [habitacionesSeleccionadas, setHabitacionesSeleccionadas] = useState(
+    []
+  );
+
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
@@ -218,7 +222,7 @@ export function CreateReserva() {
           </Grid>
 
           {/* Datos de la reserva (lado izquierdo) */}
-          <Grid size={6} sm={6}>
+          <Grid size={8} sm={6}>
             {/* Crucero */}
             <Grid size={6} sm={4}>
               <Typography variant="subtitle1">
@@ -344,37 +348,94 @@ export function CreateReserva() {
 
             <br></br>
 
-            {/* Mostrar habitaciones disponibles */}
-            <Grid size={8} sm={6}>
-              <Typography variant="subtitle1">
-                <b>Habitaciones Disponibles</b>
-              </Typography>
-              <br></br>
-              <FormControl fullWidth>
-                {habitacionesDisponibles.length > 0 ? (
+            {/* Grid contenedor de las habitaciones */}
+            <Grid container spacing={3} alignItems="stretch">
+              <Grid
+                xs={6}
+                sm={6}
+                style={{
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "16px",
+                  padding: "10px",
+                }}
+              >
+                <Typography variant="subtitle1">
+                  <b>Habitaciones disponibles</b>
+                </Typography>
+                <br />
+                <FormControl fullWidth>
+                  {habitacionesDisponibles.length > 0 ? (
+                    <>
+                      <ListBox
+                        multiple
+                        options={habitacionesDisponibles.map((habitacion) => ({
+                          label: `${habitacion.nombre}/ $${habitacion.precio} 
+                      /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
+                      / ${habitacion.nombreCategoria}`, // Mostrar información relevante
+                          value: habitacion.idHabitacion,
+                          group: habitacion.nombreCategoria, // Agrupar por nombre de categoría
+                        }))}
+                        className="w-full md:w-14rem"
+                        onChange={(e) => {
+                          console.log("Habitaciones seleccionadas:", e.value); // Muestra los ids de las habitaciones seleccionadas
+                          // Acciones cuando se selecciona una habitación
+                          setSelectedHabitacion(e.value); // Actualizar el estado de la habitación seleccionada
+                          setValue("habitacion", e.value); //'e.value' tiene el id de las habitaciones seleccionadas
+                        }}
+                        value={selectedHabitacion}
+                        placeholder="Seleccione una habitación"
+                        grouped // Agrupar por nombre de categoría
+                      />
+                    </>
+                  ) : (
+                    <Typography>
+                      No hay habitaciones disponibles para esta fecha
+                    </Typography>
+                  )}
+                </FormControl>
+              </Grid>
+
+              <IconButton
+                onClick={() => {
+                  if (selectedHabitacion) {
+                    setHabitacionesSeleccionadas([
+                      ...habitacionesSeleccionadas,
+                      ...selectedHabitacion,
+                    ]); // Agregar habitación seleccionada al nuevo listbox
+                  }
+                }}
+              >
+                <AddIcon />
+              </IconButton>
+
+              {/* Mostrar habitaciones seleccionadas */}
+              <Grid
+                xs={6}
+                sm={6}
+                style={{
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "16px",
+                  padding: "10px",
+                }}
+              >
+                <Typography variant="subtitle1">
+                  <b>Habitaciones seleccionadas</b>
+                </Typography>
+                <br />
+                <FormControl fullWidth>
                   <ListBox
                     multiple
-                    options={habitacionesDisponibles.map((habitacion) => ({
-                      label: `${habitacion.nombre}/ $${habitacion.precio}`, // Mostrar información relevante
+                    options={habitacionesSeleccionadas.map((habitacion) => ({
+                      label: `${habitacion.nombre} / $${habitacion.precio}`,
                       value: habitacion.idHabitacion,
                     }))}
                     className="w-full md:w-14rem"
-                    onChange={(e) => {
-                      console.log("Habitaciones seleccionadas:", e.value); // Muestra los ids de las habitaciones seleccionadas
-                      // Acciones cuando se selecciona una habitación
-                      setSelectedHabitacion(e.value); // Actualizar el estado de la habitación seleccionada
-                      setValue("habitacion", e.value); //'e.value' tiene el id de las habitaciones seleccionadas
-                    }}
-                    value={selectedHabitacion}
-                    // styles={customStyles}
-                    placeholder="Seleccione una habitación"
+                    onChange={(e) => setHabitacionesSeleccionadas(e.value)} // Actualiza las habitaciones seleccionadas
+                    value={habitacionesSeleccionadas}
+                    placeholder="Habitaciones seleccionadas"
                   />
-                ) : (
-                  <Typography>
-                    No hay habitaciones disponibles para esta fecha
-                  </Typography>
-                )}
-              </FormControl>
+                </FormControl>
+              </Grid>
             </Grid>
           </Grid>
 
