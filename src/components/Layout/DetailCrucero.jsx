@@ -1,296 +1,194 @@
-import React from "react";
-import Container from "@mui/material/Container";
-// Importaciones de Swiper
-import { Swiper, SwiperSlide } from "swiper/react";
-import { format } from 'date-fns';
-import "swiper/css";
-import "swiper/css/navigation";
-import { Navigation } from "swiper/modules";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItemText from "@mui/material/ListItemText";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  List,
+  ListItemText,
+  ListItemIcon,
+  ListItemButton,
+  Grid,
+  Paper,
+  Card,
+  CardMedia,
+  Divider,
+} from "@mui/material";
 import { useParams } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import Grid from "@mui/material/Grid2";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import { format } from "date-fns";
 import CrucerosService from "../../services/CrucerosService";
 
 export function DetailCrucero() {
-  const routeParams = useParams();
-
-  console.log(routeParams);
-
-  //Resultado de consumo del API, respuesta
+  const { id } = useParams();
   const [data, setData] = useState(null);
-  //Error del API
   const [error, setError] = useState("");
-  //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
 
-
-  //Estado para cargar el crucero por medio de su id
   useEffect(() => {
-    //Llamar al API y obtener una crucero
-    CrucerosService.getCrucerobyId(routeParams.id)
+    CrucerosService.getCrucerobyId(id)
       .then((response) => {
         setData(response.data);
-        console.log("detalle crucero", response.data);
-        setError(response.error);
         setLoaded(true);
       })
       .catch((error) => {
-        console.log(error);
         setError(error);
-        throw new Error("Respuesta no válida del servidor");
+        setLoaded(true);
       });
-  }, [routeParams.id]);
+  }, [id]);
 
-  if (!loaded) return <p>Cargando...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
-  console.log("datos del crucero", data);
+  if (!loaded) return <Typography>Cargando...</Typography>;
+  if (error) return <Typography>Error: {error.message}</Typography>;
 
   return (
-    <Container component="main" sx={{ mt: 8, mb: 2, paddingRight: 40 }}>
-      {data && (
-        <>
-          <Grid container spacing={0} direction="row" sx={{ mb: 2 }}>
-            <Grid size={5}>
-              <Box
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Paper
+        elevation={4}
+        sx={{
+          p: 3,
+          borderRadius: 2,
+          background: "linear-gradient(to right, #f0f8ff, #e6f7ff)",
+        }}
+      >
+        <Grid container spacing={4}>
+          {/* Imagen del crucero */}
+          <Grid item xs={12} md={5}>
+            <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
+              <CardMedia
                 component="img"
-                sx={{
-                  borderRadius: "4%",
-                  maxWidth: "100%",
-                  height: "300px",
-                }}
-                alt="Detalle del crucero"
-                src={data.foto}
+                image={data.foto}
+                alt="Imagen del crucero"
+                sx={{ height: "100%", objectFit: "cover" }}
               />
-            </Grid>
-            <Grid item xs={12} md={7}>
-              <Typography variant="h4" component="h1" gutterBottom>
-                {data.nombre}
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                component="h1"
-                gutterBottom
-              ></Typography>
-              <Typography component="span" variant="subtitle1" display="block">
-                <Box fontWeight="bold" display="inline">
-                  Cantidad de días:
-                </Box>{" "}
-                {data.cantDias}
-              </Typography>
-              <Typography component="span" variant="subtitle1" display="block">
-                <Box fontWeight="bold" display="inline">
-                  Nombre del barco:
-                </Box>{" "}
-                {data.barco.nombre}
-              </Typography>
-              <br></br>
-
-              <Typography component="span" variant="subtitle1">
-                <Box fontWeight="bold">Fechas de salida:</Box>
-                <List
-                  sx={{
-                    width: "100%",
-                    maxWidth: 360,
-                    bgcolor: "background.paper",
-                  }}
-                >
-                  {data.fechasPreciosHabitaciones &&
-                  data.fechasPreciosHabitaciones.length > 0 ? (
-                    data.fechasPreciosHabitaciones
-                      .reduce((acc, fecha) => {
-                        // Agrupar precios de habitaciones por fechaSalida
-                        const fechaExistente = acc.find(
-                          (item) => item.fechaSalida === fecha.fechaSalida
-                        );
-
-                        if (fechaExistente) {
-                          fechaExistente.precios.push(fecha); // Si la fecha ya existe, añadir los precios de habitaciones
-                        } else {
-                          acc.push({
-                            fechaSalida: fecha.fechaSalida,
-                            precios: [fecha], // Si no existe, crear nueva entrada para la fecha con sus precios
-                          });
-                        }
-
-                        return acc;
-                      }, [])
-                      .map((fechaGroup, index) => (
-                        <React.Fragment key={index}>
-                          {/* Mostrar la fecha de salida */}
-                          <ListItemButton>
-                            <ListItemIcon>
-                              <StarIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={`${format(new Date(fechaGroup.fechaSalida), "dd/MM/yyyy")}`}
-                            />
-                          </ListItemButton>
-
-                          {/* Sublista de habitaciones con su precio correspondiente */}
-                          <List component="div" disablePadding>
-                            {fechaGroup.precios.map((precio) => {
-                              const habitacion = data.habitaciones.find(
-                                (h) => h.idHabitacion === precio.idHabitacion
-                              );
-
-                              return (
-                                <ListItemButton
-                                  key={precio.idHabitacion}
-                                  sx={{ pl: 10 }}
-                                >
-                                  <ListItemIcon>
-                                    <ArrowRightIcon />
-                                  </ListItemIcon>
-                                  <ListItemText
-                                    primary={
-                                      habitacion
-                                        ? habitacion.nombre
-                                        : "No disponible"
-                                    }
-                                    secondary={
-                                      precio
-                                        ? `$${precio.precio}`
-                                        : "No disponible"
-                                    }
-                                  />
-                                </ListItemButton>
-                              );
-                            })}
-                          </List>
-                        </React.Fragment>
-                      ))
-                  ) : (
-                    <Typography variant="body2">
-                      No hay fechas disponibles
-                    </Typography>
-                  )}
-                </List>
-              </Typography>
-            </Grid>
-
-            
+            </Card>
           </Grid>
-          <br></br>
 
-          <Grid
-            container
-            spacing={2}
-            sx={{ backgroundColor: "#d4f1f4", borderRadius: "10px" }}
-          >
-            {/* Título de Itinerario */}
-            <Typography variant="h6" component="h4" gutterBottom>
-              <Box fontWeight="bold">Itinerario</Box>
+          {/* Detalles */}
+          <Grid item xs={12} md={7}>
+            <Typography
+              variant="h4"
+              component="h1"
+              gutterBottom
+              sx={{ fontWeight: "bold", color: "#00304E" }}
+            >
+              {data.nombre}
             </Typography>
 
-            {/* Contenedor del Swiper */}
-            <Grid container spacing={2} sx={{ ml: 0 }}>
-              {data.puertosItinerario && data.puertosItinerario.length > 0 ? (
-                <Swiper
-                  navigation={true} // Activa los controles de navegación
-                  modules={[Navigation]}
-                  className="mySwiper"
-                  style={{
-                    width: "100%",
-                    height: "250px",
-                    position: "relative",
-                  }} // Ajusta el tamaño del Swiper
-                >
-                  {data.puertosItinerario.map((actividad, index) => (
-                    <SwiperSlide key={index}>
-                      <Grid
-                        container
-                        sx={{ position: "relative", width: "100%" }}
-                      >
-                        {/* Imagen de la actividad a la izquierda */}
-                        <Grid item xs={12} md={6} sx={{ position: "relative" }}>
-                          <Box
-                            component="img"
-                            sx={{
-                              width: "100%",
-                              height: "300px",
-                              objectFit: "cover",
-                              borderRadius: "8px",
-                              marginLeft: "150px",
-                              paddingBottom: "60px",
-                            }}
-                            alt={`Puerto ${actividad.nombre}`}
-                            src={actividad.puerto.foto}
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              <b>Días de viaje:</b> {data.cantDias}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              <b>Barco asociado:</b> {data.barco.nombre}
+            </Typography>
+
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                Fechas y precios:
+              </Typography>
+              <List>
+                {data.fechasPreciosHabitaciones &&
+                data.fechasPreciosHabitaciones.length > 0 ? (
+                  data.fechasPreciosHabitaciones
+                    .reduce((acc, fecha) => {
+                      const fechaExistente = acc.find(
+                        (item) => item.fechaSalida === fecha.fechaSalida
+                      );
+                      if (fechaExistente) {
+                        fechaExistente.precios.push(fecha);
+                      } else {
+                        acc.push({
+                          fechaSalida: fecha.fechaSalida,
+                          precios: [fecha],
+                        });
+                      }
+                      return acc;
+                    }, [])
+                    .map((fechaGroup, index) => (
+                      <React.Fragment key={index}>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <StarIcon color="primary" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={`${format(new Date(fechaGroup.fechaSalida), "dd/MM/yyyy")}`}
                           />
-                          {/* Botones de navegación dentro de la imagen */}
-
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              top: "50%",
-                              left: "10px",
-                              zIndex: 2,
-                              transform: "translateY(-50%)",
-                            }}
-                          >
-                            {/* Botón de navegación izquierdo*/}
-                          </Box>
-
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              top: "50%",
-                              right: "10px",
-                              zIndex: 2,
-                              transform: "translateY(-50%)",
-                            }}
-                          >
-                            {/* Botón de navegación derecho */}
-                          </Box>
-                        </Grid>
-
-                        {/* Información del puerto a la derecha */}
-                        <Grid
-                          item
-                          xs={12}
-                          md={3}
-                          sx={{ paddingLeft: 30, position: "relative" }}
-                        >
-                          <Box
-                            sx={{
-                              padding: "10px",
-                              backgroundColor: "rgba(0, 0, 0, 0.5)",
-                              color: "white",
-                              borderRadius: "8px",
-                            }}
-                          >
-                            <Typography
-                              variant="h6"
-                              sx={{ fontWeight: "bold" }}
-                            >
-                              Día {actividad.dia}: {actividad.puerto.nombre}
-                            </Typography>
-                            <Typography variant="body1" sx={{ mt: 1 }}>
-                              {actividad.descripcion}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              ) : (
-                <Typography variant="body2">
-                  No hay puertos disponibles
-                </Typography>
-              )}
-            </Grid>
+                        </ListItemButton>
+                        <List component="div" disablePadding>
+                          {fechaGroup.precios.map((precio) => {
+                            const habitacion = data.habitaciones.find(
+                              (h) => h.idHabitacion === precio.idHabitacion
+                            );
+                            return (
+                              <ListItemButton key={precio.idHabitacion} sx={{ pl: 10 }}>
+                                <ListItemIcon>
+                                  <ArrowRightIcon />
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={habitacion ? habitacion.nombre : "No disponible"}
+                                  secondary={`$${precio.precio}`}
+                                />
+                              </ListItemButton>
+                            );
+                          })}
+                        </List>
+                      </React.Fragment>
+                    ))
+                ) : (
+                  <Typography variant="body2">No hay fechas disponibles</Typography>
+                )}
+              </List>
+            </Box>
           </Grid>
-        </>
-      )}
+        </Grid>
+
+        <Box mt={6}>
+          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+            Itinerario
+          </Typography>
+
+          <Paper sx={{ p: 2, borderRadius: 2, backgroundColor: "#e0f7fa" }}>
+            {data.puertosItinerario && data.puertosItinerario.length > 0 ? (
+              <Swiper
+                navigation
+                modules={[Navigation]}
+                className="mySwiper"
+                style={{ width: "100%", height: "350px" }}
+              >
+                {data.puertosItinerario.map((actividad, index) => (
+                  <SwiperSlide key={index}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <CardMedia
+                          component="img"
+                          image={actividad.puerto.foto}
+                          alt={`Puerto ${actividad.nombre}`}
+                          sx={{ width: "100%", height: 300, borderRadius: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6} sx={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                          Día {actividad.dia}: {actividad.puerto.nombre}
+                        </Typography>
+                        <Typography variant="body1" sx={{ mt: 1 }}>
+                          {actividad.descripcion}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <Typography variant="body2">No hay puertos disponibles</Typography>
+            )}
+          </Paper>
+        </Box>
+      </Paper>
     </Container>
   );
 }
