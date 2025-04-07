@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import * as yup from "yup";
 import { format, addDays } from "date-fns";
@@ -137,8 +138,11 @@ export function CreateReserva() {
   // Estado para almacenar las habitaciones disponibles
   const [habitacionesDisponibles, setHabitacionesDisponibles] = useState([]);
 
-  // Estado para almacenar la habitación seleccionada
-  const [selectedHabitacion, setSelectedHabitacion] = useState([]);
+  // Estado para almacenar la habitación seleccionada 
+  const [selectedHabitacionDisponible, setSelectedHabitacionDisponible] = useState([]);
+
+  // Estado para almacenar la habitación agregada
+  const [selectedHabitacionAgregada, setSelectedHabitacionAgregada] = useState([]);
 
   // Estado para controlar las habitaciones seleccionadas del listbox
   const [habitacionesSeleccionadas, setHabitacionesSeleccionadas] = useState(
@@ -215,7 +219,7 @@ export function CreateReserva() {
     <>
       <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
         <Grid container spacing={3}>
-          <Grid size={12} sm={12} >
+          <Grid size={12} sm={12}>
             <Typography variant="h5" gutterBottom>
               <b>Generar reserva</b>
             </Typography>
@@ -349,7 +353,7 @@ export function CreateReserva() {
             <br></br>
 
             {/* Grid contenedor de las habitaciones */}
-            <Grid container spacing={2} alignItems="stretch" size= {15}>
+            <Grid container spacing={2} alignItems="stretch" size={15}>
               <Grid
                 xs={6}
                 sm={6}
@@ -377,18 +381,21 @@ export function CreateReserva() {
                         }))}
                         className="w-full md:w-14rem"
                         onChange={(e) => {
-                          console.log("Habitacion seleccionada en ´Habitaciones disponibles:", e.value); // Muestra los ids de las habitaciones seleccionadas
+                          console.log(
+                            "Habitacion seleccionada en ´Habitaciones disponibles:",
+                            e.value
+                          ); // Muestra los ids de las habitaciones seleccionadas
                           // Acciones cuando se selecciona una habitación
-                          setSelectedHabitacion(e.value); // Actualizar el estado de la habitación seleccionada
+                          setSelectedHabitacionDisponible(e.value); // Actualizar el estado de la habitación seleccionada
                           setValue("habitacion", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
                         }}
-                        value={selectedHabitacion}
+                        value={selectedHabitacionDisponible}
                         placeholder="Seleccione una habitación"
                       />
                     </>
                   ) : (
                     <Typography>
-                      No hay habitaciones disponibles para esta fecha
+                      No hay habitaciones disponibles
                     </Typography>
                   )}
                 </FormControl>
@@ -397,23 +404,51 @@ export function CreateReserva() {
               {/* Botón para agregar habitación */}
               <Tooltip title="Agregar Habitación">
                 <IconButton
-                  style={{
-                    backgroundColor: "green",
-                    color: "white",
-                    borderRadius: "10px",
-                    width: "60px",
-                    height: "50px",
-                    marginTop: "20px",
-                  }}
+                  style={
+                    habitacionesDisponibles.length > 0
+                      ? {
+                          backgroundColor: "green",
+                          color: "white",
+                          borderRadius: "10px",
+                          width: "60px",
+                          height: "50px",
+                          marginTop: "60px",
+                        }
+                      : {
+                          backgroundColor: "gray",
+                          color: "white",
+                          borderRadius: "10px",
+                          width: "60px",
+                          height: "50px",
+                          marginTop: "60px",
+                        }
+                  }
                   onClick={() => {
-                    if (selectedHabitacion) {
-                      console.log("Habitación agregada", selectedHabitacion);
+                    //Verificar si la habitación ya ha sido seleccionada
+                    const isAlreadySelected = habitacionesSeleccionadas.some(
+                      (habitacion) =>
+                        habitacion.idHabitacion ===
+                        selectedHabitacionDisponible.idHabitacion
+                    );
+
+                    if (!isAlreadySelected && selectedHabitacionDisponible) {
+                      console.log(
+                        "Habitación agregada",
+                        selectedHabitacionDisponible
+                      );
                       setHabitacionesSeleccionadas([
                         ...habitacionesSeleccionadas,
-                        selectedHabitacion, //Añadir el objeto completo de la habitación
+                        selectedHabitacionDisponible, //Añadir el objeto completo de la habitación
                       ]); // Agregar habitación seleccionada al nuevo listbox
+                    } else {
+                      toast.error("Esta habitación ya ha sido agregada.", {
+                        duration: 1500,
+                        position: "top-center",
+                      });
+                      return;
                     }
                   }}
+                  disabled={habitacionesDisponibles.length > 0 ? false : true}
                 >
                   <AddIcon />
                 </IconButton>
@@ -435,21 +470,54 @@ export function CreateReserva() {
                 <br />
                 <FormControl fullWidth>
                   <ListBox
-                    multiple
-                    options={habitacionesSeleccionadas.map((habitacion) => ({
-                      label: `${habitacion.nombre}/ $${habitacion.precio} 
+                    options={habitacionesSeleccionadas.map(
+                      (habitacion) => ({
+                        label: `${habitacion.nombre}/ $${habitacion.precio} 
                       /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
-                      / ${habitacion.nombreCategoria}`, // Mostrar información relevante                      
-                      value: habitacion,
-                    }))}
+                      / ${habitacion.nombreCategoria}`, // Mostrar información relevante
+                        value: habitacion,
+                      })
+                    )}
                     className="w-full md:w-14rem"
                     onChange={(e) => {
-                      console.log("Habitacion seleccionada en ´Habitaciones seleccionadas´:", e.value); // Muestra los ids de las habitaciones seleccionadas
-                      // Acciones cuando se selecciona una habitación
-                      setSelectedHabitacion(e.value); // Actualizar el estado de la habitación seleccionada
+                      console.log(
+                        "Habitacion seleccionada en ´Habitaciones seleccionadas´:",
+                        e.value
+                      );
+                      setSelectedHabitacionAgregada(e.value); // Actualizar el estado de la habitación seleccionada
                       setValue("habitacion", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
                     }}
-                    value={habitacionesSeleccionadas.map((h) => h.idHabitacion)} // Usar las ids como valores seleccionados                    placeholder="Habitaciones seleccionadas"
+                    value={selectedHabitacionAgregada} // Usar el objeto completo de las habitaciones seleccionadas
+                    emptyMessage="No hay habitaciones cargadas"
+                    itemTemplate={(habitacion) => (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span>
+                          {habitacion.nombre}/ ${habitacion.precio}
+                          /habitacion: {habitacion.minHuesped} /Max: 
+                          {habitacion.maxHuesped}/ {habitacion.nombreCategoria}
+                        </span>
+                        <IconButton
+                          color="red"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evitar que se ejecute onChange al hacer clic en el botón
+                            setHabitacionesSeleccionadas((prev) =>
+                              prev.filter(
+                                (h) =>
+                                  h.idHabitacion !== habitacion.idHabitacion
+                              )
+                            ); //Eliminar la habitación seleccionada 
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    )}
                   />
                 </FormControl>
               </Grid>
@@ -477,11 +545,8 @@ export function CreateReserva() {
                 <b>Resumen de la reserva</b>
               </Typography>
 
-              <Grid container spacing={2}>
-
-              </Grid>
+              <Grid container spacing={2}></Grid>
             </Grid>
-
           </Grid>
         </Grid>
       </form>
