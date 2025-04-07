@@ -215,7 +215,7 @@ export function CreateReserva() {
     <>
       <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
         <Grid container spacing={3}>
-          <Grid size={12} sm={12}>
+          <Grid size={12} sm={12} >
             <Typography variant="h5" gutterBottom>
               <b>Generar reserva</b>
             </Typography>
@@ -349,7 +349,7 @@ export function CreateReserva() {
             <br></br>
 
             {/* Grid contenedor de las habitaciones */}
-            <Grid container spacing={3} alignItems="stretch">
+            <Grid container spacing={2} alignItems="stretch" size= {15}>
               <Grid
                 xs={6}
                 sm={6}
@@ -367,24 +367,23 @@ export function CreateReserva() {
                   {habitacionesDisponibles.length > 0 ? (
                     <>
                       <ListBox
-                        multiple
+                        // multiple
                         options={habitacionesDisponibles.map((habitacion) => ({
                           label: `${habitacion.nombre}/ $${habitacion.precio} 
                       /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
                       / ${habitacion.nombreCategoria}`, // Mostrar información relevante
-                          value: habitacion.idHabitacion,
-                          group: habitacion.nombreCategoria, // Agrupar por nombre de categoría
+                          value: habitacion, //Guardar el objeto habitación completo
+                          // group: habitacion.nombreCategoria, // Agrupar por nombre de categoría
                         }))}
                         className="w-full md:w-14rem"
                         onChange={(e) => {
-                          console.log("Habitaciones seleccionadas:", e.value); // Muestra los ids de las habitaciones seleccionadas
+                          console.log("Habitacion seleccionada en ´Habitaciones disponibles:", e.value); // Muestra los ids de las habitaciones seleccionadas
                           // Acciones cuando se selecciona una habitación
                           setSelectedHabitacion(e.value); // Actualizar el estado de la habitación seleccionada
-                          setValue("habitacion", e.value); //'e.value' tiene el id de las habitaciones seleccionadas
+                          setValue("habitacion", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
                         }}
                         value={selectedHabitacion}
                         placeholder="Seleccione una habitación"
-                        grouped // Agrupar por nombre de categoría
                       />
                     </>
                   ) : (
@@ -395,18 +394,30 @@ export function CreateReserva() {
                 </FormControl>
               </Grid>
 
-              <IconButton
-                onClick={() => {
-                  if (selectedHabitacion) {
-                    setHabitacionesSeleccionadas([
-                      ...habitacionesSeleccionadas,
-                      ...selectedHabitacion,
-                    ]); // Agregar habitación seleccionada al nuevo listbox
-                  }
-                }}
-              >
-                <AddIcon />
-              </IconButton>
+              {/* Botón para agregar habitación */}
+              <Tooltip title="Agregar Habitación">
+                <IconButton
+                  style={{
+                    backgroundColor: "green",
+                    color: "white",
+                    borderRadius: "10px",
+                    width: "60px",
+                    height: "50px",
+                    marginTop: "20px",
+                  }}
+                  onClick={() => {
+                    if (selectedHabitacion) {
+                      console.log("Habitación agregada", selectedHabitacion);
+                      setHabitacionesSeleccionadas([
+                        ...habitacionesSeleccionadas,
+                        selectedHabitacion, //Añadir el objeto completo de la habitación
+                      ]); // Agregar habitación seleccionada al nuevo listbox
+                    }
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
 
               {/* Mostrar habitaciones seleccionadas */}
               <Grid
@@ -426,13 +437,19 @@ export function CreateReserva() {
                   <ListBox
                     multiple
                     options={habitacionesSeleccionadas.map((habitacion) => ({
-                      label: `${habitacion.nombre} / $${habitacion.precio}`,
-                      value: habitacion.idHabitacion,
+                      label: `${habitacion.nombre}/ $${habitacion.precio} 
+                      /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
+                      / ${habitacion.nombreCategoria}`, // Mostrar información relevante                      
+                      value: habitacion,
                     }))}
                     className="w-full md:w-14rem"
-                    onChange={(e) => setHabitacionesSeleccionadas(e.value)} // Actualiza las habitaciones seleccionadas
-                    value={habitacionesSeleccionadas}
-                    placeholder="Habitaciones seleccionadas"
+                    onChange={(e) => {
+                      console.log("Habitacion seleccionada en ´Habitaciones seleccionadas´:", e.value); // Muestra los ids de las habitaciones seleccionadas
+                      // Acciones cuando se selecciona una habitación
+                      setSelectedHabitacion(e.value); // Actualizar el estado de la habitación seleccionada
+                      setValue("habitacion", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
+                    }}
+                    value={habitacionesSeleccionadas.map((h) => h.idHabitacion)} // Usar las ids como valores seleccionados                    placeholder="Habitaciones seleccionadas"
                   />
                 </FormControl>
               </Grid>
@@ -441,12 +458,12 @@ export function CreateReserva() {
 
           {/*Datos del crucero (lado derecho) */}
 
-          <Grid container direction="column" spacing={2}>
+          <Grid container direction="stretch" spacing={2}>
             <Grid
               item
               xs={12}
               style={{
-                backgroundColor: "#16537e",
+                backgroundColor: "#f5f5f5",
                 borderRadius: "16px",
                 padding: "10px",
               }}
@@ -455,68 +472,16 @@ export function CreateReserva() {
                 align="center"
                 variant="h5"
                 gutterBottom
-                color="white"
+                color="¨black"
               >
-                <b>Itinerario y fechas</b>
+                <b>Resumen de la reserva</b>
               </Typography>
 
               <Grid container spacing={2}>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    style={{ backgroundColor: "#50C878" }}
-                    onClick={async () => {
-                      try {
-                        // Llamada al servicio para crear el itinerario
-                        const nuevoItinerario = {
-                          estado: 1,
-                        };
 
-                        const response =
-                          await ItinerarioService.createItinerario(
-                            nuevoItinerario
-                          );
-
-                        console.log("Itinerario creado:", response.data);
-                      } catch (error) {
-                        console.error("Error al crear el itinerario:", error);
-                      }
-                    }}
-                  >
-                    Gestionar itinerarios
-                  </Button>
-                </Grid>
               </Grid>
             </Grid>
 
-            {/* Botón Confirmar*/}
-            <Grid size={4} sm={4} spacing={1}>
-              <Button
-                variant="contained"
-                // type="submit"
-                style={{
-                  backgroundColor: "#16537e",
-                  color: "white",
-                  display:
-                    puertosItinerario && fechasCrucero ? "block" : "none",
-                }}
-                onClick={() => {
-                  console.log(
-                    "Estado actual de selectedCrucero:",
-                    selectedCrucero
-                  );
-                  if (puertosItinerario && fechasCrucero) {
-                    toast.success(`Gestión de crucero exitosa`, {
-                      duration: 2000,
-                      position: "top-center",
-                    });
-                    navigate("/admin/crucero");
-                  }
-                }}
-              >
-                Confirmar
-              </Button>
-            </Grid>
           </Grid>
         </Grid>
       </form>

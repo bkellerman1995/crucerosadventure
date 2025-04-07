@@ -89,7 +89,8 @@ class HabitacionDisponibleFechaModel
                     WHERE hd.idCruceroFecha = cf.idCruceroFecha
                         AND cf.idCrucero = $idCrucero            -- Filtra por el ID del crucero
                         AND cf.fechaSalida = '$fecha'          -- Filtra por la fecha de salida
-                        AND hd.disponible = 1;";
+                        AND hd.disponible = 1
+                    order by idHabitacion desc";
 
             //Ejecutar la consulta
             // $vResultado = $this->enlace->executeSQL($vSql, [$idCrucero, $fecha]);
