@@ -62,6 +62,7 @@ class RoutesController
                     if ($idCrucero && $fechaSeleccionada) {
                         $response = new $controller();
                         $response->$action($idCrucero, $fechaSeleccionada);  // Pasar los parámetros al controlador
+                    
                     } else {
                         // Si faltan parámetros
                         $json = array(

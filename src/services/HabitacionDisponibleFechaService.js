@@ -15,18 +15,27 @@ class HabitacionDisponibleFecha {
   getDisponibilidadHabitacionPorFechaByCrucero(idCrucero, fechaSeleccionada) {
     console.log("BASE_URL habitacionDisponible: ", BASE_URL);
     console.log("idCrucero: ", idCrucero, "fecha: ", fechaSeleccionada);
+
     return axios.get(BASE_URL, {
       params: {
         idCrucero: idCrucero,
-        fechaSeleccionada: fechaSeleccionada
-      }
+        fechaSeleccionada: fechaSeleccionada,
+      },
+      validateStatus: (status) => {
+        // Maneja los errores (4xx y 5xx) dentro del .then() en el componente React.
+        // return status >= 200 && status < 300;
+        return status < 500;
+      },
     });
   }
 
   //Obtener la informacion de la disponibilidad de habitación por fecha
   //localhost:81/crucerosadventure/habitaciondisponiblefecha/{id}
   getDisponibilidadHabitacionPorFechaByID(habitaciondisponiblefechaID) {
-    console.log("BASE_URL habitacionDisponible: ", BASE_URL + "/" + habitaciondisponiblefechaID);
+    console.log(
+      "BASE_URL habitacionDisponible: ",
+      BASE_URL + "/" + habitaciondisponiblefechaID
+    );
     console.log("habitacionDisponible ID: ", habitaciondisponiblefechaID);
     return axios.get(BASE_URL + "/" + habitaciondisponiblefechaID);
   }
@@ -35,7 +44,6 @@ class HabitacionDisponibleFecha {
   agregarDisponibilidadHabitacionFecha(disponibilidadhabitacionfecha) {
     return axios.post(BASE_URL, JSON.stringify(disponibilidadhabitacionfecha));
   }
-
 }
 
 export default new HabitacionDisponibleFecha()

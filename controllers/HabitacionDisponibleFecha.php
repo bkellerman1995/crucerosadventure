@@ -34,8 +34,15 @@ class habitacionDisponibleFecha
             
             //Método del modelo
             //Si los parámetros idCrucero y fecha están presentes, pasarlos al método del modelo
-            if ($idCrucero && $fechaSeleccionada){
-                $result = $habitacionDisponibleFecha -> getDisponibilidadPorFecha ($idCrucero, $fechaSeleccionada);
+            if ($idCrucero && $fechaSeleccionada) {
+                $result = $habitacionDisponibleFecha->getDisponibilidadPorFecha($idCrucero, $fechaSeleccionada);
+
+                // Si la respuesta es vacía, devolver un mensaje indicando que no hay habitaciones disponibles
+                if (empty($result)) {
+                    $response->toJSON(["message" => "No hay habitaciones disponibles para esta fecha."]);
+                    http_response_code(404); // Código 404 para indicar que no se encontraron resultados
+                    return;
+                }
             }
 
             //Si los parámetros idCrucero y fecha no están presentes en el GET, simplemente ejecutar 

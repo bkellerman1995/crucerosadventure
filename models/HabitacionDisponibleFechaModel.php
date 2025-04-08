@@ -87,14 +87,15 @@ class HabitacionDisponibleFechaModel
                     JOIN crucero_fecha cf ON phf.idCruceroFecha = cf.idCruceroFecha
                     JOIN categoriahabitacion ch ON h.idcategoriaHabitacion = ch.idcategoriaHabitacion
                     WHERE hd.idCruceroFecha = cf.idCruceroFecha
-                        AND cf.idCrucero = $idCrucero            -- Filtra por el ID del crucero
-                        AND cf.fechaSalida = '$fecha'          -- Filtra por la fecha de salida
+                        AND cf.idCrucero = $idCrucero
+                        AND cf.fechaSalida = '$fecha'    
                         AND hd.disponible = 1
                     order by idHabitacion desc";
 
             //Ejecutar la consulta
             // $vResultado = $this->enlace->executeSQL($vSql, [$idCrucero, $fecha]);
             $vResultado = $this->enlace->executeSQL($vSql);
+
 
             //Retornar la respuesta
             return $vResultado;
