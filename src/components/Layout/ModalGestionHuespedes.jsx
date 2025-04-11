@@ -19,6 +19,7 @@ export function ModalGestionHuespedes({
   maxHuespedes,
   control,
   idHabitacion,
+  eliminarHabitacionSeleccionada
 }) {
   
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
@@ -41,6 +42,9 @@ export function ModalGestionHuespedes({
 
   const confirmarCerrarYEliminar = () => {
     setOpenConfirmDialog(false);
+    //Llamar a la función para eliminar la habitación seleccionada
+    //del listbox "Habitaciones seleccionadas"
+    eliminarHabitacionSeleccionada(idHabitacion);
     handleClose();
   };
 
@@ -223,4 +227,5 @@ ModalGestionHuespedes.propTypes = {
   setCruceroCreado: PropTypes.func.isRequired,
   setPuertosItinerario: PropTypes.func.isRequired,
   idHabitacion: PropTypes.number.isRequired,
+  eliminarHabitacionSeleccionada: PropTypes.func.isRequired,
 };

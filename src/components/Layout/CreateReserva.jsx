@@ -94,7 +94,7 @@ export function CreateReserva() {
   const [idHabitacion, setIdHabitacion] = useState(null);
 
   // Estado para almacenar la cantidad máxima de huéspedes
-  const [maxHuespedes, setMaxHuespedes] = useState (null);
+  const [maxHuespedes, setMaxHuespedes] = useState(null);
 
   // Estado para las fechas asignadas al crucero seleccionado
   const [fechasSalida, setFechasSalida] = useState(false);
@@ -183,6 +183,17 @@ export function CreateReserva() {
         }
       });
   }, []);
+
+  //Función para manejar la eliminicación de la habitación
+  //seleccionada cuando se cierre el modal de "ModalGestionHuespedes"
+  const eliminarHabitacionSeleccionada = (idHabitacion) => {
+    // Eliminar la habitación de las seleccionadas
+    setHabitacionesSeleccionadas((prevHabitaciones) =>
+      prevHabitaciones.filter(
+        (habitacion) => habitacion.idHabitacion !== idHabitacion
+      )
+    );
+  };
 
   // Accion submit
   const onSubmit = async (DataForm) => {
@@ -440,8 +451,13 @@ export function CreateReserva() {
                           ...habitacionesSeleccionadas,
                           selectedHabitacionDisponible, //Añadir el objeto completo de la habitación
                         ]); // Agregar habitación seleccionada al nuevo listbox
-                        setMaxHuespedes (selectedHabitacionDisponible.maxHuesped);
-                        console.log ("Enviando la cant Máxima de huéspedes al modal: ", maxHuespedes);
+                        setMaxHuespedes(
+                          selectedHabitacionDisponible.maxHuesped
+                        );
+                        console.log(
+                          "Enviando la cant Máxima de huéspedes al modal: ",
+                          maxHuespedes
+                        );
                         setOpenModalGestHuespedes(true);
                       } else {
                         toast.error("Esta habitación ya ha sido agregada.", {
@@ -594,10 +610,12 @@ export function CreateReserva() {
       <ModalGestionHuespedes
         open={openModalGestHuespedes}
         handleClose={() => setOpenModalGestHuespedes(false)}
-        maxHuespedes = {maxHuespedes}
+        maxHuespedes={maxHuespedes}
         control={{ ...control, setValue }}
         setPuertosItinerario={setPuertosItinerario}
-        idHabitacion={idHabitacion} // Pasar el id del crucero
+        idHabitacion={idHabitacion} // Pasar el id de la habitación
+        eliminarHabitacionSeleccionada = {eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
+
       />
     </>
   );

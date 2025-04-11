@@ -50,195 +50,193 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped})
         apellido1: "",
         apellido2: "",
         telefono: "",
+        estado: 1,
       });
     }
   }, [open, reset]);
 
   // Accion submit del botón guardar
-  const onSubmit = (data, e) => {
-    e.preventDefault(); // Asegurar que el evento se capture bien. El modal puede no estar permitiendo que se ejecute onSubmit.
-
+  const onSubmit = (data) => {
     // Formulario para agregar el huésped a la habitación
     const formData = {
       idHabitacion,
       ...data, // Contenido del formulario
     };
 
-    //Asignarle a infoHuesped lo que viene en "data" que es el formulario
+    // Asignar a infoHuesped lo que viene en "data" que es el formulario
     infoHuesped = data;
 
     console.log("Enviando datos:", formData);
-    try {
-      HuespedService.createHuesped(formData)
-        .then((response) => {
-          if (response?.data) {
-            toast.success("Gestión de huésped exitosa", { duration: 1500 });
-            handleClose();
-          }
-        })
-        .catch((err) => {
-          console.error("Error al crear huesped:", err);
-          toast.error("Hubo un error al gestionar el huésped.");
-        });
-    } catch (error) {
-      console.error(error);
-    }
+
+    // Enviar la petición al backend
+    HuespedService.createHuesped(formData)
+      .then((response) => {
+        if (response?.data) {
+          toast.success("Gestión de huésped exitosa", { duration: 1500 });
+          handleClose();
+        }
+      })
+      .catch((err) => {
+        console.error("Error al crear huésped:", err);
+        toast.error("Hubo un error al gestionar el huésped.");
+      });
   };
 
-  // Función para cerrar el modal
   const handleModalClose = () => {
     handleClose(); // Cierra el modal
   };
 
   return (
-    <Modal open={open} onClose={handleModalClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "50vw",
-          maxWidth: "600px",
-          bgcolor: "background.paper",
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-        }}
-      >
-        <Typography variant="h5" component="h2">
-          <b>Gestionar Huésped</b>
-        </Typography>
-        <br />
+    <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+      <Modal open={open} onClose={handleModalClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "50vw",
+            maxWidth: "600px",
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography variant="h5" component="h2">
+            <b>Gestionar Huésped</b>
+          </Typography>
+          <br />
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <Grid container spacing={2} direction="column">
-            {/* Campo nombre */}
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <Controller
-                  name="nombre"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Nombre"
-                      error={Boolean(errors.nombre)}
-                      helperText={errors.nombre?.message}
-                    />
-                  )}
-                />
-              </FormControl>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Grid container spacing={2} direction="column">
+              {/* Campo nombre */}
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <Controller
+                    name="nombre"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Nombre"
+                        error={Boolean(errors.nombre)}
+                        helperText={errors.nombre?.message}
+                      />
+                    )}
+                  />
+                </FormControl>
+              </Grid>
+
+              {/* Campo apellido1 */}
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <Controller
+                    name="apellido1"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Primer Apellido"
+                        error={Boolean(errors.apellido1)}
+                        helperText={errors.apellido1?.message}
+                      />
+                    )}
+                  />
+                </FormControl>
+              </Grid>
+
+              {/* Campo apellido2 */}
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <Controller
+                    name="apellido2"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Segundo Apellido"
+                        error={Boolean(errors.apellido2)}
+                        helperText={errors.apellido2?.message}
+                      />
+                    )}
+                  />
+                </FormControl>
+              </Grid>
+
+              {/* Campo teléfono */}
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <Controller
+                    name="telefono"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Teléfono"
+                        error={Boolean(errors.telefono)}
+                        helperText={errors.telefono?.message}
+                      />
+                    )}
+                  />
+                </FormControl>
+              </Grid>
+
+              {/* Estado */}
+              <Grid item xs={12}>
+                <FormControl fullWidth disabled>
+                  <Controller
+                    name="estado"
+                    control={control}
+                    render={({ field }) => (
+                      <Select {...field} label="Estado">
+                        <MenuItem value={1}>Activo</MenuItem>
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+              </Grid>
             </Grid>
 
-            {/* Campo apellido1 */}
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <Controller
-                  name="apellido1"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Primer Apellido"
-                      error={Boolean(errors.apellido1)}
-                      helperText={errors.apellido1?.message}
-                    />
-                  )}
-                />
-              </FormControl>
-            </Grid>
+            <Button
+              type="submit"
+              sx={{
+                mt: 3,
+                backgroundColor: "#16537e",
+                color: "white",
+                "&:hover": { backgroundColor: "#133d5a" },
+                width: "200px",
+                height: "40px",
+                fontSize: "0.9rem",
+                mx: "auto",
+                display: "block",
+              }}
+            >
+              Guardar
+            </Button>
 
-            {/* Campo apellido2 */}
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <Controller
-                  name="apellido2"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Segundo Apellido"
-                      error={Boolean(errors.apellido2)}
-                      helperText={errors.apellido2?.message}
-                    />
-                  )}
-                />
-              </FormControl>
-            </Grid>
-
-            {/* Campo teléfono */}
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <Controller
-                  name="telefono"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Teléfono"
-                      error={Boolean(errors.telefono)}
-                      helperText={errors.telefono?.message}
-                    />
-                  )}
-                />
-              </FormControl>
-            </Grid>
-
-            {/* Estado */}
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <Controller
-                  name="estado"
-                  control={control}
-                  render={({ field }) => (
-                    <Select {...field} label="Estado">
-                      <MenuItem value={1}>Activo</MenuItem>
-                    </Select>
-                  )}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-
-          <Button
-            type="submit"
-            sx={{
-              mt: 3,
-              backgroundColor: "#16537e",
-              color: "white",
-              "&:hover": { backgroundColor: "#133d5a" },
-              width: "200px",
-              height: "40px",
-              fontSize: "0.9rem",
-              mx: "auto",
-              display: "block",
-            }}
-          >
-            Guardar
-          </Button>
-
-          <Button
-            onClick={handleModalClose}
-            sx={{
-              position: "absolute",
-              top: "5px",
-              right: "5px",
-              minWidth: "30px",
-              height: "30px",
-              backgroundColor: "#16537e",
-              color: "white",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              "&:hover": { backgroundColor: "darkred" },
-              zIndex: 1000,
-            }}
-          >
-            ✕
-          </Button>
-        </form>
-      </Box>
-    </Modal>
+            <Button
+              onClick={handleModalClose}
+              sx={{
+                position: "absolute",
+                top: "5px",
+                right: "5px",
+                minWidth: "30px",
+                height: "30px",
+                backgroundColor: "#16537e",
+                color: "white",
+                fontSize: "1rem",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "darkred" },
+                zIndex: 1000,
+              }}
+            >
+              ✕
+            </Button>
+          </form>
+        </Box>
+      </Modal>
+    </form>
   );
 }
 
