@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import HuespedService from "../../services/HuespedService";
 
 
-export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped}) {
+export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped, setHuespedesContador}) {
   console.log("id Habitacion recibido en modal", idHabitacion);
 
   // Esquema de validación
@@ -56,38 +56,39 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped})
   }, [open, reset]);
 
   // Accion submit del botón guardar
-  const onSubmit = (data) => {
-    // Formulario para agregar el huésped a la habitación
-    const formData = {
-      idHabitacion,
-      ...data, // Contenido del formulario
-    };
-
-    // Asignar a infoHuesped lo que viene en "data" que es el formulario
-    infoHuesped = data;
-
-    console.log("Enviando datos:", formData);
-
-    // Enviar la petición al backend
-    HuespedService.createHuesped(formData)
-      .then((response) => {
+  const onSubmit = async (data) => {
+    try {
+      const isValid = await huespedSchema.isValid(data);
+  
+      if (isValid) {
+        const formData = {
+          idHabitacion,
+          ...data,
+        };
+        infoHuesped = data;
+  
+        console.log("Enviando datos:", formData);
+  
+        const response = await HuespedService.createHuesped(formData);
+  
         if (response?.data) {
           toast.success("Gestión de huésped exitosa", { duration: 1500 });
+          setHuespedesContador((prevCount) => prevCount + 1); // Incrementar el contador de huéspedes
           handleClose();
         }
-      })
-      .catch((err) => {
-        console.error("Error al crear huésped:", err);
-        toast.error("Hubo un error al gestionar el huésped.");
-      });
+      }
+    } catch (error) {
+      console.error("Error al gestionar el huésped:", error);
+      toast.error("Hubo un error al gestionar el huésped.");
+    }
   };
+  
 
   const handleModalClose = () => {
     handleClose(); // Cierra el modal
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
       <Modal open={open} onClose={handleModalClose}>
         <Box
           sx={{
@@ -236,7 +237,6 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped})
           </form>
         </Box>
       </Modal>
-    </form>
   );
 }
 
@@ -245,5 +245,6 @@ ModalInfoHuesped.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   idHabitacion: PropTypes.number.isRequired,
-  infoHabitacion: PropTypes.object.isRequired
+  infoHabitacion: PropTypes.object.isRequired,
+  setHuespedesContador: PropTypes.number.isRequired
 };

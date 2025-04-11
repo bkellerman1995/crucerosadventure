@@ -26,6 +26,8 @@ export function ModalGestionHuespedes({
   const [error, setError] = useState("");
   const [openModalInfoHuesped, setOpenModalInfoHuesped] = useState(false);
   const [infoHuesped, setInfoHuesped] = useState (null);
+  const [huespedesContador, setHuespedesContador] = useState(0); // Estado para contar huéspedes añadidos
+
 
   useEffect(() => {
     if (open && maxHuespedes > 0) {
@@ -179,6 +181,7 @@ export function ModalGestionHuespedes({
           handleClose={() => setOpenModalInfoHuesped(false)}
           idHabitacion = {idHabitacion}
           infoHuesped = {infoHuesped}
+          setHuespedesContador={setHuespedesContador}
         />
 
         <Button
@@ -224,8 +227,6 @@ ModalGestionHuespedes.propTypes = {
   handleClose: PropTypes.func.isRequired,
   maxHuespedes: PropTypes.number.isRequired,
   control: PropTypes.object.isRequired,
-  setCruceroCreado: PropTypes.func.isRequired,
-  setPuertosItinerario: PropTypes.func.isRequired,
   idHabitacion: PropTypes.number.isRequired,
   eliminarHabitacionSeleccionada: PropTypes.func.isRequired,
 };
