@@ -26,7 +26,15 @@ export function ModalGestionHuespedes({
   const [openModalInfoHuesped, setOpenModalInfoHuesped] = useState(false);
   const [infoHuesped, setInfoHuesped] = useState (null);
   const [huespedesContador, setHuespedesContador] = useState(0); // Estado para contar huéspedes añadidos
+  
+  // Estado para un array de longitud "maxHuespedes" que gestiona 
+  // cada huesped que se gestione en el modal
 
+  const [huespedes, setHuespedes] = useState(
+    Array.from({ length: maxHuespedes }, () => ({ nombre: null, gestionado: false })) // Estado inicial con 'null' para nombre y 'false' para gestionado
+  );
+
+  const [selectedHuespedIndex, setSelectedHuespedIndex] = useState(null); // Para seleccionar un huésped dentro del array 
 
   useEffect(() => {
     if (open && maxHuespedes > 0) {
@@ -35,30 +43,47 @@ export function ModalGestionHuespedes({
     }
   }, [open, maxHuespedes, infoHuesped]);
 
-  //Abrir confirm Dialog en caso de que
-  //se quiera cerrar el modal
-  const handleModalClose = () => {
-    setOpenConfirmDialog(true);
+
+  const handleModalClose = (event, reason) => {
+    if (reason !== "backdropClick") {
+      handleClose();  // Solo cerrar si no es un clic en el backdrop
+    }
   };
+
+  const handleGestionHuesped = (index) => {
+
+    setSelectedHuespedIndex(index); // Guardar el índice del huésped a gestionar
+    setOpenModalInfoHuesped(true); // Abrir el modal de gestión de huésped
+  }
+
+  // Callback para actualizar un huésped específico
+  const actualizarHuesped = (index, nuevoHuesped) => {
+    const updatedHuespedes = [...huespedes];
+    // Actualizar el huésped solo en el índice correspondiente
+    updatedHuespedes[index] = { ...updatedHuespedes[index], ...nuevoHuesped }; 
+    setHuespedes (updatedHuespedes);
+  }
 
   const confirmarCerrarYEliminar = () => {
     setOpenConfirmDialog(false);
     //Llamar a la función para eliminar la habitación seleccionada
     //del listbox "Habitaciones seleccionadas"
     eliminarHabitacionSeleccionada(idHabitacion);
-    if (control && control.setValue) {
-      for (let i = 0; i < maxHuespedes; i++) {
-        control.setValue(`puerto-${i}`, null);
-      }
-    }
-
     handleClose();
   };
 
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <Modal open={open} onClose={handleModalClose}>
+    <Modal
+      open={open}
+      onClose={handleModalClose}
+      slotProps={{
+        backdrop: {
+          onClick: (e) => e.stopPropagation(), // Evitar que el fondo cierre el modal
+        },
+      }}
+    >
       <Box
         sx={{
           position: "absolute",
@@ -100,8 +125,6 @@ export function ModalGestionHuespedes({
 
         <Grid container spacing={2}>
           {[...Array(Number(maxHuespedes))].map((_, index) => {
-            // Asegurarte de que maxHuespedes sea un número
-            console.log("Tipo de maxHuespedes: ", typeof maxHuespedes);
             return (
               <Grid item xs={12} key={index}>
                 <Grid
@@ -149,7 +172,8 @@ export function ModalGestionHuespedes({
                       }}
                     >
                       <Typography variant="subtitle3">
-                      { infoHuesped !=null ? `${infoHuesped.nombre}` : "Información no disponible"}
+                        {huespedes[index]?.nombre ||
+                          "Información no disponible"}
                       </Typography>
                     </Box>
                   </Grid>
@@ -167,11 +191,8 @@ export function ModalGestionHuespedes({
                         minWidth: "180px",
                         height: "40px",
                       }}
-                      disabled={!!infoHuesped}  // Deshabilita el botón si la información del huesped está disponible
-                      onClick={() => {
-                        setOpenModalInfoHuesped(true);
-
-                      }}
+                      disabled={!!huespedes[index]?.nombre} // Deshabilita el botón si la información del huesped está disponible
+                      onClick={() => handleGestionHuesped(index)}
                     >
                       Gestionar Huésped
                     </Button>
@@ -185,11 +206,11 @@ export function ModalGestionHuespedes({
         <ModalInfoHuesped
           open={openModalInfoHuesped}
           handleClose={() => setOpenModalInfoHuesped(false)}
-          idHabitacion = {idHabitacion}
-          infoHuesped = {infoHuesped}
-          setHuespedesContador={setHuespedesContador}
-          setInfoHuesped = {setInfoHuesped}
-
+          idHabitacion={idHabitacion}
+          infoHuesped={huespedes[selectedHuespedIndex]} // Pasar el huésped seleccionado al modal
+          setInfoHuesped={(nuevoHuesped) =>
+            actualizarHuesped(selectedHuespedIndex, nuevoHuesped)
+          } // Actualiza solo el huésped gestionado        />
         />
 
         <Button

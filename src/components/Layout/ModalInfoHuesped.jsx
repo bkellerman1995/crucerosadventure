@@ -13,7 +13,6 @@ import HuespedService from "../../services/HuespedService";
 
 
 export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesContador, setInfoHuesped}) {
-  console.log("id Habitacion recibido en modal", idHabitacion);
 
   // Esquema de validación
   const huespedSchema = yup.object({
@@ -45,6 +44,7 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
 
   //Cuando el modal se abre, resetear los campos
   useEffect(() => {
+    
     if (open) {
       reset({
         nombre: "",
@@ -56,6 +56,7 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
     }
   }, [open, reset]);
 
+
   // Accion submit del botón guardar
   const onSubmit = async (data) => {
     try {
@@ -65,7 +66,7 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
       if (isValid) {
         const formData = {
           idHabitacion,
-          ...data,
+          ...data, // Contenido del formulario
         };
 
         console.log("Enviando datos:", formData);
@@ -77,8 +78,8 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
               if (response?.data) {
                 toast.success("Gestión de huésped exitosa", { duration: 1500 });
                 setHuespedesContador((prevCount) => prevCount + 1); // Incrementar el contador de huéspedes
-                console.log ("Cant. de Huéspedes creados: ", setHuespedesContador )
-                setInfoHuesped(formData);
+                console.log ("Cant. de Huéspedes creados hasta el momento: ", setHuespedesContador )
+                setInfoHuesped(formData); // Actualiza solo el huésped correspondiente en el estado
                 handleClose();
               }
             })
@@ -101,9 +102,11 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
     }
   };
   
-
-  const handleModalClose = () => {
-    handleClose(); // Cierra el modal
+  // Función para cerrar el modal
+  const handleModalClose = (event, reason) => {
+    if (reason !== "backdropClick") {
+      handleClose();  // Solo cerrar si no es un clic en el backdrop
+    }
   };
 
   return (
