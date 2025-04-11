@@ -1,33 +1,24 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
-import FormHelperText from "@mui/material/FormHelperText";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
-import { useForm, Controller } from "react-hook-form";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+import { useForm} from "react-hook-form";
 import { Tooltip } from "@mui/material";
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import * as yup from "yup";
 import { format, addDays } from "date-fns";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigate } from "react-router-dom";
 import CruceroService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
 import { ListBox } from "primereact/listbox";
-import { ModalGestionPuertos } from "./ModalGestionPuertos";
-import { ModalGestionFechas } from "./ModalGestionFechas";
-import ItinerarioService from "../../services/ItinerarioService";
+import { ModalGestionHuespedes } from "./ModalGestionHuespedes";
 import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
 
 export function CreateReserva() {
-  const navigate = useNavigate();
-
   //Estilos personalizados para el select
   const customStyles = {
     option: (provided, state) => ({
@@ -59,34 +50,12 @@ export function CreateReserva() {
   };
 
   // Esquema de validación
-  const cruceroSchema = yup.object({
+  const habitacionSchema = yup.object({
     nombre: yup
       .string()
       .required("El nombre es requerido")
       .min(2, "Debe tener al menos 2 caracteres")
       .max(50, "No debe sobrepasar los 50 caracteres"),
-
-    cantDias: yup
-      .number()
-      .typeError("Debe ser un número")
-      .required("La cantidad de días es requerida")
-      .positive("Debe ser un número positivo")
-      .min(7, "La cantidad de días debe ser al menos 7")
-      .max(14, "La cantidad de días no debe ser mayor a 14"),
-
-    foto: yup
-      .mixed()
-      .required("La imagen es obligatoria")
-      .test("fileType", "Debe cargar una imagen (jpg, png, jpeg)", (value) => {
-        return (
-          value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
-        );
-      })
-      .test(
-        "fileSize",
-        "El tamaño debe ser menor a 500MB",
-        (value) => value && value.size <= 524288000 // Verifica si el tamaño del archivo es menor a 500 MB (524288000 bytes)
-      ),
   });
 
   //Función para manejar el form
@@ -103,14 +72,11 @@ export function CreateReserva() {
       idBarco: null,
       estado: "",
     },
-    resolver: yupResolver(cruceroSchema),
+    resolver: yupResolver(habitacionSchema),
   });
 
-  // Estado para controlar la apertura del modal de Gestion Cruceros
-  const [openModalGestPuertos, setOpenModalGestPuertos] = useState(false);
-
-  // Estado para controlar la apertura del modal de Gestion Fechas y Precios
-  const [openModalGestFechas, setOpenModalGestFechas] = useState(false);
+  // Estado para controlar la apertura del modal de Gestion Huéspedes
+  const [openModalGestHuespedes, setOpenModalGestHuespedes] = useState(false);
 
   //Hooks de control de errores
   const [error, setError] = useState("");
@@ -123,6 +89,12 @@ export function CreateReserva() {
 
   // Estado para almacenar el id del crucero
   const [idCrucero, setIdCrucero] = useState(null);
+
+  // Estado para almacenar el id de habitación
+  const [idHabitacion, setIdHabitacion] = useState(null);
+
+  // Estado para almacenar la cantidad máxima de huéspedes
+  const [maxHuespedes, setMaxHuespedes] = useState (null);
 
   // Estado para las fechas asignadas al crucero seleccionado
   const [fechasSalida, setFechasSalida] = useState(false);
@@ -175,12 +147,11 @@ export function CreateReserva() {
               setHabitacionesDisponibles(response.data); // Establecer habitaciones disponibles
             } else {
               setHabitacionesDisponibles([]); // Limpiar habitaciones disponibles
-              setHabitacionesSeleccionadas ([]); //Limpiar habitaciones seleccionadas
+              setHabitacionesSeleccionadas([]); //Limpiar habitaciones seleccionadas
             }
           } else {
-            setHabitacionesDisponibles([]);// Limpiar habitaciones disponibles
-            setHabitacionesSeleccionadas ([]); //Limpiar habitaciones seleccionadas
-
+            setHabitacionesDisponibles([]); // Limpiar habitaciones disponibles
+            setHabitacionesSeleccionadas([]); //Limpiar habitaciones seleccionadas
           }
         })
         .catch((error) => {
@@ -352,7 +323,6 @@ export function CreateReserva() {
                       //Actualizar la fecha seleccionada
                       setFechaSeleccionada(selectedOption);
                     }}
-                    
                     value={fechaSeleccionada} // Asegurarse de que el valor del select se restablezca para que se muestre el placeholder
                     styles={customStyles}
                     placeholder="Seleccione una fecha de salida"
@@ -457,10 +427,22 @@ export function CreateReserva() {
                           "Habitación agregada",
                           selectedHabitacionDisponible
                         );
+
+                        //Configurar el idHabitacion para abrir el modalGestionHuespedes
+                        setIdHabitacion(
+                          selectedHabitacionDisponible.idHabitacion
+                        );
+                        console.log(
+                          "Habitación enviada al modal:",
+                          selectedHabitacionDisponible
+                        );
                         setHabitacionesSeleccionadas([
                           ...habitacionesSeleccionadas,
                           selectedHabitacionDisponible, //Añadir el objeto completo de la habitación
                         ]); // Agregar habitación seleccionada al nuevo listbox
+                        setMaxHuespedes (selectedHabitacionDisponible.maxHuesped);
+                        console.log ("Enviando la cant Máxima de huéspedes al modal: ", maxHuespedes);
+                        setOpenModalGestHuespedes(true);
                       } else {
                         toast.error("Esta habitación ya ha sido agregada.", {
                           duration: 1500,
@@ -510,7 +492,7 @@ export function CreateReserva() {
                         );
                       } else {
                         toast.error(
-                          "Por favor selecciona una habitación para quitar.",
+                          "Por favor seleccione una habitación para quitar.",
                           {
                             duration: 1500,
                             position: "top-center",
@@ -581,7 +563,7 @@ export function CreateReserva() {
             </Grid>
           </Grid>
 
-          {/*Datos del crucero (lado derecho) */}
+          {/*Resumen de la reserva (lado derecho) */}
 
           {/* <Grid container direction="stretch" spacing={2}>
             <Grid
@@ -608,21 +590,14 @@ export function CreateReserva() {
         </Grid>
       </form>
 
-      {/* Modal importado para Gestión de puertos */}
-      <ModalGestionPuertos
-        open={openModalGestPuertos}
-        handleClose={() => setOpenModalGestPuertos(false)}
+      {/* Modal importado para Gestión de Huéspedes */}
+      <ModalGestionHuespedes
+        open={openModalGestHuespedes}
+        handleClose={() => setOpenModalGestHuespedes(false)}
+        maxHuespedes = {maxHuespedes}
         control={{ ...control, setValue }}
         setPuertosItinerario={setPuertosItinerario}
-        idCrucero={idCrucero} // Pasar el id del crucero
-      />
-
-      {/* Modal importado para Gestión de fechas y habitaciones */}
-      <ModalGestionFechas
-        open={openModalGestFechas}
-        handleClose={() => setOpenModalGestFechas(false)}
-        setFechasCrucero={setFechasCrucero}
-        idCrucero={idCrucero} // Pasar el id del crucero
+        idHabitacion={idHabitacion} // Pasar el id del crucero
       />
     </>
   );

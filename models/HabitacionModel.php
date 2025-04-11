@@ -22,7 +22,7 @@ class HabitacionModel
             //Obtener la categoriaHabitacion
             $catHabitacionModel = new CategoriaHabitacionModel();
 
-            //Procedimiento almacenado ObtenerHabitaciones
+            //Consulta para obtener habitaciones
             $vSQL = "SELECT * FROM habitacion where estado = 1 order by idHabitacion asc;";
             
             //Ejecutar la consulta
