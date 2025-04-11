@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { ModalInfoHuesped } from "./ModalInfoHuesped";
-import ItinerarioService from "../../services/ItinerarioService";
 import PropTypes from "prop-types";
 
 export function ModalGestionHuespedes({
@@ -34,7 +33,7 @@ export function ModalGestionHuespedes({
       console.log ("Cant. Huéspedes máxima recibida: ", maxHuespedes);
       console.log ("ID de habitación recibida: ", idHabitacion);
     }
-  }, [open, maxHuespedes]);
+  }, [open, maxHuespedes, infoHuesped]);
 
   //Abrir confirm Dialog en caso de que
   //se quiera cerrar el modal
@@ -47,6 +46,12 @@ export function ModalGestionHuespedes({
     //Llamar a la función para eliminar la habitación seleccionada
     //del listbox "Habitaciones seleccionadas"
     eliminarHabitacionSeleccionada(idHabitacion);
+    if (control && control.setValue) {
+      for (let i = 0; i < maxHuespedes; i++) {
+        control.setValue(`puerto-${i}`, null);
+      }
+    }
+
     handleClose();
   };
 
@@ -144,7 +149,7 @@ export function ModalGestionHuespedes({
                       }}
                     >
                       <Typography variant="subtitle3">
-                        Información del huésped
+                      { infoHuesped !=null ? `${infoHuesped.nombre}` : "Información no disponible"}
                       </Typography>
                     </Box>
                   </Grid>
@@ -162,6 +167,7 @@ export function ModalGestionHuespedes({
                         minWidth: "180px",
                         height: "40px",
                       }}
+                      disabled={!!infoHuesped}  // Deshabilita el botón si la información del huesped está disponible
                       onClick={() => {
                         setOpenModalInfoHuesped(true);
 
@@ -182,6 +188,8 @@ export function ModalGestionHuespedes({
           idHabitacion = {idHabitacion}
           infoHuesped = {infoHuesped}
           setHuespedesContador={setHuespedesContador}
+          setInfoHuesped = {setInfoHuesped}
+
         />
 
         <Button

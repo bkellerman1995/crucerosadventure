@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import HuespedService from "../../services/HuespedService";
 
 
-export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped, setHuespedesContador}) {
+export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesContador, setInfoHuesped}) {
   console.log("id Habitacion recibido en modal", idHabitacion);
 
   // Esquema de validación
@@ -30,6 +30,7 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped, 
   //Hooks de control de errores
   const [error, setError] = useState("");
   const onError = (errors, e) => console.log(errors, e);
+
 
   //Función para manejar el form
   const {
@@ -58,23 +59,40 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped, 
   // Accion submit del botón guardar
   const onSubmit = async (data) => {
     try {
+      //Validar el esquema de Huésped
       const isValid = await huespedSchema.isValid(data);
-  
+
       if (isValid) {
         const formData = {
           idHabitacion,
           ...data,
         };
-        infoHuesped = data;
-  
+
         console.log("Enviando datos:", formData);
-  
-        const response = await HuespedService.createHuesped(formData);
-  
-        if (response?.data) {
-          toast.success("Gestión de huésped exitosa", { duration: 1500 });
-          setHuespedesContador((prevCount) => prevCount + 1); // Incrementar el contador de huéspedes
+
+        try {
+          HuespedService.createHuesped(formData)
+            .then((response) => {
+              setError(response.error);
+              if (response?.data) {
+                toast.success("Gestión de huésped exitosa", { duration: 1500 });
+                setHuespedesContador((prevCount) => prevCount + 1); // Incrementar el contador de huéspedes
+                console.log ("Cant. de Huéspedes creados: ", setHuespedesContador )
+                setInfoHuesped(formData);
+                handleClose();
+              }
+            })
+            .catch((error) => {
+              if (error instanceof SyntaxError) {
+                console.log(error);
+                setError(error);
+                throw new Error("Respuesta no válida del servidor");
+              }
+            });
+
           handleClose();
+        } catch (error) {
+          console.error(error);
         }
       }
     } catch (error) {
@@ -105,7 +123,7 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion, infoHuesped, 
           }}
         >
           <Typography variant="h5" component="h2">
-            <b>Gestionar Huésped</b>
+            <b>Agregar Huésped</b>
           </Typography>
           <br />
 
@@ -246,5 +264,6 @@ ModalInfoHuesped.propTypes = {
   handleClose: PropTypes.func.isRequired,
   idHabitacion: PropTypes.number.isRequired,
   infoHabitacion: PropTypes.object.isRequired,
-  setHuespedesContador: PropTypes.number.isRequired
+  setHuespedesContador: PropTypes.number.isRequired,
+  setInfoHuesped: PropTypes.object.isRequired
 };

@@ -8,9 +8,9 @@ class huesped
         try {
             $response = new Response();
             //Instancia modelo
-            $habitacionModel = new HuespedModel();
+            $huespedModel = new HuespedModel();
             //Método del modelo
-            $result = $habitacionModel->all();
+            $result = $huespedModel->all();
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -24,9 +24,9 @@ class huesped
         try {
             $response = new Response();
             //Instancia del modelo
-            $habitacion = new HabitacionModel();
+            $huespedModel = new HuespedModel();
             //Acción del modelo a ejecutar
-            $result = $habitacion->get($id);
+            $result = $huespedModel->get($id);
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -42,9 +42,9 @@ class huesped
             //Obtener json enviado
             $inputJSON = $request->getJSON();
             //Instancia del modelo
-            $habitacion = new HabitacionModel();
+            $huespedModel = new HuespedModel();
             //Acción del modelo a ejecutar
-            $result = $habitacion->create($inputJSON);
+            $result = $huespedModel->create($inputJSON);
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
@@ -59,9 +59,9 @@ class huesped
             //Obtener json enviado
             $inputJSON = $request->getJSON();
             //Instancia del modelo
-            $habitacion = new HabitacionModel();
+            $huespedModel = new HuespedModel();
             //Acción del modelo a ejecutar
-            $result = $habitacion->update($inputJSON);
+            $result = $huespedModel->update($inputJSON);
             //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
