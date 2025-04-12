@@ -11,7 +11,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import toast from "react-hot-toast";
 import HuespedService from "../../services/HuespedService";
 
-
 export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesContador, setInfoHuesped}) {
 
   // Esquema de validación
@@ -70,6 +69,8 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
         };
 
         console.log("Enviando datos:", formData);
+        setInfoHuesped(formData); // Actualiza solo el huésped correspondiente en el estado
+        
 
         try {
           HuespedService.createHuesped(formData)
@@ -79,7 +80,6 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
                 toast.success("Gestión de huésped exitosa", { duration: 1500 });
                 setHuespedesContador((prevCount) => prevCount + 1); // Incrementar el contador de huéspedes
                 console.log ("Cant. de Huéspedes creados hasta el momento: ", setHuespedesContador )
-                setInfoHuesped(formData); // Actualiza solo el huésped correspondiente en el estado
                 handleClose();
               }
             })
