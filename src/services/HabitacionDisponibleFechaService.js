@@ -44,6 +44,15 @@ class HabitacionDisponibleFecha {
   agregarDisponibilidadHabitacionFecha(disponibilidadhabitacionfecha) {
     return axios.post(BASE_URL, JSON.stringify(disponibilidadhabitacionfecha));
   }
+
+  //Poner una habitación como no disponible una vez se reserva
+  updateEstadoHabitacionFecha(Habitacion) {
+    return axios({
+      method: "put",
+      url: BASE_URL,
+      data: JSON.stringify(Habitacion),
+    });
+  }
 }
 
 export default new HabitacionDisponibleFecha()

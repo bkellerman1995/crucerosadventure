@@ -9,6 +9,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import toast from "react-hot-toast";
 import { ModalInfoHuesped } from "./ModalInfoHuesped";
 import PropTypes from "prop-types";
 import HuespedService from "../../services/HuespedService";
@@ -18,15 +19,13 @@ export function ModalGestionHuespedes({
   open,
   handleClose,
   maxHuespedes,
-  control,
   idHabitacion,
-  eliminarHabitacionSeleccionada
+  eliminarHabitacionSeleccionada,
 }) {
   
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [error, setError] = useState("");
   const [openModalInfoHuesped, setOpenModalInfoHuesped] = useState(false);
-  const [infoHuesped, setInfoHuesped] = useState (null);
   const [huespedesContador, setHuespedesContador] = useState(0); // Estado para contar huéspedes añadidos
   
   // Estado para un array de longitud "maxHuespedes" que gestiona 
@@ -42,8 +41,9 @@ export function ModalGestionHuespedes({
     if (open && maxHuespedes > 0) {
       console.log ("Cant. Huéspedes máxima recibida: ", maxHuespedes);
       console.log ("ID de habitación recibida: ", idHabitacion);
+      console.log ("Valor contador de huéspedes", huespedesContador);
     }
-  }, [open, maxHuespedes, infoHuesped]);
+  }, [open, maxHuespedes]);
 
 
   const handleModalClose = (event, reason) => {
@@ -82,12 +82,12 @@ export function ModalGestionHuespedes({
     // Eliminar los huéspedes en la base de datos (HuespedService.deleteHuesped)
     huespedes.forEach((huesped) => {
       if (huesped.nombre) {
-        console.log ("Huésped a eliminar", huesped.idHuesped);
-        HuespedService.deleteHuesped(huesped.idHuesped) // Aquí suponemos que cada huesped tiene un campo 'id'
+        console.log ("Eliminar huésped de habitación", huesped.idHabitacion);
+        HuespedService.deleteHuesped(huesped.idHabitacion) // Aquí suponemos que cada huesped tiene un campo 'id'
           .then((response) => {
             if (response?.data) {
               console.log(
-                `Huésped con ID ${huesped.idHuesped} eliminado exitosamente`
+                `Huésped de habitación ${huesped.idHabitacion} eliminado exitosamente`
               );
             }
           })
@@ -221,7 +221,6 @@ export function ModalGestionHuespedes({
                   </Grid>
 
                   <Grid item sx={{ flexShrink: 0, ml: 45 }}>
-
                     <Button
                       type="button"
                       variant="contained"
@@ -250,7 +249,7 @@ export function ModalGestionHuespedes({
           open={openModalInfoHuesped}
           handleClose={() => setOpenModalInfoHuesped(false)}
           idHabitacion={idHabitacion}
-          infoHuesped={huespedes[selectedHuespedIndex]} // Pasar el huésped seleccionado al modal
+          setHuespedesContador={setHuespedesContador} // Pasar el huésped seleccionado al modal
           setInfoHuesped={(nuevoHuesped) =>
             actualizarHuesped(selectedHuespedIndex, nuevoHuesped)
           } // Actualiza solo el huésped gestionado        />
@@ -258,7 +257,34 @@ export function ModalGestionHuespedes({
 
         <Button
           variant="contained"
-          // onClick={handleConfirmar}
+          onClick={() => {
+            if (huespedesContador >= 1) {
+              //Eliminar todos los registros de huéspedes en el estado local
+              setHuespedes(
+                Array.from({ length: maxHuespedes }, () => ({
+                  nombre: null,
+                  gestionado: false,
+                }))
+              );
+
+              toast.success("La habitación se agregó exitosamente", {
+                duration: 1500,
+                position: "top-center",
+              });
+
+              handleClose();
+            } else {
+              // Si no hay huéspedes, mostrar un mensaje de error
+              toast.error(
+                "Debe agregar al menos un huésped antes de confirmar.",
+                {
+                  duration: 1500,
+                  position: "top-center",
+                }
+              );
+              return;
+            }
+          }}
           sx={{
             mt: 3,
             backgroundColor: "#16537e",
@@ -301,4 +327,5 @@ ModalGestionHuespedes.propTypes = {
   control: PropTypes.object.isRequired,
   idHabitacion: PropTypes.number.isRequired,
   eliminarHabitacionSeleccionada: PropTypes.func.isRequired,
+  // setHabitacionesSeleccionadas: PropTypes.func.isRequired
 };

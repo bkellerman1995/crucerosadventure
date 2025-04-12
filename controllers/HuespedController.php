@@ -70,13 +70,13 @@ class huesped
     }
 
     // DELETE eliminar (ESTO ES SOLO PARA EL FRONTEND Y ELIMINAR DATOS BASURA EN BD) 
-    public function delete($id)
+    public function delete($idHabitacion)
     {
         try {
             $response = new Response();
             $huespedModel = new HuespedModel();
 
-            $result = $huespedModel->delete($id);
+            $result = $huespedModel->delete($idHabitacion);
             $response->toJSON($result);
 
         } catch (Exception $e) {

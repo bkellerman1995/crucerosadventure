@@ -70,17 +70,24 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
 
         console.log("Enviando datos:", formData);
         setInfoHuesped(formData); // Actualiza solo el huésped correspondiente en el estado
-        
+
 
         try {
           HuespedService.createHuesped(formData)
             .then((response) => {
               setError(response.error);
               if (response?.data) {
-                toast.success("Gestión de huésped exitosa", { duration: 1500 });
-                setHuespedesContador((prevCount) => prevCount + 1); // Incrementar el contador de huéspedes
-                console.log ("Cant. de Huéspedes creados hasta el momento: ", setHuespedesContador )
+                toast.success("Gestión de huésped exitosa", { duration: 1500 });                
                 handleClose();
+                // Actualizar el contador de huéspedes
+                setHuespedesContador((prevCount) => {
+                  const newCount = prevCount + 1;
+                  console.log(
+                    "Cant. de Huéspedes creados hasta el momento: ",
+                    newCount
+                  );
+                  return newCount;
+                });
               }
             })
             .catch((error) => {
@@ -90,8 +97,6 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
                 throw new Error("Respuesta no válida del servidor");
               }
             });
-
-          handleClose();
         } catch (error) {
           console.error(error);
         }
@@ -267,6 +272,6 @@ ModalInfoHuesped.propTypes = {
   handleClose: PropTypes.func.isRequired,
   idHabitacion: PropTypes.number.isRequired,
   infoHabitacion: PropTypes.object.isRequired,
-  setHuespedesContador: PropTypes.number.isRequired,
-  setInfoHuesped: PropTypes.object.isRequired
+  setHuespedesContador: PropTypes.func.isRequired,
+  setInfoHuesped: PropTypes.func.isRequired
 };

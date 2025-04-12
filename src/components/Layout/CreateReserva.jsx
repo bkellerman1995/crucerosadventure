@@ -99,12 +99,6 @@ export function CreateReserva() {
   // Estado para las fechas asignadas al crucero seleccionado
   const [fechasSalida, setFechasSalida] = useState(false);
 
-  //Estado de los puertos añadidos al itinerario
-  const [puertosItinerario, setPuertosItinerario] = useState(false);
-
-  //Estado de las fecas añadidas al crucero
-  const [fechasCrucero, setFechasCrucero] = useState(false);
-
   // Estado para la fecha seleccionada
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
 
@@ -155,7 +149,7 @@ export function CreateReserva() {
           }
         })
         .catch((error) => {
-          // Manejamos el error si ocurre fuera de los casos normales
+          // Manejar el error si ocurre fuera de los casos normales
           console.error(
             "Error al obtener las habitaciones disponibles:",
             error
@@ -423,6 +417,10 @@ export function CreateReserva() {
                     onClick={() => {
                       // Verificar si se ha seleccionado una habitación
                       if (selectedHabitacionDisponible.length === 0) {
+                        toast.error("Debe seleccionar una habitación de la lista 'Habitaciones Disponibles'", {
+                          duration: 1500,
+                          position: "top-center",
+                        });
                         return; // No agregar la habitación si no hay una seleccionada
                       }
 
@@ -611,8 +609,6 @@ export function CreateReserva() {
         open={openModalGestHuespedes}
         handleClose={() => setOpenModalGestHuespedes(false)}
         maxHuespedes={maxHuespedes}
-        control={{ ...control, setValue }}
-        setPuertosItinerario={setPuertosItinerario}
         idHabitacion={idHabitacion} // Pasar el id de la habitación
         eliminarHabitacionSeleccionada = {eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
 
