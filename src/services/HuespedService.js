@@ -32,6 +32,13 @@ class HuespedService {
       data: JSON.stringify(huesped),
     });
   }
+
+  //Borrar huesped (SOLO PARA EFECTOS DEL FRONTEND y no tener datos basura en la base de datos)
+  deleteHuesped (huespedID) {
+    console.log("BASE_URL DELETE HUESPED: ", BASE_URL + "/" + huespedID);
+    console.log("huesped ID a eliminar: ", huespedID);
+    return axios.delete(BASE_URL + "/" + huespedID);
+  }
 }
 
 export default new HuespedService();

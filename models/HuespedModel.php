@@ -97,4 +97,15 @@ class HuespedModel
             handleException($e);
         }
     }
+
+    public function delete($id)
+    {
+        try {
+            $vSQL = "DELETE FROM huesped WHERE idHuesped = $id;";
+            $this->enlace->executeSQL_DML($vSQL);
+            return ["success" => true, "message" => "Huesped eliminado correctamente"];
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

@@ -11,6 +11,8 @@ import {
 import Grid from "@mui/material/Grid2";
 import { ModalInfoHuesped } from "./ModalInfoHuesped";
 import PropTypes from "prop-types";
+import HuespedService from "../../services/HuespedService";
+
 
 export function ModalGestionHuespedes({
   open,
@@ -45,8 +47,10 @@ export function ModalGestionHuespedes({
 
 
   const handleModalClose = (event, reason) => {
-    if (reason !== "backdropClick") {
-      handleClose();  // Solo cerrar si no es un clic en el backdrop
+    if (reason === "backdropClick") {
+      return;
+    } else {
+      setOpenConfirmDialog(true);
     }
   };
 
@@ -66,9 +70,42 @@ export function ModalGestionHuespedes({
 
   const confirmarCerrarYEliminar = () => {
     setOpenConfirmDialog(false);
+
+    //Eliminar todos los registros de huéspedes en el estado local
+    setHuespedes(
+      Array.from({ length: maxHuespedes }, () => ({
+        nombre: null,
+        gestionado: false,
+      }))
+    );
+
+    // Eliminar los huéspedes en la base de datos (HuespedService.deleteHuesped)
+    huespedes.forEach((huesped) => {
+      if (huesped.nombre) {
+        console.log ("Huésped a eliminar", huesped.idHuesped);
+        HuespedService.deleteHuesped(huesped.idHuesped) // Aquí suponemos que cada huesped tiene un campo 'id'
+          .then((response) => {
+            if (response?.data) {
+              console.log(
+                `Huésped con ID ${huesped.idHuesped} eliminado exitosamente`
+              );
+            }
+          })
+          .catch((error) => {
+            console.error(
+              `Error al eliminar huésped con ID ${huesped.id}`,
+              error
+            );
+          });
+      }
+    });
+
+    // Reestablecer el contador de huespedes en 0
+    setHuespedesContador(0);
+
     //Llamar a la función para eliminar la habitación seleccionada
     //del listbox "Habitaciones seleccionadas"
-    eliminarHabitacionSeleccionada(idHabitacion);
+    eliminarHabitacionSeleccionada(idHabitacion); // Eliminar la habitación al cerrar el modal
     handleClose();
   };
 
@@ -172,13 +209,19 @@ export function ModalGestionHuespedes({
                       }}
                     >
                       <Typography variant="subtitle3">
-                        {huespedes[index]?.nombre ||
-                          "Información no disponible"}
+                        {huespedes[index]?.nombre &&
+                        huespedes[index]?.apellido1 &&
+                        huespedes[index]?.apellido2 &&
+                        huespedes[index]?.telefono
+                          ? `${huespedes[index]?.nombre} ${huespedes[index]?.apellido1} ${huespedes[index]?.apellido2}
+                          Tel: ${huespedes[index]?.telefono}`
+                          : "Información no disponible"}
                       </Typography>
                     </Box>
                   </Grid>
 
-                  <Grid item sx={{ flexShrink: 0, ml: 35 }}>
+                  <Grid item sx={{ flexShrink: 0, ml: 45 }}>
+
                     <Button
                       type="button"
                       variant="contained"

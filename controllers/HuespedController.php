@@ -68,4 +68,19 @@ class huesped
             handleException($e);
         }
     }
+
+    // DELETE eliminar (ESTO ES SOLO PARA EL FRONTEND Y ELIMINAR DATOS BASURA EN BD) 
+    public function delete($id)
+    {
+        try {
+            $response = new Response();
+            $huespedModel = new HuespedModel();
+
+            $result = $huespedModel->delete($id);
+            $response->toJSON($result);
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }
