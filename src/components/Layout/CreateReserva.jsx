@@ -128,9 +128,7 @@ export function CreateReserva() {
     []
   );
 
-  
-
-  //Control de errores
+ //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
   //Use Effect para renderizar las habitaciones disponibles y habitaciones seleccionadas [idCrucero, fechaSeleccionada]
@@ -213,6 +211,14 @@ export function CreateReserva() {
       });
   }, []);
 
+  // Use effect para vaciar el listbox de "Complementos seleccionados" si 
+  // el listbox de "Habitaciones seleccionadas" se vacía
+  useEffect(() => {
+    if (habitacionesSeleccionadas.length === 0) {
+      setComplementosSeleccionados([]); // Vaciar complementos cuando no hay habitaciones seleccionadas
+    }
+  }, [habitacionesSeleccionadas]); //escucha cuando haya un cambio en "habitacionesSeleccionadas"
+  
   //Función para manejar la eliminicación de la habitación
   //seleccionada cuando se cierre el modal de "ModalGestionHuespedes"
   const eliminarHabitacionSeleccionada = (idHabitacion) => {
@@ -471,6 +477,7 @@ export function CreateReserva() {
                           ...habitacionesSeleccionadas,
                           selectedHabitacionDisponible, //Añadir el objeto completo de la habitación
                         ]); // Agregar habitación seleccionada al nuevo listbox
+                        setSelectedHabitacionAgregada(null);
                         setMaxHuespedes(
                           selectedHabitacionDisponible.maxHuesped
                         );
@@ -601,7 +608,7 @@ export function CreateReserva() {
                       setValue("habitacion", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
                     }}
                     value={selectedHabitacionAgregada} // Usar el objeto completo de las habitaciones seleccionadas
-                    emptyMessage="No hay habitaciones cargadas"
+                    emptyMessage="No hay habitaciones seleccionadas"
                     itemContent={(habitacion) => (
                       <div
                         style={{
@@ -651,7 +658,7 @@ export function CreateReserva() {
                         className="w-full md:w-14rem"
                         onChange={(e) => {
                           console.log(
-                            "Habitacion seleccionada en ´Habitaciones disponibles:",
+                            "Complemento seleccionado en ´Complementos disponibles´:",
                             e.value
                           ); // Muestra los ids de las complementos seleccionados
                           // Acciones cuando se selecciona un complemento
@@ -728,6 +735,8 @@ export function CreateReserva() {
                           ...complementosSeleccionados,
                           selectedComplementoDisponible, //Añadir el objeto completo del complemento
                         ]); // Agregar complemento seleccionado al nuevo listbox
+                        setSelectedComplementoAgregado(null);
+
                       } else {
                         toast.error("Este complemento ya ha sido agregado.", {
                           duration: 1500,
@@ -771,9 +780,9 @@ export function CreateReserva() {
                     }
                     onClick={() => {
                       // Verificar si hay un complemento seleccionado en el ListBox de "Complementos seleccionados"
-                      if (selectedComplementoAgregado !== null) {
+                      if (selectedComplementoAgregado != null) {
                         console.log(
-                          "Complemento seleccionado: ",
+                          "Complemento seleccionado en 'Complementos seleccionados': ",
                           selectedComplementoAgregado
                         );
                         // Filtrar los complementos seleccionados para eliminar el seleccionado

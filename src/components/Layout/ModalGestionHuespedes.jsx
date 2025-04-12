@@ -258,7 +258,9 @@ export function ModalGestionHuespedes({
         <Button
           variant="contained"
           onClick={() => {
+            console.log ("Contador de huespedes:" , huespedesContador);
             if (huespedesContador >= 1) {
+              setHuespedesContador(0);
               //Eliminar todos los registros de huéspedes en el estado local
               setHuespedes(
                 Array.from({ length: maxHuespedes }, () => ({
@@ -266,11 +268,11 @@ export function ModalGestionHuespedes({
                   gestionado: false,
                 }))
               );
-
               toast.success("La habitación se agregó exitosamente", {
                 duration: 1500,
                 position: "top-center",
               });
+              console.log("Reseteando el contador de huéspedes a: ", huespedesContador);
 
               handleClose();
             } else {
