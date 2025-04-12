@@ -869,12 +869,23 @@ export function CreateReserva() {
               <Button
                 variant="contained"
                 // type="submit"
-                style={{
-                  backgroundColor: "#16537e",
-                  color: "white",
-                  // display:
-                  // puertosItinerario && fechasCrucero ? "block" : "none",
-                }}
+                style={
+                  habitacionesSeleccionadas.length > 0 && complementosSeleccionados.length > 0
+                    ? {
+                        backgroundColor: "blue",
+                        color: "white",
+                        borderRadius: "10px",
+                        width: "100px",
+                        height: "50px",
+                      }
+                    : {
+                        backgroundColor: "gray",
+                        color: "white",
+                        borderRadius: "10px",
+                        width: "100px",
+                        height: "50px",
+                      }
+                }
                 onClick={() => {
                   // if (puertosItinerario && fechasCrucero) {
                   //   toast.success(`Gestión de crucero exitosa`, {
@@ -884,7 +895,9 @@ export function CreateReserva() {
                   //   navigate("/admin/crucero");
                   // }
                 }}
-              >
+                // Deshabilita el botón si no hay complementos o habitaciones seleccionadas
+                disabled={habitacionesSeleccionadas.length > 0 && complementosSeleccionados.length > 0 ? false : true} 
+                >
                 Reservar
               </Button>
             </Grid>
