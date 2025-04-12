@@ -23,7 +23,7 @@ class HabitacionDisponibleFecha {
       },
       validateStatus: (status) => {
         // Maneja los errores (4xx y 5xx) dentro del .then() en el componente React.
-        // return status >= 200 && status < 300;
+        // return status < 500 
         return status < 500;
       },
     });

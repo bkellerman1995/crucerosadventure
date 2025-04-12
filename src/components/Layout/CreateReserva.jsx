@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import { useForm} from "react-hook-form";
 import { Tooltip } from "@mui/material";
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
@@ -18,6 +19,7 @@ import { ListBox } from "primereact/listbox";
 import { ModalGestionHuespedes } from "./ModalGestionHuespedes";
 import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
 import HuespedService from "../../services/HuespedService";
+import ComplementoService from "../../services/ComplementoService";
 
 export function CreateReserva() {
   //Estilos personalizados para el select
@@ -50,15 +52,6 @@ export function CreateReserva() {
     }),
   };
 
-  // Esquema de validación
-  const habitacionSchema = yup.object({
-    nombre: yup
-      .string()
-      .required("El nombre es requerido")
-      .min(2, "Debe tener al menos 2 caracteres")
-      .max(50, "No debe sobrepasar los 50 caracteres"),
-  });
-
   //Función para manejar el form
   const {
     control,
@@ -73,7 +66,6 @@ export function CreateReserva() {
       idBarco: null,
       estado: "",
     },
-    resolver: yupResolver(habitacionSchema),
   });
 
   // Estado para controlar la apertura del modal de Gestion Huéspedes
@@ -106,8 +98,15 @@ export function CreateReserva() {
   // Estado para almacenar las habitaciones disponibles
   const [habitacionesDisponibles, setHabitacionesDisponibles] = useState([]);
 
+  // Estado para almacenar los complementos disponibles
+  const [complementosDisponibles, setComplementosDisponibles] = useState([]);
+
   // Estado para almacenar la habitación seleccionada
   const [selectedHabitacionDisponible, setSelectedHabitacionDisponible] =
+    useState([]);
+
+  // Estado para almacenar el complemento seleccionado
+  const [selectedComplementoDisponible, setSelectedComplementoDisponible] =
     useState([]);
 
   // Estado para almacenar la habitación agregada
@@ -115,15 +114,24 @@ export function CreateReserva() {
     []
   );
 
+  // Estado para almacenar el complemento agregado
+  const [selectedComplementoAgregado, setSelectedComplementoAgregado] =
+    useState([]);
+
   // Estado para controlar las habitaciones seleccionadas del listbox
   const [habitacionesSeleccionadas, setHabitacionesSeleccionadas] = useState(
+    []
+  );
+
+  // Estado para controlar los complementos seleccionados del listbox
+  const [complementosSeleccionados, setComplementosSeleccionados] = useState(
     []
   );
 
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
-  //Use Effect para renderizar las habitaciones disponibles y habitaciones seleccionadas
+  //Use Effect para renderizar las habitaciones disponibles y habitaciones seleccionadas [idCrucero, fechaSeleccionada]
   useEffect(() => {
     if (idCrucero && fechaSeleccionada) {
       console.log("idCrucero:", idCrucero);
@@ -157,10 +165,34 @@ export function CreateReserva() {
           );
           toast.error("Hubo un error al obtener las habitaciones disponibles.");
         });
+
+      ComplementoService.getComplementos()
+        .then((response) => {
+          if (response.status >= 200 && response.status < 300) {
+            // Si la respuesta es correcta
+            if (response.data && response.data.length > 0) {
+              setComplementosDisponibles(response.data); // Establecer complementos disponibles
+            } else {
+              setComplementosDisponibles([]); // Limpiar complementos disponibles
+              setComplementosSeleccionados([]); //Limpiar complementos seleccionados
+            }
+          } else {
+            setComplementosDisponibles([]); // Limpiar complementos disponibles
+            setComplementosSeleccionados([]); //Limpiar complementos seleccionados
+          }
+        })
+        .catch((error) => {
+          // Manejar el error si ocurre fuera de los casos normales
+          console.error(
+            "Error al obtener las habitaciones disponibles:",
+            error
+          );
+          toast.error("Hubo un error al obtener las habitaciones disponibles.");
+        });
     }
   }, [idCrucero, fechaSeleccionada]);
 
-  //Use Effect para cargar los cruceros al iniciar el componente
+  //Use Effect para cargar los cruceros al iniciar el componente []
   useEffect(() => {
     CruceroService.getCruceros()
       .then((response) => {
@@ -205,26 +237,10 @@ export function CreateReserva() {
 
     try {
       // Validar el objeto con Yup de manera asíncrona
-      const isValid = await cruceroSchema.isValid(DataForm);
+      const isValid = await reservaSchema.isValid(DataForm);
 
       if (isValid) {
-        //Acceder al nombre del archivo de la foto
-        const fotoNombre = DataForm.foto
-          ? DataForm.foto.name
-          : "No hay foto cargada";
-
-        console.log("Nombre del archivo cargado:", fotoNombre);
-        //Extraer el barco del objeto DataForm
-        const { barco, ...restoDeDataForm } = DataForm;
-        //adjuntar el nombre de la imagen a la ruta por defecto
-
-        // Agregar la ruta al objeto DataForm como un campo adicional
-        const dataConRuta = {
-          ...restoDeDataForm, // Copiar todos los demás datos
-          idbarco: barco?.value,
-        };
-
-        console.log("Enviando datos del crucero al form: ", dataConRuta);
+        console.log("Enviando datos de la reserva al form: ", DataForm);
       } else {
         //Configurar el estado de crucero creado a false
       }
@@ -418,10 +434,13 @@ export function CreateReserva() {
                     onClick={() => {
                       // Verificar si se ha seleccionado una habitación
                       if (selectedHabitacionDisponible.length === 0) {
-                        toast.error("Debe seleccionar una habitación de la lista 'Habitaciones Disponibles'", {
-                          duration: 1500,
-                          position: "top-center",
-                        });
+                        toast.error(
+                          "Debe seleccionar una habitación de la lista 'Habitaciones Disponibles'",
+                          {
+                            duration: 1500,
+                            position: "top-center",
+                          }
+                        );
                         return; // No agregar la habitación si no hay una seleccionada
                       }
 
@@ -596,13 +615,262 @@ export function CreateReserva() {
                 </FormControl>
               </Grid>
             </Grid>
+            <br></br>
+
+            {/* Grid contenedor de los complementos */}
+            <Grid container spacing={2} alignItems="stretch" size={15}>
+              <Grid
+                xs={6}
+                sm={6}
+                style={{
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "16px",
+                  padding: "10px",
+                }}
+              >
+                <Typography variant="subtitle1">
+                  <b>Complementos disponibles</b>
+                </Typography>
+                <br />
+                <FormControl fullWidth>
+                  {complementosDisponibles.length > 0 ? (
+                    <>
+                      <ListBox
+                        // multiple
+                        options={complementosDisponibles.map((complemento) => ({
+                          label: `${complemento.nombre}/ $${complemento.precio} 
+                      /Aplica por: ${complemento.precioAplicado}`, // Mostrar información relevante
+                          value: complemento, //Guardar el objeto complemento completo
+                        }))}
+                        className="w-full md:w-14rem"
+                        onChange={(e) => {
+                          console.log(
+                            "Habitacion seleccionada en ´Habitaciones disponibles:",
+                            e.value
+                          ); // Muestra los ids de las complementos seleccionados
+                          // Acciones cuando se selecciona un complemento
+                          setSelectedComplementoDisponible(e.value); // Actualizar el estado del complemento seleccionado
+                          setValue("complemento", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
+                        }}
+                        value={selectedComplementoDisponible}
+                        placeholder="Seleccione un complemento"
+                      />
+                    </>
+                  ) : (
+                    <Typography>No hay complementos disponibles</Typography>
+                  )}
+                </FormControl>
+              </Grid>
+
+              <Grid
+                container
+                direction="column"
+                alignItems="center"
+                spacing={2}
+                marginTop={3}
+              >
+                {/* Botón para agregar complemento */}
+                <Tooltip title="Agregar Complemento">
+                  <IconButton
+                    style={
+                      habitacionesDisponibles.length > 0
+                        ? {
+                            backgroundColor: "green",
+                            color: "white",
+                            borderRadius: "10px",
+                            width: "60px",
+                            height: "50px",
+                            // marginTop: "60px",
+                          }
+                        : {
+                            backgroundColor: "gray",
+                            color: "white",
+                            borderRadius: "10px",
+                            width: "60px",
+                            height: "50px",
+                            // marginTop: "60px",
+                          }
+                    }
+                    onClick={() => {
+                      // Verificar si se ha seleccionado un complemento
+                      if (selectedComplementoDisponible.length === 0) {
+                        toast.error(
+                          "Debe seleccionar un complemento de la lista 'Complementos Disponibles'",
+                          {
+                            duration: 1500,
+                            position: "top-center",
+                          }
+                        );
+                        return; // No agregar el complemento si no hay uno seleccionado
+                      }
+
+                      //Verificar si el complemento ya ha sido seleccionado
+                      const isAlreadySelected = complementosSeleccionados.some(
+                        (complemento) =>
+                          complemento.idComplemento ===
+                          selectedComplementoDisponible.idComplemento
+                      );
+
+                      if (!isAlreadySelected && selectedComplementoDisponible) {
+                        console.log(
+                          "Complemento agregado",
+                          selectedComplementoDisponible
+                        );
+
+                        setComplementosSeleccionados([
+                          ...complementosSeleccionados,
+                          selectedComplementoDisponible, //Añadir el objeto completo del complemento
+                        ]); // Agregar complemento seleccionado al nuevo listbox
+                      } else {
+                        toast.error("Este complemento ya ha sido agregado.", {
+                          duration: 1500,
+                          position: "top-center",
+                        });
+                        return;
+                      }
+                    }}
+                    disabled={complementosDisponibles.length > 0 ? false : true}
+                  >
+                    <KeyboardDoubleArrowRightIcon />
+                  </IconButton>
+                </Tooltip>
+
+                {/* Botón para quitar complemento */}
+                <Tooltip title="Quitar Complemento">
+                  <IconButton
+                    style={
+                      complementosSeleccionados.length > 0
+                        ? {
+                            backgroundColor: "red",
+                            color: "white",
+                            borderRadius: "10px",
+                            width: "60px",
+                            height: "50px",
+                            // marginTop: "60px",
+                          }
+                        : {
+                            backgroundColor: "gray",
+                            color: "white",
+                            borderRadius: "10px",
+                            width: "60px",
+                            height: "50px",
+                            // marginTop: "60px",
+                          }
+                    }
+                    onClick={() => {
+                      // Verificar si hay un complemento seleccionado en el ListBox de "Complementos seleccionados"
+                      if (selectedComplementoAgregado) {
+                        // Filtrar los complementos seleccionados para eliminar el seleccionado
+                        setComplementosSeleccionados((prev) =>
+                          prev.filter(
+                            (complemento) =>
+                              complemento.idComplemento !==
+                              selectedComplementoAgregado.idComplemento
+                          )
+                        );
+                      } else {
+                        toast.error(
+                          "Por favor seleccione un complemento para quitar.",
+                          {
+                            duration: 1500,
+                            position: "top-center",
+                          }
+                        );
+                      }
+                    }}
+                    disabled={
+                      complementosSeleccionados.length > 0 ? false : true
+                    }
+                  >
+                    <KeyboardDoubleArrowLeftIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+
+              {/* Mostrar complementos seleccionados */}
+              <Grid
+                xs={6}
+                sm={6}
+                style={{
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "16px",
+                  padding: "10px",
+                }}
+              >
+                <Typography variant="subtitle1">
+                  <b>Complementos seleccionados</b>
+                </Typography>
+                <br />
+                <FormControl fullWidth>
+                  <ListBox
+                    options={complementosSeleccionados.map((complemento) => ({
+                      label: `${complemento.nombre}/ $${complemento.precio} 
+                      /Aplica por: ${complemento.precioAplicado}`, // Mostrar información relevante
+                      value: complemento, //Guardar el objeto complemento completo
+                    }))}
+                    className="w-full md:w-14rem"
+                    onChange={(e) => {
+                      console.log(
+                        "Complemento seleccionado en ´Complementos seleccionados´:",
+                        e.value
+                      );
+                      setSelectedComplementoAgregado(e.value); // Actualizar el estado del complemento seleccionado
+                      setValue("complemento", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
+                    }}
+                    value={selectedComplementoAgregado} // Usar el objeto completo de los complementos seleccionados
+                    emptyMessage="No hay complementos cargados"
+                    itemContent={(complemento) => (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span>
+                          {complemento.nombre}/ ${complemento.precio}
+                          /Aplica por: {complemento.precioAplicado}
+                        </span>
+                      </div>
+                    )}
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+            <br></br>
+
+            {/* Botón Reservar*/}
+            <Grid size={4} sm={4} spacing={1}>
+              <Button
+                variant="contained"
+                // type="submit"
+                style={{
+                  backgroundColor: "#16537e",
+                  color: "white",
+                  // display:
+                  // puertosItinerario && fechasCrucero ? "block" : "none",
+                }}
+                onClick={() => {
+                  // if (puertosItinerario && fechasCrucero) {
+                  //   toast.success(`Gestión de crucero exitosa`, {
+                  //     duration: 2000,
+                  //     position: "top-center",
+                  //   });
+                  //   navigate("/admin/crucero");
+                  // }
+                }}
+              >
+                Reservar
+              </Button>
+            </Grid>
           </Grid>
 
           {/*Resumen de la reserva (lado derecho) */}
 
-          {/* <Grid container direction="stretch" spacing={2}>
+          <Grid container direction="stretch" spacing={2}>
             <Grid
               item
+              width={400}
               xs={12}
               style={{
                 backgroundColor: "#f5f5f5",
@@ -621,7 +889,7 @@ export function CreateReserva() {
 
               <Grid container spacing={2}></Grid>
             </Grid>
-          </Grid> */}
+          </Grid>
         </Grid>
       </form>
 
@@ -631,8 +899,7 @@ export function CreateReserva() {
         handleClose={() => setOpenModalGestHuespedes(false)}
         maxHuespedes={maxHuespedes}
         idHabitacion={idHabitacion} // Pasar el id de la habitación
-        eliminarHabitacionSeleccionada = {eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
-
+        eliminarHabitacionSeleccionada={eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
       />
     </>
   );

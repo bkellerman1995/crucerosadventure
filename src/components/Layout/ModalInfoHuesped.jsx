@@ -25,9 +25,9 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
     estado: yup.number().required("El estado es requerido"),
   });
 
-  //Hooks de control de errores
+  //Control de errores
   const [error, setError] = useState("");
-  const onError = (errors, e) => console.log(errors, e);
+  // const onError = (errors, e) => console.log(errors, e);
 
 
   //Función para manejar el form
