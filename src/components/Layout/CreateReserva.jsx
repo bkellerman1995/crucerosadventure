@@ -17,6 +17,7 @@ import Select from "react-select";
 import { ListBox } from "primereact/listbox";
 import { ModalGestionHuespedes } from "./ModalGestionHuespedes";
 import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
+import HuespedService from "../../services/HuespedService";
 
 export function CreateReserva() {
   //Estilos personalizados para el select
@@ -504,6 +505,26 @@ export function CreateReserva() {
                               selectedHabitacionAgregada.idHabitacion
                           )
                         );
+
+                        // Eliminar los huéspedes en la base de datos (HuespedService.deleteHuesped)
+                        habitacionesSeleccionadas.forEach((habitacion) => {
+                          if (habitacion) {
+                            HuespedService.deleteHuesped(idHabitacion) // Aquí suponemos que cada huesped tiene un campo 'id'
+                              .then((response) => {
+                                if (response?.data) {
+                                  console.log(
+                                    `Huésped de habitación ${habitacion.idHabitacion} eliminado exitosamente`
+                                  );
+                                }
+                              })
+                              .catch((error) => {
+                                console.error(
+                                  `Error al eliminar huésped con de habitación ${habitacion.idHabitacion}`,
+                                  error
+                                );
+                              });
+                          }
+                        });
                       } else {
                         toast.error(
                           "Por favor seleccione una habitación para quitar.",
