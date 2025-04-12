@@ -128,7 +128,16 @@ export function CreateReserva() {
     []
   );
 
- //Control de errores
+  // Estado para actualizar la información del resumen de la reserva
+  const [resumenReserva, setResumenReserva] = useState({
+    crucero: "",
+    fecha: "",
+    habitaciones: [],
+    complementos: [],
+    total: 0, 
+  });
+
+  //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
   //Use Effect para renderizar las habitaciones disponibles y habitaciones seleccionadas [idCrucero, fechaSeleccionada]
@@ -192,7 +201,7 @@ export function CreateReserva() {
     }
   }, [idCrucero, fechaSeleccionada]);
 
-  //Use Effect para cargar los cruceros al iniciar el componente []
+  //Use Effect para cargar los cruceros al iniciar el componente "[]"
   useEffect(() => {
     CruceroService.getCruceros()
       .then((response) => {
@@ -211,15 +220,56 @@ export function CreateReserva() {
       });
   }, []);
 
-  // Use effect para vaciar el listbox de "Complementos seleccionados" si 
+  // Use effect para vaciar el listbox de "Complementos seleccionados" si
   // el listbox de "Habitaciones seleccionadas" se vacía
   useEffect(() => {
     if (habitacionesSeleccionadas.length === 0) {
       setComplementosSeleccionados([]); // Vaciar complementos cuando no hay habitaciones seleccionadas
     }
   }, [habitacionesSeleccionadas]); //escucha cuando haya un cambio en "habitacionesSeleccionadas"
-  
-  //Función para manejar la eliminicación de la habitación
+
+  // Use effect para cambiar dinámicamente la información en "Resumen Reserva"
+  useEffect(() => {
+    // Aquí se cargan los datos necesarios, dependiendo de los cambios de `selectedCrucero`, `fechaSeleccionada`, etc.
+    if (
+      selectedCrucero &&
+      fechaSeleccionada &&
+      habitacionesSeleccionadas.length > 0 &&
+      complementosSeleccionados.length > 0
+    ) {
+      // Lógica para cargar o actualizar el resumen de la reserva con la información relevante.
+      console.log("Crucero seleccionado:", selectedCrucero);
+      console.log("Fecha seleccionada:", fechaSeleccionada);
+      console.log("Habitaciones seleccionadas:", habitacionesSeleccionadas);
+      console.log("Complementos seleccionados:", complementosSeleccionados);
+
+      let total = 0;
+      habitacionesSeleccionadas.forEach((habitacion) => {
+        total += habitacion.precio;
+      });
+
+      complementosSeleccionados.forEach((complemento) => {
+        total += complemento.precio;
+      })
+
+      setResumenReserva((prevState) => ({
+        ...prevState,
+        crucero: selectedCrucero.label, 
+        fecha: fechaSeleccionada.label,
+        habitaciones: habitacionesSeleccionadas.map (habitacion => habitacion.nombre),
+        complementos: complementosSeleccionados.map (complemento => complemento.nombre),
+        total: total,
+      }))
+
+    }
+  }, [
+    selectedCrucero,
+    fechaSeleccionada,
+    habitacionesSeleccionadas,
+    complementosSeleccionados, // escucha cambios en los diferentes cambios
+  ]);
+
+  //Función para manejar la eliminación de la habitación
   //seleccionada cuando se cierre el modal de "ModalGestionHuespedes"
   const eliminarHabitacionSeleccionada = (idHabitacion) => {
     // Eliminar la habitación de las seleccionadas
@@ -736,7 +786,6 @@ export function CreateReserva() {
                           selectedComplementoDisponible, //Añadir el objeto completo del complemento
                         ]); // Agregar complemento seleccionado al nuevo listbox
                         setSelectedComplementoAgregado(null);
-
                       } else {
                         toast.error("Este complemento ya ha sido agregado.", {
                           duration: 1500,
@@ -870,7 +919,8 @@ export function CreateReserva() {
                 variant="contained"
                 // type="submit"
                 style={
-                  habitacionesSeleccionadas.length > 0 && complementosSeleccionados.length > 0
+                  habitacionesSeleccionadas.length > 0 &&
+                  complementosSeleccionados.length > 0
                     ? {
                         backgroundColor: "blue",
                         color: "white",
@@ -896,8 +946,13 @@ export function CreateReserva() {
                   // }
                 }}
                 // Deshabilita el botón si no hay complementos o habitaciones seleccionadas
-                disabled={habitacionesSeleccionadas.length > 0 && complementosSeleccionados.length > 0 ? false : true} 
-                >
+                disabled={
+                  habitacionesSeleccionadas.length > 0 &&
+                  complementosSeleccionados.length > 0
+                    ? false
+                    : true
+                }
+              >
                 Reservar
               </Button>
             </Grid>
@@ -905,15 +960,16 @@ export function CreateReserva() {
 
           {/*Resumen de la reserva (lado derecho) */}
 
-          <Grid container direction="stretch" spacing={2}>
+          <Grid container direction="column" spacing={2} >
             <Grid
               item
-              width={400}
+              width={450}
               xs={12}
               style={{
                 backgroundColor: "#f5f5f5",
                 borderRadius: "16px",
                 padding: "10px",
+                marginRight: "20px",
               }}
             >
               <Typography
@@ -925,7 +981,41 @@ export function CreateReserva() {
                 <b>Resumen de la reserva</b>
               </Typography>
 
-              <Grid container spacing={2}></Grid>
+              <Grid container direction = "column" spacing={2} >
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1"><b>Crucero seleccionado:</b></Typography>
+                  <Typography>{resumenReserva.crucero}</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1"><b>Fecha seleccionada:</b></Typography>
+                  <Typography>{resumenReserva.fecha}</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">
+                    <b>Habitaciones seleccionadas:</b>
+                  </Typography>
+                  <Typography>
+                    {resumenReserva.habitaciones.join(", ")}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">
+                    <b>Complementos seleccionados:</b>
+                  </Typography>
+                  <Typography>
+                    {resumenReserva.complementos.join(", ")}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1"><b>Total:</b></Typography>
+                  <Typography>{resumenReserva.total}</Typography>
+                </Grid>
+                
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
