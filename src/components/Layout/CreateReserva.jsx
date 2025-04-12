@@ -128,6 +128,8 @@ export function CreateReserva() {
     []
   );
 
+  
+
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
@@ -515,7 +517,11 @@ export function CreateReserva() {
                     }
                     onClick={() => {
                       // Verificar si hay una habitación seleccionada en el ListBox de "Habitaciones seleccionadas"
-                      if (selectedHabitacionAgregada) {
+                      if (selectedHabitacionAgregada !== null) {
+                        console.log(
+                          "Habitacion seleccionada: ",
+                          selectedHabitacionAgregada
+                        );
                         // Filtrar las habitaciones seleccionadas para eliminar la seleccionada
                         setHabitacionesSeleccionadas((prev) =>
                           prev.filter(
@@ -673,7 +679,8 @@ export function CreateReserva() {
                 <Tooltip title="Agregar Complemento">
                   <IconButton
                     style={
-                      habitacionesDisponibles.length > 0
+                      complementosDisponibles.length > 0 &&
+                      habitacionesSeleccionadas.length > 0
                         ? {
                             backgroundColor: "green",
                             color: "white",
@@ -729,7 +736,12 @@ export function CreateReserva() {
                         return;
                       }
                     }}
-                    disabled={complementosDisponibles.length > 0 ? false : true}
+                    disabled={
+                      complementosDisponibles.length > 0 &&
+                      habitacionesSeleccionadas.length > 0
+                        ? false
+                        : true
+                    }
                   >
                     <KeyboardDoubleArrowRightIcon />
                   </IconButton>
@@ -759,7 +771,11 @@ export function CreateReserva() {
                     }
                     onClick={() => {
                       // Verificar si hay un complemento seleccionado en el ListBox de "Complementos seleccionados"
-                      if (selectedComplementoAgregado) {
+                      if (selectedComplementoAgregado !== null) {
+                        console.log(
+                          "Complemento seleccionado: ",
+                          selectedComplementoAgregado
+                        );
                         // Filtrar los complementos seleccionados para eliminar el seleccionado
                         setComplementosSeleccionados((prev) =>
                           prev.filter(
@@ -804,7 +820,7 @@ export function CreateReserva() {
                 <FormControl fullWidth>
                   <ListBox
                     options={complementosSeleccionados.map((complemento) => ({
-                      label: `${complemento.nombre}/ $${complemento.precio} 
+                      label: `${complemento.nombre}/ $${complemento.precio * habitacionesSeleccionadas.length} 
                       /Aplica por: ${complemento.precioAplicado}`, // Mostrar información relevante
                       value: complemento, //Guardar el objeto complemento completo
                     }))}
