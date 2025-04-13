@@ -236,9 +236,18 @@ export function CreateReserva() {
   useEffect(() => {
     console.log("Crucero seleccionado: ", selectedCrucero);
     console.log("Fecha seleccionada: ", fechaSeleccionada);
-    console.log ("Habitaciones seleccionadas", habitacionesSeleccionadas);
-    console.log ("Complementos seleccionados", complementosSeleccionados);
 
+    // Asegurarse de que los datos están disponibles antes de continuar
+    if (
+      !selectedCrucero ||
+      !fechaSeleccionada ||
+      habitacionesDisponibles === null ||
+      habitacionesDisponibles.length === 0 ||
+      complementosDisponibles === null ||
+      complementosDisponibles.length === 0
+    ) {
+      return; // Solo salir si no hay datos disponibles
+    }
 
     // Evitar el retorno anticipado, dejar que el efecto se ejecute siempre
     let total = 0;
@@ -247,78 +256,64 @@ export function CreateReserva() {
     let puertoRegreso = "";
     let cantDias = 0;
 
-    // Si no hay información, no hacer nada, pero sin retornar anticipadamente
-    if (
-      (selectedCrucero ||
-      fechaSeleccionada) ||
-      habitacionesSeleccionadas.length > 0 ||
-      complementosSeleccionados.length > 0
-    ) {
-      // Calcular el total de las habitaciones y complementos seleccionados
-      habitacionesSeleccionadas.forEach((habitacion) => {
-        total += habitacion.precio;
-      });
+    // Calcular el total de las habitaciones y complementos seleccionados
+    habitacionesSeleccionadas.forEach((habitacion) => {
+      total += habitacion.precio;
+    });
 
-      complementosSeleccionados.forEach((complemento) => {
-        total += complemento.precio;
-      });
+    complementosSeleccionados.forEach((complemento) => {
+      total += complemento.precio;
+    });
 
-      const fetchCruceroData = async () => {
-        try {
-          // Obtener los datos del crucero
-          const response = await CrucerosService.getCrucerobyId(
-            selectedCrucero.value
-          );
-          puertos = response.data.puertosItinerario;
-          puertoSalida = puertos[0].puerto.nombre;
-          puertoRegreso = puertos[puertos.length - 1].puerto.nombre;
-          cantDias = response.data.cantDias;
+    const fetchCruceroData = async () => {
+      try {
+        // Obtener los datos del crucero
+        const response = await CrucerosService.getCrucerobyId(
+          selectedCrucero.value
+        );
+        puertos = response.data.puertosItinerario;
+        puertoSalida = puertos[0].puerto.nombre;
+        puertoRegreso = puertos[puertos.length - 1].puerto.nombre;
+        cantDias = response.data.cantDias;
 
-          // Actualizar el estado con los datos obtenidos
-          setResumenReserva((prevState) => ({
-            ...prevState,
-            crucero: selectedCrucero ? selectedCrucero.label : "",
-            puertoSalida: puertoSalida,
-            puertoRegreso: puertoRegreso,
-            fechaInicio: fechaSeleccionada ? fechaSeleccionada.label : "",
-            // fechaRegreso: fechaSeleccionada
-            //   ? format(addDays(fechaSeleccionada.value, cantDias), "dd/MM/yyyy")
-            //   : "",
-            fechaRegreso: fechaSeleccionada
-              ? new Date(
-                  new Date(fechaSeleccionada.value).getTime() +
-                    (cantDias * 24 * 60 * 60 * 1000)
-                ).toLocaleDateString("es-CR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  timeZone: "UTC"
-                })
-              : "",
+        // Actualizar el estado con los datos obtenidos
+        setResumenReserva((prevState) => ({
+          ...prevState,
+          crucero: selectedCrucero ? selectedCrucero.label : "",
+          puertoSalida: puertoSalida,
+          puertoRegreso: puertoRegreso,
+          fechaInicio: fechaSeleccionada ? fechaSeleccionada.label : "",
+          fechaRegreso: fechaSeleccionada
+            ? new Date(
+                new Date(fechaSeleccionada.value).getTime() +
+                  cantDias * 24 * 60 * 60 * 1000
+              ).toLocaleDateString("es-CR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                timeZone: "UTC",
+              })
+            : "",
+          habitaciones: habitacionesSeleccionadas.map(
+            (habitacion) => habitacion.nombre
+          ),
+          complementos: complementosSeleccionados.map(
+            (complemento) => complemento.nombre
+          ),
+          total: total,
+        }));
+      } catch (error) {
+        console.error("Error al obtener los datos del crucero:", error);
+        setError(error);
+      }
+    };
 
-            habitaciones: habitacionesSeleccionadas.map(
-              (habitacion) => habitacion.nombre
-            ),
-            complementos: complementosSeleccionados.map(
-              (complemento) => complemento.nombre
-            ),
-            total: total,
-          }));
-        } catch (error) {
-          console.error("Error al obtener los datos del crucero:", error);
-          setError(error);
-        }
-      };
-
-      // Llamar la función asíncrona solo si los datos están disponibles
-      fetchCruceroData();
-    } else {
-      return;
-    }
+    // Llamar la función asíncrona solo si los datos están disponibles
+    fetchCruceroData();
   }, [
     selectedCrucero,
     fechaSeleccionada,
-    habitacionesSeleccionadas,
+    habitacionesDisponibles,
     complementosSeleccionados,
   ]);
   
@@ -412,6 +407,22 @@ export function CreateReserva() {
 
                       //Restablecer el valor de fechaSalida al cambiar el crucero
                       setFechaSeleccionada(null);
+
+                      //Restablecer el array de habitaciones disponibles a []
+                      setHabitacionesDisponibles([]);
+
+                      //Restablecer el resumenReserva a valores predeterminados
+                      // Estado para actualizar la información del resumen de la reserva
+                      setResumenReserva({
+                        crucero: "",
+                        fechaInicio: "",
+                        fechaRegreso: "",
+                        puertoSalida: "",
+                        puertoRegreso: "",
+                        habitaciones: [],
+                        complementos: [],
+                        total: 0,
+                      });
 
                       //Obtener las fechas asignadas al crucero seleccionado
                       if (selectedOption) {
