@@ -129,14 +129,11 @@ export function CreateReserva() {
     []
   );
 
-  // Estado para manejar los puertos de salida y regreso
-  const [puertoSalida, setPuertoSalida] = useState("");
-  const [puertoRegreso, setPuertoRegreso] = useState("");
-
   // Estado para actualizar la información del resumen de la reserva
   const [resumenReserva, setResumenReserva] = useState({
     crucero: "",
-    fechaSalida: "",
+    fechaInicio: "",
+    fechaRegreso: "",
     puertoSalida: "",
     puertoRegreso: "",
     habitaciones: [],
@@ -248,6 +245,7 @@ export function CreateReserva() {
     let puertos = [];
     let puertoSalida = "";
     let puertoRegreso = "";
+    let cantDias = 0;
 
     // Si no hay información, no hacer nada, pero sin retornar anticipadamente
     if (
@@ -274,14 +272,30 @@ export function CreateReserva() {
           puertos = response.data.puertosItinerario;
           puertoSalida = puertos[0].puerto.nombre;
           puertoRegreso = puertos[puertos.length - 1].puerto.nombre;
+          cantDias = response.data.cantDias;
 
           // Actualizar el estado con los datos obtenidos
           setResumenReserva((prevState) => ({
             ...prevState,
             crucero: selectedCrucero ? selectedCrucero.label : "",
-            fechaSalida: fechaSeleccionada ? fechaSeleccionada.label : "",
             puertoSalida: puertoSalida,
             puertoRegreso: puertoRegreso,
+            fechaInicio: fechaSeleccionada ? fechaSeleccionada.label : "",
+            // fechaRegreso: fechaSeleccionada
+            //   ? format(addDays(fechaSeleccionada.value, cantDias), "dd/MM/yyyy")
+            //   : "",
+            fechaRegreso: fechaSeleccionada
+              ? new Date(
+                  new Date(fechaSeleccionada.value).getTime() +
+                    (cantDias * 24 * 60 * 60 * 1000)
+                ).toLocaleDateString("es-CR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  timeZone: "UTC"
+                })
+              : "",
+
             habitaciones: habitacionesSeleccionadas.map(
               (habitacion) => habitacion.nombre
             ),
@@ -308,9 +322,6 @@ export function CreateReserva() {
     complementosSeleccionados,
   ]);
   
-
-
-
   //Función para manejar la eliminación de la habitación
   //seleccionada cuando se cierre el modal de "ModalGestionHuespedes"
   const eliminarHabitacionSeleccionada = (idHabitacion) => {
@@ -1049,7 +1060,14 @@ export function CreateReserva() {
                   <Typography variant="subtitle1">
                     <b>Fecha de salida:</b>
                   </Typography>
-                  <Typography>{resumenReserva.fechaSalida}</Typography>
+                  <Typography>{resumenReserva.fechaInicio}</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">
+                    <b>Fecha de regreso:</b>
+                  </Typography>
+                  <Typography>{resumenReserva.fechaRegreso}</Typography>
                 </Grid>
 
                 <Grid item xs={12}>
