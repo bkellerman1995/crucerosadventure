@@ -20,6 +20,7 @@ import { ModalGestionHuespedes } from "./ModalGestionHuespedes";
 import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
 import HuespedService from "../../services/HuespedService";
 import ComplementoService from "../../services/ComplementoService";
+import CrucerosService from "../../services/CrucerosService";
 
 export function CreateReserva() {
   //Estilos personalizados para el select
@@ -128,13 +129,19 @@ export function CreateReserva() {
     []
   );
 
+  // Estado para manejar los puertos de salida y regreso
+  const [puertoSalida, setPuertoSalida] = useState("");
+  const [puertoRegreso, setPuertoRegreso] = useState("");
+
   // Estado para actualizar la información del resumen de la reserva
   const [resumenReserva, setResumenReserva] = useState({
     crucero: "",
-    fecha: "",
+    fechaSalida: "",
+    puertoSalida: "",
+    puertoRegreso: "",
     habitaciones: [],
     complementos: [],
-    total: 0, 
+    total: 0,
   });
 
   //Control de errores
@@ -201,7 +208,7 @@ export function CreateReserva() {
     }
   }, [idCrucero, fechaSeleccionada]);
 
-  //Use Effect para cargar los cruceros al iniciar el componente "[]"
+  //Use Effect para cargar los cruceros al cargar la página "[]"
   useEffect(() => {
     CruceroService.getCruceros()
       .then((response) => {
@@ -237,36 +244,62 @@ export function CreateReserva() {
       habitacionesSeleccionadas.length > 0 &&
       complementosSeleccionados.length > 0
     ) {
+      let total = 0;
+
       // Lógica para cargar o actualizar el resumen de la reserva con la información relevante.
       console.log("Crucero seleccionado:", selectedCrucero);
       console.log("Fecha seleccionada:", fechaSeleccionada);
       console.log("Habitaciones seleccionadas:", habitacionesSeleccionadas);
       console.log("Complementos seleccionados:", complementosSeleccionados);
 
-      let total = 0;
       habitacionesSeleccionadas.forEach((habitacion) => {
         total += habitacion.precio;
       });
 
       complementosSeleccionados.forEach((complemento) => {
         total += complemento.precio;
-      })
+      });
 
-      setResumenReserva((prevState) => ({
-        ...prevState,
-        crucero: selectedCrucero.label, 
-        fecha: fechaSeleccionada.label,
-        habitaciones: habitacionesSeleccionadas.map (habitacion => habitacion.nombre),
-        complementos: complementosSeleccionados.map (complemento => complemento.nombre),
-        total: total,
-      }))
+      const fetchCruceroData = async () => {
+        try {
+          // Obtener el puerto de salida y de regreso
+          const response = await CrucerosService.getCrucerobyId(
+            selectedCrucero.value
+          );
 
+          const puertos = response.data.puertosItinerario;
+          setPuertoSalida(puertos[0].puerto.nombre);
+          console.log("Puerto de salida", puertoSalida);
+          setPuertoRegreso(puertos[puertos.length - 1].puerto.nombre);
+          console.log("Puerto de regreso", puertoRegreso);
+          setResumenReserva((prevState) => ({
+            ...prevState,
+            crucero: selectedCrucero ? selectedCrucero.label : "",
+            fechaSalida: fechaSeleccionada ? fechaSeleccionada.label : "",
+            puertoSalida: puertoSalida,
+            puertoRegreso: puertoRegreso,
+            habitaciones: habitacionesSeleccionadas.map(
+              (habitacion) => habitacion.nombre
+            ),
+            complementos: complementosSeleccionados.map(
+              (complemento) => complemento.nombre
+            ),
+            total: total,
+          }));
+        } catch (error) {
+          console.error("Error al obtener los datos del crucero:", error);
+          setError(error);
+        }
+      };
+      // Llamar la función asíncrona
+      fetchCruceroData();
     }
+
   }, [
     selectedCrucero,
     fechaSeleccionada,
     habitacionesSeleccionadas,
-    complementosSeleccionados, // escucha cambios en los diferentes cambios
+    complementosSeleccionados,
   ]);
 
   //Función para manejar la eliminación de la habitación
@@ -960,7 +993,7 @@ export function CreateReserva() {
 
           {/*Resumen de la reserva (lado derecho) */}
 
-          <Grid container direction="column" spacing={2} >
+          <Grid container direction="column" spacing={2}>
             <Grid
               item
               width={450}
@@ -981,15 +1014,33 @@ export function CreateReserva() {
                 <b>Resumen de la reserva</b>
               </Typography>
 
-              <Grid container direction = "column" spacing={2} >
+              <Grid container direction="column" spacing={2}>
                 <Grid item xs={12}>
-                  <Typography variant="subtitle1"><b>Crucero seleccionado:</b></Typography>
+                  <Typography variant="subtitle1">
+                    <b>Crucero seleccionado:</b>
+                  </Typography>
                   <Typography>{resumenReserva.crucero}</Typography>
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Typography variant="subtitle1"><b>Fecha seleccionada:</b></Typography>
-                  <Typography>{resumenReserva.fecha}</Typography>
+                  <Typography variant="subtitle1">
+                    <b>Puerto de salida:</b>
+                  </Typography>
+                  <Typography>{resumenReserva.puertoSalida}</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">
+                    <b>Puerto de regreso:</b>
+                  </Typography>
+                  <Typography>{resumenReserva.puertoRegreso}</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">
+                    <b>Fecha de salida:</b>
+                  </Typography>
+                  <Typography>{resumenReserva.fechaSalida}</Typography>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -1010,11 +1061,18 @@ export function CreateReserva() {
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1"><b>Total:</b></Typography>
-                  <Typography>{resumenReserva.total}</Typography>
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  xs={12}
+                  alignItems="center"
+                >
+                  <Typography variant="subtitle1">
+                    <b>Total :</b>
+                  </Typography>
+                  <Typography>$ {resumenReserva.total}</Typography>
                 </Grid>
-                
               </Grid>
             </Grid>
           </Grid>
