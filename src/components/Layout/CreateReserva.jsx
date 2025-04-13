@@ -144,6 +144,10 @@ export function CreateReserva() {
     total: 0,
   });
 
+  // Estado para controlar si se añadieron huespedes a la habitación
+  // antes de cargar "Resumen de reserva"
+  const [huespedesAgregados, setHuespedesAgregados] = useState (false);
+
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
@@ -243,14 +247,13 @@ export function CreateReserva() {
     // Asegurarse de que los datos están disponibles antes de continuar
     if (
       !selectedCrucero ||
-      !fechaSeleccionada
-      || habitacionesDisponibles.length === 0 
-      
+      !fechaSeleccionada ||
+      habitacionesDisponibles.length === 0
     ) {
       return; // Solo salir si no hay datos disponibles
     }
 
-    // Evitar el retorno anticipado, dejar que el efecto se ejecute siempre
+    // Valores por defecto antes de cargar el resumen de reserva
     let totalHabitaciones = 0;
     let totalComplementos = 0;
     let puertos = [];
@@ -260,16 +263,16 @@ export function CreateReserva() {
 
     // Calcular el total de las habitaciones y complementos seleccionados
     habitacionesSeleccionadas.forEach((habitacion) => {
-      totalHabitaciones += habitacion.precio;
+      totalHabitaciones += parseInt(habitacion.precio); 
     });
 
     complementosSeleccionados.forEach((complemento) => {
-      totalComplementos += complemento.precio;
+      totalComplementos += parseInt(complemento.precio);
     });
 
     const fetchCruceroData = async () => {
       try {
-
+        let habitacionesConHuespedes = [];
         // Obtener los datos del crucero
         const response = await CrucerosService.getCrucerobyId(
           selectedCrucero.value
@@ -279,26 +282,40 @@ export function CreateReserva() {
         puertoRegreso = puertos[puertos.length - 1].puerto.nombre;
         cantDias = response.data.cantDias;
 
-        // Obtener la cantidad de huéspedes para cada habitación seleccionada
-        const habitacionesConHuespedes = await Promise.all(
-          habitacionesSeleccionadas.map(async (habitacion) => {
-            try {
-              // Hacer la llamada al servicio que devuelve la cantidad de huéspedes por habitación
-              const cantidadHuespedesResponse =
-                await HabitacionService.getHabitacionById(
-                  habitacion.idHabitacion
+        //Verificar que ya se hayan agregado
+        // huéspedes a la habitación seleccioanda
+        // sea mayor a 0
+        if (
+          huespedesAgregados === true &&
+          habitacionesSeleccionadas.length > 0
+        ) {
+          // Obtener la cantidad de huéspedes para cada habitación seleccionada
+          habitacionesConHuespedes = await Promise.all(
+            habitacionesSeleccionadas.map(async (habitacion) => {
+              try {
+                // Hacer la llamada al servicio que devuelve la cantidad de huéspedes por habitación
+                const cantidadHuespedesResponse =
+                  await HabitacionService.getHabitacionById(
+                    habitacion.idHabitacion
+                  );
+                console.log(
+                  "Cant. Huespedes: ",
+                  cantidadHuespedesResponse.data.cantHuespedes
                 );
-              console.log ("Cant. Huespedes: ", cantidadHuespedesResponse.data.cantHuespedes);
-              return {
-                nombre: habitacion.nombre,
-                cantidad: cantidadHuespedesResponse.data.cantHuespedes,
-              };
-            } catch (error) {
-              console.error(`Error al obtener la cantidad de huéspedes para la habitación ${habitacion.nombre}`, error);
-              return { nombre: habitacion.nombre, cantidad: 0 }; // Fallback si hay error
-            }
-          })
-        );
+                return {
+                  nombre: habitacion.nombre,
+                  cantidad: cantidadHuespedesResponse.data.cantHuespedes,
+                };
+              } catch (error) {
+                console.error(
+                  `Error al obtener la cantidad de huéspedes para la habitación ${habitacion.nombre}`,
+                  error
+                );
+                return { nombre: habitacion.nombre, cantidad: 0 }; // Fallback si hay error
+              }
+            })
+          );
+        }
 
         // Actualizar el estado con los datos obtenidos
         setResumenReserva((prevState) => ({
@@ -318,14 +335,15 @@ export function CreateReserva() {
                 timeZone: "UTC",
               })
             : "",
-            habitaciones: habitacionesConHuespedes, // Actualizar las habitaciones con los datos de cantidad de huéspedes
-          // habitaciones: habitacionesSeleccionadas.map(
-          //   (habitacion) => habitacion.nombre
-          // ),
+          habitaciones: habitacionesConHuespedes, // Actualizar las habitaciones con los datos de cantidad de huéspedes
+
           complementos: complementosSeleccionados.map(
             (complemento) => complemento.nombre
           ),
-          total: 0,
+
+          totalHabitaciones : totalHabitaciones, 
+          totalComplementos : totalComplementos,
+
         }));
       } catch (error) {
         console.error("Error al obtener los datos del crucero:", error);
@@ -341,6 +359,7 @@ export function CreateReserva() {
     habitacionesDisponibles,
     habitacionesSeleccionadas,
     complementosSeleccionados,
+    huespedesAgregados,
   ]);
   
   //Función para manejar la eliminación de la habitación
@@ -603,6 +622,7 @@ export function CreateReserva() {
                         return; // No agregar la habitación si no hay una seleccionada
                       }
 
+                      setHuespedesAgregados(false);
                       //Verificar si la habitación ya ha sido seleccionada
                       const isAlreadySelected = habitacionesSeleccionadas.some(
                         (habitacion) =>
@@ -624,9 +644,11 @@ export function CreateReserva() {
                           "Habitación enviada al modal:",
                           selectedHabitacionDisponible
                         );
+
+                        //Añadir el objeto completo de la habitación
                         setHabitacionesSeleccionadas([
                           ...habitacionesSeleccionadas,
-                          selectedHabitacionDisponible, //Añadir el objeto completo de la habitación
+                          selectedHabitacionDisponible, 
                         ]); // Agregar habitación seleccionada al nuevo listbox
                         setSelectedHabitacionAgregada(null);
                         setMaxHuespedes(
@@ -680,7 +702,8 @@ export function CreateReserva() {
                           "Habitacion seleccionada: ",
                           selectedHabitacionAgregada
                         );
-                        // Filtrar las habitaciones seleccionadas para eliminar la seleccionada
+
+                        // Eliminar la habitación seleccionada de la lista de habitaciones
                         setHabitacionesSeleccionadas((prev) =>
                           prev.filter(
                             (habitacion) =>
@@ -689,25 +712,31 @@ export function CreateReserva() {
                           )
                         );
 
+                        // Si la lista de habitacionSeleccionadas tiene longitud 0 deshabilitar los huéspedes agregados
+                        if (habitacionesSeleccionadas.length === 0)
+                          setHuespedesAgregados(false);
+
                         // Eliminar los huéspedes en la base de datos (HuespedService.deleteHuesped)
-                        habitacionesSeleccionadas.forEach((habitacion) => {
-                          if (habitacion) {
-                            HuespedService.deleteHuesped(idHabitacion) // Aquí suponemos que cada huesped tiene un campo 'id'
+                        // habitacionesSeleccionadas.forEach((habitacion) => {
+                          if (selectedHabitacionAgregada.idHabitacion) {
+                            HuespedService.deleteHuesped(selectedHabitacionAgregada.idHabitacion) // Aquí suponemos que cada huesped tiene un campo 'id'
                               .then((response) => {
                                 if (response?.data) {
                                   console.log(
-                                    `Huésped de habitación ${habitacion.idHabitacion} eliminado exitosamente`
+                                    `Huésped de habitación ${selectedHabitacionAgregada.idHabitacion} eliminado exitosamente`
                                   );
                                 }
                               })
                               .catch((error) => {
                                 console.error(
-                                  `Error al eliminar huésped con de habitación ${habitacion.idHabitacion}`,
+                                  `Error al eliminar huésped con de habitación ${selectedHabitacionAgregada.idHabitacion}`,
                                   error
                                 );
                               });
                           }
-                        });
+                        // });
+
+
                       } else {
                         toast.error(
                           "Por favor seleccione una habitación para quitar.",
@@ -744,9 +773,9 @@ export function CreateReserva() {
                 <FormControl fullWidth>
                   <ListBox
                     options={habitacionesSeleccionadas.map((habitacion) => ({
-                      label: `${habitacion.nombre}/ $${habitacion.precio} 
-                      /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
-                      / ${habitacion.nombreCategoria}`, // Mostrar información relevante
+                      label: `${habitacion.nombre}/ $${habitacion.precio}`,
+                      // /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
+                      // / ${habitacion.nombreCategoria}`, // Mostrar información relevante
                       value: habitacion,
                     }))}
                     className="w-full md:w-14rem"
@@ -993,7 +1022,7 @@ export function CreateReserva() {
                       setValue("complemento", e.value); //'e.value' tiene todo el objeto "habitación" seleccionado
                     }}
                     value={selectedComplementoAgregado} // Usar el objeto completo de los complementos seleccionados
-                    emptyMessage="No hay complementos cargados"
+                    emptyMessage="No hay complementos seleccionados"
                     itemContent={(complemento) => (
                       <div
                         style={{
@@ -1122,27 +1151,45 @@ export function CreateReserva() {
                   <Typography variant="subtitle1">
                     <b>Habitaciones seleccionadas:</b>
                   </Typography>
-                  {/* <Typography>
-                    {resumenReserva.habitaciones.join(", ")}
-                  </Typography> */}
+
                   <List>
                     {resumenReserva.habitaciones.map((habitacion, index) => (
                       <ListItem key={index}>
                         <Typography>
-                          {habitacion.nombre} - {habitacion.cantidad} Huéspedes
+                          {habitacion.nombre} - Cantidad de huéspedes: {habitacion.cantidad}
                         </Typography>
                       </ListItem>
                     ))}
                   </List>
                 </Grid>
 
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  xs={12}
+                  alignItems="center"
+                >
+                  <Typography variant="subtitle1">
+                    <b>Total por habitaciones:</b>
+                  </Typography>
+                  <Typography>$ {resumenReserva.totalHabitaciones}</Typography>
+                </Grid>
+
                 <Grid item xs={12}>
                   <Typography variant="subtitle1">
                     <b>Complementos seleccionados:</b>
                   </Typography>
-                  <Typography>
-                    {resumenReserva.complementos.join(", ")}
-                  </Typography>
+                  <List>
+                    {resumenReserva.complementos.map((complemento, index) => (
+                      <ListItem key={index}>
+                        <Typography>
+                          {complemento.nombre}
+                        </Typography>
+                      </ListItem>
+                    ))}
+                  </List>
+
                 </Grid>
 
                 <Grid
@@ -1170,6 +1217,7 @@ export function CreateReserva() {
         maxHuespedes={maxHuespedes}
         idHabitacion={idHabitacion} // Pasar el id de la habitación
         eliminarHabitacionSeleccionada={eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
+        setHuespedesAgregados = {setHuespedesAgregados} // Enviar función para controlar si se añadieron huéspedes o no.
       />
     </>
   );

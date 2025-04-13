@@ -21,6 +21,7 @@ export function ModalGestionHuespedes({
   maxHuespedes,
   idHabitacion,
   eliminarHabitacionSeleccionada,
+  setHuespedesAgregados
 }) {
   
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
@@ -250,9 +251,11 @@ export function ModalGestionHuespedes({
           handleClose={() => setOpenModalInfoHuesped(false)}
           idHabitacion={idHabitacion}
           setHuespedesContador={setHuespedesContador} // Pasar el huésped seleccionado al modal
+          // Actualiza solo el huésped gestionado
           setInfoHuesped={(nuevoHuesped) =>
             actualizarHuesped(selectedHuespedIndex, nuevoHuesped)
-          } // Actualiza solo el huésped gestionado        />
+          } 
+
         />
 
         <Button
@@ -268,11 +271,12 @@ export function ModalGestionHuespedes({
                   gestionado: false,
                 }))
               );
+              setHuespedesAgregados(true);
               toast.success("La habitación se agregó exitosamente", {
                 duration: 1500,
                 position: "top-center",
               });
-              console.log("Reseteando el contador de huéspedes a: ", huespedesContador);
+              console.log("Configurando el contador de huéspedes a: ", huespedesContador);
 
               handleClose();
             } else {
@@ -329,5 +333,5 @@ ModalGestionHuespedes.propTypes = {
   control: PropTypes.object.isRequired,
   idHabitacion: PropTypes.number.isRequired,
   eliminarHabitacionSeleccionada: PropTypes.func.isRequired,
-  // setHabitacionesSeleccionadas: PropTypes.func.isRequired
-};
+  setHuespedesAgregados: PropTypes.func.isRequired
+}

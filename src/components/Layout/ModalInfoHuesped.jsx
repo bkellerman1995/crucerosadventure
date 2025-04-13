@@ -77,7 +77,7 @@ export function ModalInfoHuesped({ open, handleClose,idHabitacion,setHuespedesCo
             .then((response) => {
               setError(response.error);
               if (response?.data) {
-                toast.success("Gestión de huésped exitosa", { duration: 1500 });                
+                toast.success("Gestión de huésped exitosa", { duration: 1500 });
                 handleClose();
                 // Actualizar el contador de huéspedes
                 setHuespedesContador((prevCount) => {
@@ -273,5 +273,5 @@ ModalInfoHuesped.propTypes = {
   idHabitacion: PropTypes.number.isRequired,
   infoHabitacion: PropTypes.object.isRequired,
   setHuespedesContador: PropTypes.func.isRequired,
-  setInfoHuesped: PropTypes.func.isRequired
+  setInfoHuesped: PropTypes.func.isRequired,
 };
