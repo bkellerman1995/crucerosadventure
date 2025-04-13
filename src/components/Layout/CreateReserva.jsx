@@ -141,6 +141,9 @@ export function CreateReserva() {
     complementos: [],
     totalHabitaciones: 0,
     totalComplementos: 0,
+    subTotal: 0,
+    impuesto: 0.13,
+    tarifaPortuaria: 100,
     total: 0,
   });
 
@@ -256,6 +259,10 @@ export function CreateReserva() {
     // Valores por defecto antes de cargar el resumen de reserva
     let totalHabitaciones = 0;
     let totalComplementos = 0;
+    let subTotal = 0;
+    let impuesto = 0.13;
+    let tarifaPortuaria = 100;
+    let total = 0;
     let puertos = [];
     let puertoSalida = "";
     let puertoRegreso = "";
@@ -269,6 +276,11 @@ export function CreateReserva() {
     complementosSeleccionados.forEach((complemento) => {
       totalComplementos += parseInt(complemento.precio);
     });
+
+    subTotal = totalHabitaciones + totalComplementos;
+
+    total += subTotal + (subTotal * impuesto + tarifaPortuaria);
+    
 
     const fetchCruceroData = async () => {
       try {
@@ -337,14 +349,18 @@ export function CreateReserva() {
             : "",
           habitaciones: habitacionesConHuespedes, // Actualizar las habitaciones con los datos de cantidad de huéspedes
 
-          complementos: complementosSeleccionados.map(
-            (complemento) => complemento.nombre
-          ),
+          complementos: complementosSeleccionados, 
 
           totalHabitaciones : totalHabitaciones, 
           totalComplementos : totalComplementos,
+          subTotal : subTotal,
+          impuesto : impuesto,
+          tarifaPortuaria : tarifaPortuaria,
+          total : total,
+
 
         }));
+
       } catch (error) {
         console.error("Error al obtener los datos del crucero:", error);
         setError(error);
@@ -648,7 +664,7 @@ export function CreateReserva() {
                         //Añadir el objeto completo de la habitación
                         setHabitacionesSeleccionadas([
                           ...habitacionesSeleccionadas,
-                          selectedHabitacionDisponible, 
+                          selectedHabitacionDisponible,
                         ]); // Agregar habitación seleccionada al nuevo listbox
                         setSelectedHabitacionAgregada(null);
                         setMaxHuespedes(
@@ -718,25 +734,25 @@ export function CreateReserva() {
 
                         // Eliminar los huéspedes en la base de datos (HuespedService.deleteHuesped)
                         // habitacionesSeleccionadas.forEach((habitacion) => {
-                          if (selectedHabitacionAgregada.idHabitacion) {
-                            HuespedService.deleteHuesped(selectedHabitacionAgregada.idHabitacion) // Aquí suponemos que cada huesped tiene un campo 'id'
-                              .then((response) => {
-                                if (response?.data) {
-                                  console.log(
-                                    `Huésped de habitación ${selectedHabitacionAgregada.idHabitacion} eliminado exitosamente`
-                                  );
-                                }
-                              })
-                              .catch((error) => {
-                                console.error(
-                                  `Error al eliminar huésped con de habitación ${selectedHabitacionAgregada.idHabitacion}`,
-                                  error
+                        if (selectedHabitacionAgregada.idHabitacion) {
+                          HuespedService.deleteHuesped(
+                            selectedHabitacionAgregada.idHabitacion
+                          ) // Aquí suponemos que cada huesped tiene un campo 'id'
+                            .then((response) => {
+                              if (response?.data) {
+                                console.log(
+                                  `Huésped de habitación ${selectedHabitacionAgregada.idHabitacion} eliminado exitosamente`
                                 );
-                              });
-                          }
+                              }
+                            })
+                            .catch((error) => {
+                              console.error(
+                                `Error al eliminar huésped con de habitación ${selectedHabitacionAgregada.idHabitacion}`,
+                                error
+                              );
+                            });
+                        }
                         // });
-
-
                       } else {
                         toast.error(
                           "Por favor seleccione una habitación para quitar.",
@@ -1156,7 +1172,8 @@ export function CreateReserva() {
                     {resumenReserva.habitaciones.map((habitacion, index) => (
                       <ListItem key={index}>
                         <Typography>
-                          {habitacion.nombre} - Cantidad de huéspedes: {habitacion.cantidad}
+                          {habitacion.nombre} - Cantidad de huéspedes:{" "}
+                          {habitacion.cantidad}
                         </Typography>
                       </ListItem>
                     ))}
@@ -1180,16 +1197,70 @@ export function CreateReserva() {
                   <Typography variant="subtitle1">
                     <b>Complementos seleccionados:</b>
                   </Typography>
+                  {/* <Typography variant="subtitle1">
+                    <b>{resumenReserva.complementos}</b>
+                  </Typography> */}
                   <List>
                     {resumenReserva.complementos.map((complemento, index) => (
                       <ListItem key={index}>
                         <Typography>
-                          {complemento.nombre}
+                          {complemento.nombre} - ${complemento.precio}
                         </Typography>
                       </ListItem>
                     ))}
                   </List>
+                </Grid>
 
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  xs={12}
+                  alignItems="center"
+                >
+                  <Typography variant="subtitle1">
+                    <b>Total por complementos:</b>
+                  </Typography>
+                  <Typography>$ {resumenReserva.totalComplementos}</Typography>
+                </Grid>
+
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  xs={12}
+                  alignItems="center"
+                >
+                  <Typography variant="subtitle1">
+                    <b>Subtotal :</b>
+                  </Typography>
+                  <Typography>$ {resumenReserva.subTotal}</Typography>
+                </Grid>
+
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  xs={12}
+                  alignItems="center"
+                >
+                  <Typography variant="subtitle1">
+                    <b>Impuesto (IVA) :</b>
+                  </Typography>
+                  <Typography> {resumenReserva.impuesto * 100}%</Typography>
+                </Grid>
+
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  xs={12}
+                  alignItems="center"
+                >
+                  <Typography variant="subtitle1">
+                    <b>Tarifa portuaria :</b>
+                  </Typography>
+                  <Typography>$ {resumenReserva.tarifaPortuaria}</Typography>
                 </Grid>
 
                 <Grid
@@ -1217,7 +1288,7 @@ export function CreateReserva() {
         maxHuespedes={maxHuespedes}
         idHabitacion={idHabitacion} // Pasar el id de la habitación
         eliminarHabitacionSeleccionada={eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
-        setHuespedesAgregados = {setHuespedesAgregados} // Enviar función para controlar si se añadieron huéspedes o no.
+        setHuespedesAgregados={setHuespedesAgregados} // Enviar función para controlar si se añadieron huéspedes o no.
       />
     </>
   );
