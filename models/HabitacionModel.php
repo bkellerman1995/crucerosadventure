@@ -84,6 +84,11 @@ class HabitacionModel
             $cathabitacion = $catHabitacionModel->get($vResultado->idcategoriaHabitacion);
             $vResultado->cathabitacion = $cathabitacion;
 
+            //Obtener la cantidad de huéspedes de esta habitación
+            $cantHuespedes = $this->getCantHuespedesHabitacion($id);
+
+            $vResultado->cantHuespedes = $cantHuespedes;
+
             //Retornar la respuesta
             return $vResultado;
         } catch (Exception $e) {
@@ -131,6 +136,26 @@ class HabitacionModel
         }
     }
 
+    //Obtener la cantidad total de huéspedes para la habitación 
+    public function getCantHuespedesHabitacion($id)
+    {
+        try {
+
+            $vSql = "Select count(idhuesped) as cantidad from huesped where idhabitacion = $id";
+
+            //Ejecutar la consulta sql
+            $vResultado = $this->enlace->executeSQL($vSql);
+            if (!empty($vResultado)) {
+
+                // $vResultado = $vResultado[0];
+                //Retornar la respuesta
+                return $vResultado[0]->cantidad;
+            }
+        } catch (Exception $e) {
+            handleException($e);
+        }
+
+    }
     //Obtener la cantidad de huespedes por habitacion 
     //por medio del id del barco
     public function getHuespedesHabitacion($id)

@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useForm} from "react-hook-form";
-import { Tooltip } from "@mui/material";
+import { Tooltip, List, ListItem } from "@mui/material";
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import IconButton from "@mui/material/IconButton";
@@ -21,6 +21,7 @@ import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibl
 import HuespedService from "../../services/HuespedService";
 import ComplementoService from "../../services/ComplementoService";
 import CrucerosService from "../../services/CrucerosService";
+import HabitacionService from "../../services/HabitacionService";
 
 export function CreateReserva() {
   //Estilos personalizados para el select
@@ -132,12 +133,14 @@ export function CreateReserva() {
   // Estado para actualizar la información del resumen de la reserva
   const [resumenReserva, setResumenReserva] = useState({
     crucero: "",
-    fechaInicio: "",
-    fechaRegreso: "",
     puertoSalida: "",
     puertoRegreso: "",
+    fechaInicio: "",
+    fechaRegreso: "",
     habitaciones: [],
     complementos: [],
+    totalHabitaciones: 0,
+    totalComplementos: 0,
     total: 0,
   });
 
@@ -240,17 +243,16 @@ export function CreateReserva() {
     // Asegurarse de que los datos están disponibles antes de continuar
     if (
       !selectedCrucero ||
-      !fechaSeleccionada ||
-      habitacionesDisponibles === null ||
-      habitacionesDisponibles.length === 0 ||
-      complementosDisponibles === null ||
-      complementosDisponibles.length === 0
+      !fechaSeleccionada
+      || habitacionesDisponibles.length === 0 
+      
     ) {
       return; // Solo salir si no hay datos disponibles
     }
 
     // Evitar el retorno anticipado, dejar que el efecto se ejecute siempre
-    let total = 0;
+    let totalHabitaciones = 0;
+    let totalComplementos = 0;
     let puertos = [];
     let puertoSalida = "";
     let puertoRegreso = "";
@@ -258,15 +260,16 @@ export function CreateReserva() {
 
     // Calcular el total de las habitaciones y complementos seleccionados
     habitacionesSeleccionadas.forEach((habitacion) => {
-      total += habitacion.precio;
+      totalHabitaciones += habitacion.precio;
     });
 
     complementosSeleccionados.forEach((complemento) => {
-      total += complemento.precio;
+      totalComplementos += complemento.precio;
     });
 
     const fetchCruceroData = async () => {
       try {
+
         // Obtener los datos del crucero
         const response = await CrucerosService.getCrucerobyId(
           selectedCrucero.value
@@ -275,6 +278,27 @@ export function CreateReserva() {
         puertoSalida = puertos[0].puerto.nombre;
         puertoRegreso = puertos[puertos.length - 1].puerto.nombre;
         cantDias = response.data.cantDias;
+
+        // Obtener la cantidad de huéspedes para cada habitación seleccionada
+        const habitacionesConHuespedes = await Promise.all(
+          habitacionesSeleccionadas.map(async (habitacion) => {
+            try {
+              // Hacer la llamada al servicio que devuelve la cantidad de huéspedes por habitación
+              const cantidadHuespedesResponse =
+                await HabitacionService.getHabitacionById(
+                  habitacion.idHabitacion
+                );
+              console.log ("Cant. Huespedes: ", cantidadHuespedesResponse.data.cantHuespedes);
+              return {
+                nombre: habitacion.nombre,
+                cantidad: cantidadHuespedesResponse.data.cantHuespedes,
+              };
+            } catch (error) {
+              console.error(`Error al obtener la cantidad de huéspedes para la habitación ${habitacion.nombre}`, error);
+              return { nombre: habitacion.nombre, cantidad: 0 }; // Fallback si hay error
+            }
+          })
+        );
 
         // Actualizar el estado con los datos obtenidos
         setResumenReserva((prevState) => ({
@@ -294,13 +318,14 @@ export function CreateReserva() {
                 timeZone: "UTC",
               })
             : "",
-          habitaciones: habitacionesSeleccionadas.map(
-            (habitacion) => habitacion.nombre
-          ),
+            habitaciones: habitacionesConHuespedes, // Actualizar las habitaciones con los datos de cantidad de huéspedes
+          // habitaciones: habitacionesSeleccionadas.map(
+          //   (habitacion) => habitacion.nombre
+          // ),
           complementos: complementosSeleccionados.map(
             (complemento) => complemento.nombre
           ),
-          total: total,
+          total: 0,
         }));
       } catch (error) {
         console.error("Error al obtener los datos del crucero:", error);
@@ -314,6 +339,7 @@ export function CreateReserva() {
     selectedCrucero,
     fechaSeleccionada,
     habitacionesDisponibles,
+    habitacionesSeleccionadas,
     complementosSeleccionados,
   ]);
   
@@ -411,6 +437,15 @@ export function CreateReserva() {
                       //Restablecer el array de habitaciones disponibles a []
                       setHabitacionesDisponibles([]);
 
+                      //Restablecer el array de habitaciones seleccionadas a []
+                      setHabitacionesSeleccionadas([]);
+
+                      //Restablecer el array de complementos disponibles a []
+                      setComplementosDisponibles([]);
+
+                      //Restablecer el array de complementos seleccionados a []
+                      setComplementosSeleccionados([]);
+
                       //Restablecer el resumenReserva a valores predeterminados
                       // Estado para actualizar la información del resumen de la reserva
                       setResumenReserva({
@@ -422,6 +457,8 @@ export function CreateReserva() {
                         habitaciones: [],
                         complementos: [],
                         total: 0,
+                        totalHabitaciones: 0,
+                        totalComplementos: 0,
                       });
 
                       //Obtener las fechas asignadas al crucero seleccionado
@@ -1085,9 +1122,18 @@ export function CreateReserva() {
                   <Typography variant="subtitle1">
                     <b>Habitaciones seleccionadas:</b>
                   </Typography>
-                  <Typography>
+                  {/* <Typography>
                     {resumenReserva.habitaciones.join(", ")}
-                  </Typography>
+                  </Typography> */}
+                  <List>
+                    {resumenReserva.habitaciones.map((habitacion, index) => (
+                      <ListItem key={index}>
+                        <Typography>
+                          {habitacion.nombre} - {habitacion.cantidad} Huéspedes
+                        </Typography>
+                      </ListItem>
+                    ))}
+                  </List>
                 </Grid>
 
                 <Grid item xs={12}>
