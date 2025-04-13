@@ -279,9 +279,8 @@ export function CreateReserva() {
 
     subTotal = totalHabitaciones + totalComplementos;
 
-    total += subTotal + (subTotal * impuesto + tarifaPortuaria);
+    total += subTotal + tarifaPortuaria + ((subTotal + tarifaPortuaria) * impuesto);
     
-
     const fetchCruceroData = async () => {
       try {
         let habitacionesConHuespedes = [];
@@ -485,15 +484,18 @@ export function CreateReserva() {
                       // Estado para actualizar la información del resumen de la reserva
                       setResumenReserva({
                         crucero: "",
-                        fechaInicio: "",
-                        fechaRegreso: "",
                         puertoSalida: "",
                         puertoRegreso: "",
+                        fechaInicio: "",
+                        fechaRegreso: "",
                         habitaciones: [],
                         complementos: [],
-                        total: 0,
                         totalHabitaciones: 0,
                         totalComplementos: 0,
+                        subTotal: 0,
+                        impuesto: 0.13,
+                        tarifaPortuaria: 100,
+                        total: 0,
                       });
 
                       //Obtener las fechas asignadas al crucero seleccionado
