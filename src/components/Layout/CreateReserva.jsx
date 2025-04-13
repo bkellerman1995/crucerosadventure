@@ -237,21 +237,26 @@ export function CreateReserva() {
 
   // Use effect para cambiar dinámicamente la información en "Resumen Reserva"
   useEffect(() => {
-    // Aquí se cargan los datos necesarios, dependiendo de los cambios de `selectedCrucero`, `fechaSeleccionada`, etc.
+    console.log("Crucero seleccionado: ", selectedCrucero);
+    console.log("Fecha seleccionada: ", fechaSeleccionada);
+    console.log ("Habitaciones seleccionadas", habitacionesSeleccionadas);
+    console.log ("Complementos seleccionados", complementosSeleccionados);
+
+
+    // Evitar el retorno anticipado, dejar que el efecto se ejecute siempre
+    let total = 0;
+    let puertos = [];
+    let puertoSalida = "";
+    let puertoRegreso = "";
+
+    // Si no hay información, no hacer nada, pero sin retornar anticipadamente
     if (
-      selectedCrucero &&
-      fechaSeleccionada &&
-      habitacionesSeleccionadas.length > 0 &&
+      (selectedCrucero ||
+      fechaSeleccionada) ||
+      habitacionesSeleccionadas.length > 0 ||
       complementosSeleccionados.length > 0
     ) {
-      let total = 0;
-
-      // Lógica para cargar o actualizar el resumen de la reserva con la información relevante.
-      console.log("Crucero seleccionado:", selectedCrucero);
-      console.log("Fecha seleccionada:", fechaSeleccionada);
-      console.log("Habitaciones seleccionadas:", habitacionesSeleccionadas);
-      console.log("Complementos seleccionados:", complementosSeleccionados);
-
+      // Calcular el total de las habitaciones y complementos seleccionados
       habitacionesSeleccionadas.forEach((habitacion) => {
         total += habitacion.precio;
       });
@@ -262,16 +267,15 @@ export function CreateReserva() {
 
       const fetchCruceroData = async () => {
         try {
-          // Obtener el puerto de salida y de regreso
+          // Obtener los datos del crucero
           const response = await CrucerosService.getCrucerobyId(
             selectedCrucero.value
           );
+          puertos = response.data.puertosItinerario;
+          puertoSalida = puertos[0].puerto.nombre;
+          puertoRegreso = puertos[puertos.length - 1].puerto.nombre;
 
-          const puertos = response.data.puertosItinerario;
-          setPuertoSalida(puertos[0].puerto.nombre);
-          console.log("Puerto de salida", puertoSalida);
-          setPuertoRegreso(puertos[puertos.length - 1].puerto.nombre);
-          console.log("Puerto de regreso", puertoRegreso);
+          // Actualizar el estado con los datos obtenidos
           setResumenReserva((prevState) => ({
             ...prevState,
             crucero: selectedCrucero ? selectedCrucero.label : "",
@@ -291,16 +295,21 @@ export function CreateReserva() {
           setError(error);
         }
       };
-      // Llamar la función asíncrona
-      fetchCruceroData();
-    }
 
+      // Llamar la función asíncrona solo si los datos están disponibles
+      fetchCruceroData();
+    } else {
+      return;
+    }
   }, [
     selectedCrucero,
     fechaSeleccionada,
     habitacionesSeleccionadas,
     complementosSeleccionados,
   ]);
+  
+
+
 
   //Función para manejar la eliminación de la habitación
   //seleccionada cuando se cierre el modal de "ModalGestionHuespedes"
