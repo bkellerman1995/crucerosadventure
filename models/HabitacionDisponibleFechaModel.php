@@ -67,6 +67,26 @@ class HabitacionDisponibleFechaModel
         }
     }
 
+    // Actualizar disponibilidad de habitación en habitacion_disponible
+    public function update($objeto)
+    {
+        try {
+            // Consulta SQL para actualizar una habitacion
+
+            $sql = "UPDATE habitacion_disponible 
+            SET   disponible = 0
+            WHERE idHabitacion = '$objeto->idHabitacion'";
+
+            // Ejecutar la consulta
+            $cResults = $this->enlace->executeSQL_DML($sql);
+
+            // Retornar habitacion actualizado
+            return $this->get($objeto->idHabitacion);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
     //Obtener las fechas disponibles por fecha del crucero
     public function getDisponibilidadPorFecha($idCrucero, $fecha)
     {

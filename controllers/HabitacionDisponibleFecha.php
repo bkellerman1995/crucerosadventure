@@ -98,5 +98,25 @@ class habitacionDisponibleFecha
             handleException($e);
         }
     }
+
+    //POST para actualizar todas las habitaciones
+    // seleccionadas como no disponibles
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $habitacionDisponibleFecha = new HabitacionDisponibleFechaModel();
+            //Acción del modelo a ejecutar
+            $result = $habitacionDisponibleFecha->update($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     
 }

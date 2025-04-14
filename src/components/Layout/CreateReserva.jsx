@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid2";
@@ -22,6 +23,7 @@ import HuespedService from "../../services/HuespedService";
 import ComplementoService from "../../services/ComplementoService";
 import CrucerosService from "../../services/CrucerosService";
 import HabitacionService from "../../services/HabitacionService";
+import HabitacionDisponibleFecha from "../../services/HabitacionDisponibleFechaService";
 
 export function CreateReserva() {
   //Estilos personalizados para el select
@@ -70,6 +72,8 @@ export function CreateReserva() {
     },
   });
 
+  //UseNavigate para navegar a la página de Facturación
+  const navigate = useNavigate();
   // Estado para controlar la apertura del modal de Gestion Huéspedes
   const [openModalGestHuespedes, setOpenModalGestHuespedes] = useState(false);
 
@@ -133,6 +137,7 @@ export function CreateReserva() {
   // Estado para actualizar la información del resumen de la reserva
   const [resumenReserva, setResumenReserva] = useState({
     crucero: "",
+    nombre: "",
     puertoSalida: "",
     puertoRegreso: "",
     fechaInicio: "",
@@ -263,6 +268,7 @@ export function CreateReserva() {
     let impuesto = 0.13;
     let tarifaPortuaria = 100;
     let total = 0;
+    let nombre = "";
     let puertos = [];
     let puertoSalida = "";
     let puertoRegreso = "";
@@ -288,6 +294,7 @@ export function CreateReserva() {
         const response = await CrucerosService.getCrucerobyId(
           selectedCrucero.value
         );
+        nombre = response.data.nombre;
         puertos = response.data.puertosItinerario;
         puertoSalida = puertos[0].puerto.nombre;
         puertoRegreso = puertos[puertos.length - 1].puerto.nombre;
@@ -331,7 +338,7 @@ export function CreateReserva() {
         // Actualizar el estado con los datos obtenidos
         setResumenReserva((prevState) => ({
           ...prevState,
-          crucero: selectedCrucero ? selectedCrucero.label : "",
+          nombre: nombre,
           puertoSalida: puertoSalida,
           puertoRegreso: puertoRegreso,
           fechaInicio: fechaSeleccionada ? fechaSeleccionada.label : "",
@@ -483,6 +490,7 @@ export function CreateReserva() {
                       //Restablecer el resumenReserva a valores predeterminados
                       // Estado para actualizar la información del resumen de la reserva
                       setResumenReserva({
+                        nombre: "",
                         crucero: "",
                         puertoSalida: "",
                         puertoRegreso: "",
@@ -1067,8 +1075,7 @@ export function CreateReserva() {
                 variant="contained"
                 // type="submit"
                 style={
-                  habitacionesSeleccionadas.length > 0 &&
-                  complementosSeleccionados.length > 0
+                  habitacionesSeleccionadas.length > 0
                     ? {
                         backgroundColor: "blue",
                         color: "white",
@@ -1085,21 +1092,52 @@ export function CreateReserva() {
                       }
                 }
                 onClick={() => {
-                  // if (puertosItinerario && fechasCrucero) {
-                  //   toast.success(`Gestión de crucero exitosa`, {
-                  //     duration: 2000,
-                  //     position: "top-center",
-                  //   });
-                  //   navigate("/admin/crucero");
-                  // }
-                }}
+
+                  // Asegurarse de que habitacionesSeleccionadas no esté vacío
+                  if (habitacionesSeleccionadas.length > 0) {
+                    // Iterar sobre todas las habitaciones seleccionadas
+                    habitacionesSeleccionadas.forEach((habitacion) => {
+                      // Llamar al servicio para actualizar el estado de la habitación
+                      HabitacionDisponibleFecha.updateEstadoHabitacionFecha(
+                        habitacion
+                      )
+                        .then((response) => {
+                          console.log(
+                            `Habitación ${habitacion.nombre} actualizada exitosamente`
+                          );
+                        })
+                        .catch((error) => {
+                          console.error(
+                            `Error al actualizar la habitación ${habitacion.nombre}:`,
+                            error
+                          );
+                        });
+                    });
+                  } 
+                  toast.success(`Reserva gestionada correctamente`, {
+                    duration: 2000,
+                    position: "top-center",
+                  });
+
+                  console.log("Resumen de reserva antes de navegar:", resumenReserva);
+
+                  // Solo pasar datos serializables en resumenReserva
+                  const serializedResumenReserva = {
+                    ...resumenReserva,
+                    crucero: selectedCrucero ? selectedCrucero.value : "", // Extrae solo el label o value
+                  };
+
+                  console.log("Resumen serializado:", serializedResumenReserva);
+
+
+                  // Enviar un objeto limpio y serializable al state
+                  navigate("/reserva/factura", {
+                    state: {
+                      resumenReserva: serializedResumenReserva,
+                    },
+                  });                }}
                 // Deshabilita el botón si no hay complementos o habitaciones seleccionadas
-                disabled={
-                  habitacionesSeleccionadas.length > 0 &&
-                  complementosSeleccionados.length > 0
-                    ? false
-                    : true
-                }
+                disabled={habitacionesSeleccionadas.length > 0 ? false : true}
               >
                 Reservar
               </Button>
@@ -1134,7 +1172,7 @@ export function CreateReserva() {
                   <Typography variant="subtitle1">
                     <b>Crucero seleccionado:</b>
                   </Typography>
-                  <Typography>{resumenReserva.crucero}</Typography>
+                  <Typography>{resumenReserva.nombre}</Typography>
                 </Grid>
 
                 <Grid item xs={12}>
