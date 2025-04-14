@@ -104,7 +104,7 @@ class ReservaModel
             //Obtener informacion de habitacion por fecha
             $cruceroFechaModel = new CruceroFechaModel();
 
-            $vSql = "SELECT * FROM reserva WHERE idReserva='$id';";
+            $vSql = "SELECT * FROM reserva WHERE idReserva=$id;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);

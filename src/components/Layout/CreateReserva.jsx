@@ -24,8 +24,13 @@ import ComplementoService from "../../services/ComplementoService";
 import CrucerosService from "../../services/CrucerosService";
 import HabitacionService from "../../services/HabitacionService";
 import HabitacionDisponibleFecha from "../../services/HabitacionDisponibleFechaService";
+import {useUsuarioContext} from "../../context/usuarioContext";
 
 export function CreateReserva() {
+
+  // Usar el contexto para acceder al usuario
+  const {usuario} = useUsuarioContext();
+
   //Estilos personalizados para el select
   const customStyles = {
     option: (provided, state) => ({
@@ -280,8 +285,9 @@ export function CreateReserva() {
     });
 
     complementosSeleccionados.forEach((complemento) => {
-      totalComplementos += parseInt(complemento.precio);
+      totalComplementos += (parseInt(complemento.precio) * habitacionesSeleccionadas.length);
     });
+
 
     subTotal = totalHabitaciones + totalComplementos;
 
@@ -437,6 +443,12 @@ export function CreateReserva() {
           <Grid size={8} sm={6}>
             {/* Crucero */}
             <Grid size={6} sm={4}>
+
+              <Typography variant="subtitle1">
+                <b>Usuario: </b> {usuario.nombre} ({usuario.correoElectronico})
+              </Typography>
+              <br></br>
+
               <Typography variant="subtitle1">
                 <b>Crucero</b>
               </Typography>
@@ -1092,7 +1104,6 @@ export function CreateReserva() {
                       }
                 }
                 onClick={() => {
-
                   // Asegurarse de que habitacionesSeleccionadas no esté vacío
                   if (habitacionesSeleccionadas.length > 0) {
                     // Iterar sobre todas las habitaciones seleccionadas
@@ -1113,13 +1124,16 @@ export function CreateReserva() {
                           );
                         });
                     });
-                  } 
+                  }
                   toast.success(`Reserva gestionada correctamente`, {
                     duration: 2000,
                     position: "top-center",
                   });
 
-                  console.log("Resumen de reserva antes de navegar:", resumenReserva);
+                  console.log(
+                    "Resumen de reserva antes de navegar:",
+                    resumenReserva
+                  );
 
                   // Solo pasar datos serializables en resumenReserva
                   const serializedResumenReserva = {
@@ -1129,13 +1143,13 @@ export function CreateReserva() {
 
                   console.log("Resumen serializado:", serializedResumenReserva);
 
-
                   // Enviar un objeto limpio y serializable al state
                   navigate("/reserva/factura", {
                     state: {
                       resumenReserva: serializedResumenReserva,
                     },
-                  });                }}
+                  });
+                }}
                 // Deshabilita el botón si no hay complementos o habitaciones seleccionadas
                 disabled={habitacionesSeleccionadas.length > 0 ? false : true}
               >
@@ -1244,7 +1258,7 @@ export function CreateReserva() {
                     {resumenReserva.complementos.map((complemento, index) => (
                       <ListItem key={index}>
                         <Typography>
-                          {complemento.nombre} - ${complemento.precio}
+                          {complemento.nombre} - ${complemento.precio} - x{habitacionesSeleccionadas.length}
                         </Typography>
                       </ListItem>
                     ))}

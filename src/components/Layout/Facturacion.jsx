@@ -9,9 +9,14 @@ import { useForm} from "react-hook-form";
 import { Tooltip, List, ListItem, Input, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import { ModalGestionHuespedes } from "./ModalGestionHuespedes";
 import CrucerosService from "../../services/CrucerosService";
+import {useUsuarioContext} from "../../context/usuarioContext";
+
 
 export function Facturacion() {
   
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
   const { state } = useLocation();
 
   // Acceder a resumenReserva
@@ -110,7 +115,10 @@ export function Facturacion() {
 
           {/* Datos de la reserva (lado izquierdo) */}
           <Grid size={8} sm={6}>
-
+            <Typography variant="subtitle1">
+              <b>Usuario: </b> {usuario.nombre} ({usuario.correoElectronico})
+            </Typography>
+            <br></br>
           </Grid>
 
           {/*Resumen de la reserva (lado derecho) */}

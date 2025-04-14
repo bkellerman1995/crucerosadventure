@@ -25,6 +25,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Button from "@mui/material/Button";
 import { IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import {useUsuarioContext} from "../../context/usuarioContext";
 
 ListReservas.propTypes = {
   data: PropTypes.array,
@@ -93,11 +94,18 @@ const headCells = [
     label: "Código de reserva",
   },
   {
+    id: "usuario",
+    numeric: false,
+    disablePadding: false,
+    label: "Usuario",
+  },
+  {
     id: "crucero",
     numeric: false,
     disablePadding: false,
     label: "Crucero",
   },
+
   {
     id: "fechaInicio",
     numeric: false,
@@ -196,7 +204,11 @@ function TableHabitacionesToolbar(props) {
           component="div"
         >
           Lista de reservas
+          <br></br>
         </Typography>
+
+        
+        
       )}
       <Button
         style={{ marginRight: "15px", backgroundColor: "#16537e" }}
@@ -295,6 +307,9 @@ export function ListReservas() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -327,7 +342,6 @@ export function ListReservas() {
                       const isItemSelected = isSelected(row.id);
                       const labelId = `enhanced-table-checkbox-${index}`;
 
-                      
                       return (
                         <TableRow
                           hover
@@ -349,17 +363,28 @@ export function ListReservas() {
                             {row.title}
                           </TableCell>
                           <TableCell align="left">{row.idReserva}</TableCell>
+                          <TableCell align="left">{usuario ? `${usuario.nombre} (${usuario.correoElectronico})` : ""}</TableCell>
                           <TableCell align="left">{row.crucero}</TableCell>
                           <TableCell align="left">
-
                             {new Date(row.fechaInicio).toLocaleDateString(
-                              "es-CR"
+                              "es-CR",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                timeZone: "UTC",
+                              }
                             )}
                           </TableCell>
                           <TableCell align="left">
-
                             {new Date(row.fechaFinal).toLocaleDateString(
-                              "es-CR"
+                              "es-CR",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                timeZone: "UTC",
+                              }
                             )}
                           </TableCell>
                           {/* Contenido de la tabla */}

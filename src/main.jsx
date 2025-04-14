@@ -22,6 +22,7 @@ import { UpdateBarco } from "./components/Layout/UpdateBarco";
 import { UpdateHabitacion } from "./components/Layout/UpdateHabitacion";
 import { CreateReserva } from "./components/Layout/CreateReserva";
 import { Facturacion} from "./components/Layout/Facturacion";
+import UserProvider from "./context/usuarioContext";
 // import "bootstrap/dist/css/bootstrap.min.css";
 
 const rutas = createBrowserRouter([
@@ -136,6 +137,8 @@ const rutas = createBrowserRouter([
 ]);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={rutas} />
+    <UserProvider>
+      <RouterProvider router={rutas} />
+    </UserProvider>
   </StrictMode>
 );
