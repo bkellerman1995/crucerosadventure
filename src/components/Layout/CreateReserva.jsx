@@ -10,9 +10,7 @@ import { Tooltip, List, ListItem } from "@mui/material";
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import IconButton from "@mui/material/IconButton";
-import * as yup from "yup";
 import { format, addDays } from "date-fns";
-import { yupResolver } from "@hookform/resolvers/yup";
 import CruceroService from "../../services/CrucerosService";
 import toast from "react-hot-toast";
 import Select from "react-select";
@@ -1113,9 +1111,11 @@ export function CreateReserva() {
                         habitacion
                       )
                         .then((response) => {
-                          console.log(
-                            `Habitación ${habitacion.nombre} actualizada exitosamente`
-                          );
+                          if (response.data) {
+                            console.log(
+                              `Habitación ${habitacion.nombre} actualizada exitosamente`
+                            );
+                          }
                         })
                         .catch((error) => {
                           console.error(

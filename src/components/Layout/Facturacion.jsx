@@ -5,22 +5,41 @@ import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { useForm} from "react-hook-form";
-import { Tooltip, List, ListItem, Input, RadioGroup, FormControlLabel, Radio } from "@mui/material";
-import { ModalGestionHuespedes } from "./ModalGestionHuespedes";
+import { useForm, Controller} from "react-hook-form";
+import { Tooltip, List, ListItem,Box, TextField} from "@mui/material";
+import Select from "react-select";
+import dayjs from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import CrucerosService from "../../services/CrucerosService";
 import {useUsuarioContext} from "../../context/usuarioContext";
 
 
 export function Facturacion() {
-  
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
 
+  // Para recibir el estado de resumenReserva cuando
+  // se navega a esta sección
   const { state } = useLocation();
 
-  // Acceder a resumenReserva
+  // Acceder al estado de resumenReserva
   const { resumenReserva } = state;
+
+  // Array con las formas de pago
+  const formasPago = [
+    { tipo: "Contado", monto: resumenReserva.total },
+    { tipo: "Mínimo por huésped (c/u)", monto: 500 },
+  ];
+
+  // Estado de forma de pago seleccionada
+  const [selectedFormaPago, setSelectedFormaPago] = useState(null);
+
+  //Hooks de fecha del dia de hoy
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(
+    dayjs().add(1, "day")
+  );
 
   //Estilos personalizados para el select
   const customStyles = {
@@ -102,23 +121,277 @@ export function Facturacion() {
     }
   };
 
+  //use Effect para cargar la fecha límite de pagos del crucero
+    useEffect(() => {
+      CrucerosService.getCruceros()
+        .then((response) => {
+          console.log("Cruceros cargados", response);
+          setDataCrucero(response.data);
+  
+          setLoadedCrucero(true);
+        })
+        .catch((error) => {
+          if (error instanceof SyntaxError) {
+            console.log(error);
+            setError(error);
+            setLoadedCrucero(false);
+            throw new Error("Respuesta no válida del servidor");
+          }
+        });
+    }, []);
+
   //Cargar el grid del componente.
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
         <Grid container spacing={3}>
-          <Grid size={12} sm={12}>
-            <Typography variant="h5" gutterBottom>
-              <b>Facturación</b>
-            </Typography>
-          </Grid>
-
           {/* Datos de la reserva (lado izquierdo) */}
           <Grid size={8} sm={6}>
-            <Typography variant="subtitle1">
-              <b>Usuario: </b> {usuario.nombre} ({usuario.correoElectronico})
-            </Typography>
-            <br></br>
+            <Box
+              sx={{
+                position: "relative",
+                top: "37%",
+                left: "30%",
+                transform: "translate(-50%, -50%)",
+                width: "50vw",
+                maxWidth: "600px",
+                bgcolor: "background.paper",
+                borderRadius: 2,
+                boxShadow: 10,
+                p: 4,
+              }}
+            >
+              <Typography variant="h5" gutterBottom>
+                <b>Facturación</b>
+              </Typography>
+              <br />
+
+              <Typography variant="subtitle1">
+                <b>Usuario: </b> {usuario.nombre} ({usuario.correoElectronico})
+              </Typography>
+              <br></br>
+
+              <Grid item container direction="row" xs={12} alignItems="center">
+                <Typography variant="subtitle1">
+                  <b>Forma de pago:</b>
+                </Typography>
+                <Grid item sx={{ width: "60%", marginLeft: "20px" }}>
+                  <Select
+                    options={formasPago.map((pago) => ({
+                      label: `${pago.tipo} = $${pago.monto}`,
+                      value: pago,
+                    }))}
+                    onChange={(selectedOption) => {
+                      console.log(
+                        "Tipo de pago seleccionado: ",
+                        selectedOption.value
+                      );
+                      setSelectedFormaPago(selectedOption);
+                      setValue("pago", selectedOption.value);
+                    }}
+                    styles={{
+                      ...customStyles,
+                      container: (provided) => ({
+                        ...provided,
+                        width: "100%", // Asegura que el select ocupe el 100% del espacio disponible
+                      }),
+                    }}
+                    placeholder="Seleccione una forma de pago"
+                  />
+                </Grid>
+              </Grid>
+              <br></br>
+
+              <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                <Grid container spacing={2} direction="column">
+
+                  {/* Campo número de tarjeta */}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <Controller
+                        name="numero"
+                        control={control}
+                        render={({ field }) => {
+                          const handleKeyPress = (e) => {
+                            // Prevenir la entrada del signo "-"
+                            if (e.key === "-") {
+                              e.preventDefault();
+                            }
+                          };
+                          return (
+                            <TextField
+                              {...field} // Asocia el input con el estado del formulario
+                              label="Número de tarjeta"
+                              style={{
+                                backgroundColor: "white",
+                                width: "100%",
+                              }}
+                              type="number" // Asegura que solo se puedan ingresar números
+                              //Quitar los controles de incremento y decremento
+                              slotProps={{
+                                input: {
+                                  type: "number",
+                                  sx: {
+                                    "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                                      {
+                                        display: "none",
+                                      },
+                                    "& input[type=number]": {
+                                      MozAppearance: "textfield",
+                                    },
+                                  },
+                                },
+                              }}
+                              onKeyPress={handleKeyPress} // Prevenir ingreso de "-"
+                              onInput={(e) => {
+                                // Prevenir ingreso de números negativos
+                                if (e.target.value < 0) {
+                                  e.target.value = 0;
+                                }
+                                // Limitar la longitud a 16 caracteres
+                                if (e.target.value.length > 16) {
+                                  e.target.value = e.target.value.slice(0, 16);
+                                }
+                              }}
+                              helperText={errors.numero?.message}
+                            />
+                          );
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                  
+
+                  {/* Campo fecha Caducidad */}
+                  <Grid item size = {4} xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <Controller
+                          name="fechaCaducidad"
+                          control={control} // Control de react-hook-form
+                          defaultValue={fechaSeleccionada || dayjs()} // Valor por defecto
+                          render={({ field }) => (
+                            <DatePicker
+                              label="Fecha de caducidad"
+                              value={field.value} //Valor por defecto: hoy
+                              onChange={(newValue) => {
+                                const fechaFormateada = newValue;
+                                field.onChange(fechaFormateada);
+                              }}
+                              slotProps={{
+                                textField: {
+                                  variant: "outlined",
+                                  fullWidth: true,
+                                },
+                              }}
+                              format="DD/MM/YYYY"
+                              // Para configurar la fecha al día de hoy -> minDate={dayjs()}
+                              // Para configurar la fecha dentro de un dias
+                              minDate={dayjs().add(1, "day")}
+                              //Para forzar la selección en el UI al valor mínimo por defecto
+                              onOpen={() => {
+                                if (!fechaSeleccionada)
+                                  setFechaSeleccionada(dayjs()); // Si no hay fecha, asigna el mínimo
+                              }}
+                            />
+                          )}
+                        />
+                      </LocalizationProvider>
+                    </FormControl>
+                  </Grid>
+
+                  {/* Campo CVV */}
+                  <Grid item size={2} xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <Controller
+                        name="cvv"
+                        control={control}
+                        render={({ field }) => {
+                          const handleKeyPress = (e) => {
+                            // Prevenir la entrada del signo "-"
+                            if (e.key === "-") {
+                              e.preventDefault();
+                            }
+                          };
+                          return (
+                            <TextField
+                              {...field} // Asocia el input con el estado del formulario
+                              label="CVV"
+                              style={{
+                                backgroundColor: "white",
+                                width: "100%",
+                              }}
+                              type="number" // Asegura que solo se puedan ingresar números
+                              //Quitar los controles de incremento y decremento
+                              slotProps={{
+                                input: {
+                                  type: "number",
+                                  sx: {
+                                    "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                                      {
+                                        display: "none",
+                                      },
+                                    "& input[type=number]": {
+                                      MozAppearance: "textfield",
+                                    },
+                                  },
+                                },
+                              }}
+                              onKeyPress={handleKeyPress} // Prevenir ingreso de "-"
+                              onInput={(e) => {
+                                // Prevenir ingreso de números negativos
+                                if (e.target.value < 0) {
+                                  e.target.value = 0;
+                                }
+                                // Limitar la longitud a 16 caracteres
+                                if (e.target.value.length > 3) {
+                                  e.target.value = e.target.value.slice(0, 3);
+                                }
+                              }}
+                              helperText={errors.numero?.message}
+                            />
+                          );
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+
+                  {/* Campo nombre del titular */}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth>
+                      <Controller
+                        name="nombre"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Nombre del titular"
+                            error={Boolean(errors.nombre)}
+                            helperText={errors.nombre?.message}
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  </Grid>
+                </Grid>
+
+                <Button
+                  type="submit"
+                  sx={{
+                    mt: 3,
+                    backgroundColor: "#16537e",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#133d5a" },
+                    width: "200px",
+                    height: "40px",
+                    fontSize: "0.9rem",
+                    mx: "auto",
+                  }}
+                >
+                  Pagar
+                </Button>
+              </form>
+            </Box>
           </Grid>
 
           {/*Resumen de la reserva (lado derecho) */}
@@ -214,9 +487,7 @@ export function Facturacion() {
                   <Typography variant="subtitle1">
                     <b>Complementos seleccionados:</b>
                   </Typography>
-                  {/* <Typography variant="subtitle1">
-                    <b>{resumenReserva.complementos}</b>
-                  </Typography> */}
+
                   <List>
                     {resumenReserva.complementos.map((complemento, index) => (
                       <ListItem key={index}>

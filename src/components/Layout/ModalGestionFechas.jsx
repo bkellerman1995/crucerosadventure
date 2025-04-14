@@ -297,18 +297,15 @@ export function ModalGestionFechas({
                   >
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <Controller
-                        name="fechaSalida" // El nombre que usas en tu formulario
+                        name="fechaSalida"
                         control={control} // Control de react-hook-form
                         defaultValue={fechaSeleccionada || dayjs()} // Valor por defecto
                         render={({ field }) => (
                           <DatePicker
-                            label="Seleccione una fecha válida"
+                            label="Seleccione una fecha"
                             value={field.value} //Valor por defecto: hoy
                             onChange={(newValue) => {
                               const fechaFormateada = newValue;
-                              // && newValue.isValid()
-                              // ? newValue.format("YYYY-MM-DD")
-                              // : null;
                               field.onChange(fechaFormateada);
                             }}
                             slotProps={{
