@@ -55,6 +55,24 @@ class cruceroFechaModel
 
     }
 
+    public function getFechaLimitePagos ($idCrucero, $fecha)
+    {
+        try {
+            //Consulta sql
+            $vSql = "Select fechaLimitePagos from crucero_fecha where idCrucero = $idCrucero and fechaSalida = '$fecha';";
+
+            //Ejecutar la consulta
+            // $vResultado = $this->enlace->executeSQL($vSql, [$idCrucero, $fecha]);
+            $vResultado = $this->enlace->executeSQL($vSql);
+
+            //Retornar la respuesta
+            return $vResultado[0];
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
     public function getFechaDeCrucero($idCruceroFecha)
     {
         try {

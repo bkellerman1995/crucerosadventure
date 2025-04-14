@@ -14,6 +14,19 @@ class CruceroFechaService {
     return axios.get(BASE_URL);
   }
 
+  // Solicitar la fecha límite de pagos
+  getFechaLimiteDePago(idCrucero, fechaSeleccionada) {
+    console.log("BASE_URL crucerofecha: ", BASE_URL);
+    console.log("idCrucero: ", idCrucero, "fecha: ", fechaSeleccionada);
+
+    return axios.get(BASE_URL, {
+      params: {
+        idCrucero: idCrucero,
+        fechaSeleccionada: fechaSeleccionada,
+      },
+    });
+  }
+
   //Obtener la informacion de un cruceroFecha por su id
   //localhost:81/crucerosadventure/cruceroFecha/{id}
   getCruceroPorFechaByID(cruceroFechaID) {

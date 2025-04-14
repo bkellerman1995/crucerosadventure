@@ -12,13 +12,14 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import CrucerosService from "../../services/CrucerosService";
+import CruceroFechaService from "../../services/CruceroFechaService";
 import {useUsuarioContext} from "../../context/usuarioContext";
-
+import { format, addDays } from 'date-fns';
 
 export function Facturacion() {
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
+  console.log("Usuario cargado: ", usuario);
 
   // Para recibir el estado de resumenReserva cuando
   // se navega a esta sección
@@ -36,10 +37,23 @@ export function Facturacion() {
   // Estado de forma de pago seleccionada
   const [selectedFormaPago, setSelectedFormaPago] = useState(null);
 
-  //Hooks de fecha del dia de hoy
+  // formatear la fecha recibida de resumenReserva de "dd/mm/yyyy" a "yyyy-mm-dd"
+  // para poder enviarla como parámetro en la consulta SQL
+  function formatearFecha(fecha) {
+    const [dia, mes, año] = fecha.split("/"); // Dividir la fecha en partes
+    return `${año}-${mes}-${dia}`; // Reordenar las partes en formato YYYY-MM-DD
+  }
+
+  const fechaFormateada = formatearFecha(resumenReserva.fechaInicio);
+  console.log("Fecha formateada a enviar",fechaFormateada); 
+
+  // Estado de fecha del dia de hoy
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
     dayjs().add(1, "day")
   );
+
+  // Estado para almacenar la fecha limite de pagos
+  const [fechaLimite, setFechaLimite] = useState(null);
 
   //Estilos personalizados para el select
   const customStyles = {
@@ -122,23 +136,23 @@ export function Facturacion() {
   };
 
   //use Effect para cargar la fecha límite de pagos del crucero
-    useEffect(() => {
-      CrucerosService.getCruceros()
-        .then((response) => {
-          console.log("Cruceros cargados", response);
-          setDataCrucero(response.data);
-  
-          setLoadedCrucero(true);
-        })
-        .catch((error) => {
-          if (error instanceof SyntaxError) {
-            console.log(error);
-            setError(error);
-            setLoadedCrucero(false);
-            throw new Error("Respuesta no válida del servidor");
-          }
-        });
-    }, []);
+  useEffect(() => {
+    CruceroFechaService.getFechaLimiteDePago(
+      resumenReserva.crucero,
+      fechaFormateada
+    )
+      .then((response) => {
+        console.log("Fecha límite de pago: ", response.data.fechaLimitePagos);
+        setFechaLimite(response.data.fechaLimitePagos);
+      })
+      .catch((error) => {
+        if (error instanceof SyntaxError) {
+          console.log(error);
+          setError(error);
+          throw new Error("Respuesta no válida del servidor");
+        }
+      });
+  }, []);
 
   //Cargar el grid del componente.
   return (
@@ -150,7 +164,7 @@ export function Facturacion() {
             <Box
               sx={{
                 position: "relative",
-                top: "37%",
+                top: "42%",
                 left: "30%",
                 transform: "translate(-50%, -50%)",
                 width: "50vw",
@@ -179,14 +193,14 @@ export function Facturacion() {
                   <Select
                     options={formasPago.map((pago) => ({
                       label: `${pago.tipo} = $${pago.monto}`,
-                      value: pago,
+                      value: pago.monto,
                     }))}
                     onChange={(selectedOption) => {
                       console.log(
                         "Tipo de pago seleccionado: ",
                         selectedOption.value
                       );
-                      setSelectedFormaPago(selectedOption);
+                      setSelectedFormaPago(selectedOption.value);
                       setValue("pago", selectedOption.value);
                     }}
                     styles={{
@@ -204,6 +218,27 @@ export function Facturacion() {
 
               <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <Grid container spacing={2} direction="column">
+
+                  {/* Texto de Fecha limite de pagos*/}
+                  <Grid container direction="column" xs={12} sm={6}>
+                    <Typography variant="subtitle1">
+                      <b>Monto total a pagar: </b> ${resumenReserva.total}
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      <b>Fecha límite de pago:</b>{" "}
+                      {format(addDays(fechaLimite, 1), "dd/MM/yyyy")}
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      <b>Saldo:</b> $
+                      {parseInt(resumenReserva.total) -
+                        resumenReserva.habitaciones.reduce(
+                          (totalHuespedes, habitacion) =>
+                            totalHuespedes + parseInt(habitacion.cantidad),
+                          0
+                        ) *
+                          parseInt(selectedFormaPago)}
+                    </Typography>
+                  </Grid>
 
                   {/* Campo número de tarjeta */}
                   <Grid item xs={12} sm={6}>
@@ -260,10 +295,9 @@ export function Facturacion() {
                       />
                     </FormControl>
                   </Grid>
-                  
 
                   {/* Campo fecha Caducidad */}
-                  <Grid item size = {4} xs={12} sm={6}>
+                  <Grid item size={4} xs={12} sm={6}>
                     <FormControl fullWidth>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <Controller

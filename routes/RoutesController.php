@@ -33,6 +33,8 @@ class RoutesController
             //FIN Gestion de imagenes
 
             // CÓDIGO ESPECÍFICO PARA HABITACIONDISPONIBLE FECHA
+            // Y PARA CRUCERO FECHA
+
             // Obtener la URL completa
             $requestUri = $_SERVER['REQUEST_URI'];
 
@@ -63,6 +65,34 @@ class RoutesController
                         $response = new $controller();
                         $response->$action($idCrucero, $fechaSeleccionada);  // Pasar los parámetros al controlador
                     
+                    } else {
+                        // Si faltan parámetros
+                        $json = array(
+                            'status' => 400,
+                            'result' => 'Faltan parámetros (idCrucero, fechaSeleccionada)'
+                        );
+                        echo json_encode($json, http_response_code($json["status"]));
+                    }
+                    return;
+                }
+
+            }
+
+            // Verificar si la ruta es 'cruceroFecha'
+            if (count($routesArray) >= 2 && $routesArray[2] == 'crucerofecha') {
+
+                //Verificar si el método es GET
+                if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+                    $controller = 'cruceroFecha';  // Especificar el controlador
+                    $action = 'obtenerFechaLimitePagos';  // Especificar la acción para obtener fecha límite de pagos
+                    $idCrucero = isset($queryParams['idCrucero']) ? $queryParams['idCrucero'] : null;
+                    $fechaSeleccionada = isset($queryParams['fechaSeleccionada']) ? $queryParams['fechaSeleccionada'] : null;
+
+                    // Si los parámetros están presentes, se ejecuta la acción
+                    if ($idCrucero && $fechaSeleccionada) {
+                        $response = new $controller();
+                        $response->$action($idCrucero, $fechaSeleccionada);  // Pasar los parámetros al controlador
+
                     } else {
                         // Si faltan parámetros
                         $json = array(
