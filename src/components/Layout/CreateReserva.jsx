@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useForm} from "react-hook-form";
-import { Tooltip, List, ListItem } from "@mui/material";
+import { Tooltip, List, ListItem, Box,CircularProgress  } from "@mui/material";
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import IconButton from "@mui/material/IconButton";
@@ -25,9 +25,28 @@ import HabitacionDisponibleFecha from "../../services/HabitacionDisponibleFechaS
 import {useUsuarioContext} from "../../context/usuarioContext";
 
 export function CreateReserva() {
-
   // Usar el contexto para acceder al usuario
-  const {usuario} = useUsuarioContext();
+  const { usuario } = useUsuarioContext();
+
+    if (usuario == null) {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+          }}
+        >
+          <CircularProgress />
+          <Typography variant="h5" gutterBottom>
+            <b>Cargando</b>
+          </Typography>
+        </Box>
+      );
+    }
+
 
   //Estilos personalizados para el select
   const customStyles = {
@@ -157,7 +176,7 @@ export function CreateReserva() {
 
   // Estado para controlar si se añadieron huespedes a la habitación
   // antes de cargar "Resumen de reserva"
-  const [huespedesAgregados, setHuespedesAgregados] = useState (false);
+  const [huespedesAgregados, setHuespedesAgregados] = useState(false);
 
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
@@ -279,18 +298,19 @@ export function CreateReserva() {
 
     // Calcular el total de las habitaciones y complementos seleccionados
     habitacionesSeleccionadas.forEach((habitacion) => {
-      totalHabitaciones += parseInt(habitacion.precio); 
+      totalHabitaciones += parseInt(habitacion.precio);
     });
 
     complementosSeleccionados.forEach((complemento) => {
-      totalComplementos += (parseInt(complemento.precio) * habitacionesSeleccionadas.length);
+      totalComplementos +=
+        parseInt(complemento.precio) * habitacionesSeleccionadas.length;
     });
-
 
     subTotal = totalHabitaciones + totalComplementos;
 
-    total += subTotal + tarifaPortuaria + ((subTotal + tarifaPortuaria) * impuesto);
-    
+    total +=
+      subTotal + tarifaPortuaria + (subTotal + tarifaPortuaria) * impuesto;
+
     const fetchCruceroData = async () => {
       try {
         let habitacionesConHuespedes = [];
@@ -359,18 +379,15 @@ export function CreateReserva() {
             : "",
           habitaciones: habitacionesConHuespedes, // Actualizar las habitaciones con los datos de cantidad de huéspedes
 
-          complementos: complementosSeleccionados, 
+          complementos: complementosSeleccionados,
 
-          totalHabitaciones : totalHabitaciones, 
-          totalComplementos : totalComplementos,
-          subTotal : subTotal,
-          impuesto : impuesto,
-          tarifaPortuaria : tarifaPortuaria,
-          total : total,
-
-
+          totalHabitaciones: totalHabitaciones,
+          totalComplementos: totalComplementos,
+          subTotal: subTotal,
+          impuesto: impuesto,
+          tarifaPortuaria: tarifaPortuaria,
+          total: total,
         }));
-
       } catch (error) {
         console.error("Error al obtener los datos del crucero:", error);
         setError(error);
@@ -387,7 +404,7 @@ export function CreateReserva() {
     complementosSeleccionados,
     huespedesAgregados,
   ]);
-  
+
   //Función para manejar la eliminación de la habitación
   //seleccionada cuando se cierre el modal de "ModalGestionHuespedes"
   const eliminarHabitacionSeleccionada = (idHabitacion) => {
@@ -441,7 +458,6 @@ export function CreateReserva() {
           <Grid size={8} sm={6}>
             {/* Crucero */}
             <Grid size={6} sm={4}>
-
               <Typography variant="subtitle1">
                 <b>Usuario: </b> {usuario.nombre} ({usuario.correoElectronico})
               </Typography>
@@ -1258,7 +1274,8 @@ export function CreateReserva() {
                     {resumenReserva.complementos.map((complemento, index) => (
                       <ListItem key={index}>
                         <Typography>
-                          {complemento.nombre} - ${complemento.precio} - x{habitacionesSeleccionadas.length}
+                          {complemento.nombre} - ${complemento.precio} - x
+                          {habitacionesSeleccionadas.length}
                         </Typography>
                       </ListItem>
                     ))}

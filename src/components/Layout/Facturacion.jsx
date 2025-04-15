@@ -25,15 +25,7 @@ export function Facturacion() {
   const { usuario } = useUsuarioContext();
   console.log("Usuario cargado: ", usuario);
 
-  //Booleano para establecer sí se ha recibido respuesta
-  const [loaded, setLoaded] = useState(false);
-
-  // Para recibir el estado de resumenReserva cuando
-  // se navega a esta sección
-  
-  const { state } = useLocation();
-
-  if (state == null) {
+  if (usuario == null) {
     return (
       <Box
         sx={{
@@ -52,7 +44,34 @@ export function Facturacion() {
     );
   }
 
-  const {resumenReserva} = state;
+  // Estado booleano para establecer sí se ha recibido respuesta
+  const [loaded, setLoaded] = useState(false);
+
+  // Para recibir el estado de resumenReserva cuando
+  // se navega a esta sección
+
+  const { state } = useLocation();
+
+  if (!state || !state.resumenReserva) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+
+  const { resumenReserva } = state;
 
   // Array con las formas de pago
   const formasPago = [
@@ -113,17 +132,11 @@ export function Facturacion() {
   };
 
   // Esquema de validación
-  const reservaSchema = yup.object({
+  const facturaSchema = yup.object({
     numero: yup
       .string()
       .required("El número de tarjeta es requerido")
       .min(16, "El número de tarjeta no puede tener menos de 16 dígitos"),
-    apellido1: yup.string().required("El primer apellido es requerido"),
-    apellido2: yup.string().required("El segundo apellido es requerido"),
-    telefono: yup
-      .string()
-      .required("El teléfono es requerido")
-      .matches(/^\d{8,15}$/, "El teléfono debe tener entre 8 y 15 dígitos"),
     selectedOption: yup
       .object()
       .shape({
@@ -139,7 +152,7 @@ export function Facturacion() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(reservaSchema),
+    resolver: yupResolver(facturaSchema),
     mode: "onSubmit",
   });
 
@@ -151,47 +164,20 @@ export function Facturacion() {
   if (error) return <p>Error: {error.message}</p>;
 
   // Accion submit
-  const onSubmit = async (DataForm) => {
+  const onSubmit = async (data) => {
     try {
       // Validar el objeto con Yup de manera asíncrona
-      const isValid = await reservaSchema.isValid(DataForm);
+      const isValid = await facturaSchema.isValid(data);
 
       if (isValid) {
-        console.log("Enviando datos de la reserva al form: ", DataForm);
+        console.log("Enviando datos de pago al form: ", data);
       } else {
-        //Configurar el estado de crucero creado a false
+        console.error("Datos inválidos");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error al validar los datos:", error);
     }
   };
-
-
-  useEffect(() => {
-    // Establecer loaded en false cuando los datos del usuario estén disponibles
-    if (usuario !== null) {
-      setLoaded(false);
-    }
-  }, [usuario]);
-
-  if (!loaded) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-        <Typography variant="h5" gutterBottom>
-          <b>Cargando</b>
-        </Typography>
-      </Box>
-    );
-  }
 
   //use Effect para cargar la fecha límite de pagos del crucero
   useEffect(() => {
@@ -202,8 +188,8 @@ export function Facturacion() {
       )
         .then((response) => {
           console.log("Fecha límite de pago: ", response.data.fechaLimitePagos);
-          setLoaded(true);
           setFechaLimite(response.data.fechaLimitePagos);
+          setLoaded(true);
         })
         .catch((error) => {
           if (error instanceof SyntaxError) {
@@ -212,6 +198,8 @@ export function Facturacion() {
             throw new Error("Respuesta no válida del servidor");
           }
         });
+    } else {
+      setLoaded(false);
     }
   }, []);
 
