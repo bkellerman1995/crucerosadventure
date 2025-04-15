@@ -33,7 +33,7 @@ export function Facturacion() {
   
   const { state } = useLocation();
 
-  if (!loaded || state == null) {
+  if (state == null) {
     return (
       <Box
         sx={{
@@ -140,7 +140,7 @@ export function Facturacion() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(reservaSchema),
-    mode: "onSubmit", //validar al salir del campo
+    mode: "onSubmit",
   });
 
   //Hooks de control de errores
@@ -173,6 +173,25 @@ export function Facturacion() {
       setLoaded(false);
     }
   }, [usuario]);
+
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
 
   //use Effect para cargar la fecha límite de pagos del crucero
   useEffect(() => {
@@ -271,13 +290,20 @@ export function Facturacion() {
                     </Typography>
                     <Typography variant="subtitle1">
                       <b>Saldo:</b> $
-                      {parseInt(resumenReserva.total) -
-                        resumenReserva.habitaciones.reduce(
-                          (totalHuespedes, habitacion) =>
-                            totalHuespedes + parseInt(habitacion.cantidad),
-                          0
-                        ) *
-                          parseInt(selectedFormaPago)}
+                      {
+                        // Verificar que resumenReserva, total, habitaciones y selectedFormaPago existan
+                        resumenReserva &&
+                        resumenReserva.total &&
+                        selectedFormaPago
+                          ? parseInt(resumenReserva.total) -
+                            resumenReserva.habitaciones.reduce(
+                              (totalHuespedes, habitacion) =>
+                                totalHuespedes + parseInt(habitacion.cantidad),
+                              0
+                            ) *
+                              parseInt(selectedFormaPago)
+                          : 0 // Si falta algún valor, mostrar 0
+                      }
                     </Typography>
                   </Grid>
 
@@ -426,7 +452,7 @@ export function Facturacion() {
                                   e.target.value = e.target.value.slice(0, 3);
                                 }
                               }}
-                              helperText={errors.numero?.message}
+                              helperText={errors.cvv?.message}
                             />
                           );
                         }}
