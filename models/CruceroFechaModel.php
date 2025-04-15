@@ -55,11 +55,11 @@ class cruceroFechaModel
 
     }
 
-    public function getFechaLimitePagos ($idCrucero, $fecha)
+    public function obtenerCruceroFecha ($idCrucero, $fecha)
     {
         try {
             //Consulta sql
-            $vSql = "Select fechaLimitePagos from crucero_fecha where idCrucero = $idCrucero and fechaSalida = '$fecha';";
+            $vSql = "Select fechaLimitePagos, idCruceroFecha from crucero_fecha where idCrucero = $idCrucero and fechaSalida = '$fecha';";
 
             //Ejecutar la consulta
             // $vResultado = $this->enlace->executeSQL($vSql, [$idCrucero, $fecha]);

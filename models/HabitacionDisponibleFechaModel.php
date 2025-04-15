@@ -125,4 +125,42 @@ class HabitacionDisponibleFechaModel
         }
     }
 
+    public function getHabitacionesReservadas ($idCrucero, $fecha)
+    {
+        try {
+            //Consulta sql
+            $vSql = "SELECT 
+                        h.idHabitacion, 
+                        h.nombre, 
+                        h.descripcion,
+                        h.minHuesped,
+                        h.maxHuesped,
+                        h.idCategoriaHabitacion,
+                        ch.nombre as nombreCategoria,
+                        phf.precio    
+                    FROM habitacion h
+                    JOIN habitacion_disponible hd ON h.idHabitacion = hd.idHabitacion
+                    JOIN precio_habitacion_fecha phf ON h.idHabitacion = phf.idHabitacion
+                    JOIN crucero_fecha cf ON phf.idCruceroFecha = cf.idCruceroFecha
+                    JOIN categoriahabitacion ch ON h.idcategoriaHabitacion = ch.idcategoriaHabitacion
+                    WHERE hd.idCruceroFecha = cf.idCruceroFecha
+                        AND cf.idCrucero = $idCrucero
+                        AND cf.fechaSalida = '$fecha'    
+                        AND hd.disponible = 0
+                    order by idHabitacion desc";
+
+            //Ejecutar la consulta
+            // $vResultado = $this->enlace->executeSQL($vSql, [$idCrucero, $fecha]);
+            $vResultado = $this->enlace->executeSQL($vSql);
+
+
+            //Retornar la respuesta
+            return $vResultado;
+
+        } catch (Exception $e) {
+            handleException($e);
+        }
+
+    }
+
 }

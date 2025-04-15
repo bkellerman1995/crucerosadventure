@@ -15,7 +15,7 @@ class CruceroFechaService {
   }
 
   // Solicitar la fecha límite de pagos
-  getFechaLimiteDePago(idCrucero, fechaSeleccionada) {
+  getCruceroFecha(idCrucero, fechaSeleccionada) {
     console.log("BASE_URL crucerofecha: ", BASE_URL);
     console.log("idCrucero: ", idCrucero, "fecha: ", fechaSeleccionada);
 

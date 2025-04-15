@@ -36,8 +36,8 @@ class cruceroFecha
         }
     }
 
-    // Solicitud para obtener la fecha limite de pagos (tabla crucero_fecha) 
-    public function obtenerFechaLimitePagos ()
+    // Solicitud para obtener objeto crucero_fecha (tabla crucero_fecha) 
+    public function obtenerCruceroFecha ()
     {
         try {
             $response = new Response();
@@ -52,7 +52,7 @@ class cruceroFecha
             //Método del modelo
             //Si los parámetros idCrucero y fecha están presentes, pasarlos al método del modelo
             if ($idCrucero && $fechaSeleccionada) {
-                $result = $cruceroFechaModel->getFechaLimitePagos($idCrucero, $fechaSeleccionada);
+                $result = $cruceroFechaModel->obtenerCruceroFecha($idCrucero, $fechaSeleccionada);
 
                 // Si la respuesta es vacía, devolver un mensaje indicando que no hay habitaciones disponibles
                 if (empty($result)) {

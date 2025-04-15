@@ -84,7 +84,7 @@ class RoutesController
                 //Verificar si el método es GET
                 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                     $controller = 'cruceroFecha';  // Especificar el controlador
-                    $action = 'obtenerFechaLimitePagos';  // Especificar la acción para obtener fecha límite de pagos
+                    $action = 'obtenerCruceroFecha';  // Especificar la acción para obtener fecha límite de pagos
                     $idCrucero = isset($queryParams['idCrucero']) ? $queryParams['idCrucero'] : null;
                     $fechaSeleccionada = isset($queryParams['fechaSeleccionada']) ? $queryParams['fechaSeleccionada'] : null;
 

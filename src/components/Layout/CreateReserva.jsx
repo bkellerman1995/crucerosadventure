@@ -23,6 +23,7 @@ import CrucerosService from "../../services/CrucerosService";
 import HabitacionService from "../../services/HabitacionService";
 import HabitacionDisponibleFecha from "../../services/HabitacionDisponibleFechaService";
 import {useUsuarioContext} from "../../context/usuarioContext";
+import ReservaService from "../../services/ReservaService";
 
 export function CreateReserva() {
   // Usar el contexto para acceder al usuario
@@ -158,6 +159,9 @@ export function CreateReserva() {
 
   // Estado para actualizar la información del resumen de la reserva
   const [resumenReserva, setResumenReserva] = useState({
+    idReserva: 0,
+    idUsuario : 0,
+    idCruceroFecha: 0,
     crucero: "",
     nombre: "",
     puertoSalida: "",
@@ -1141,10 +1145,6 @@ export function CreateReserva() {
                         });
                     });
                   }
-                  toast.success(`Reserva gestionada correctamente`, {
-                    duration: 2000,
-                    position: "top-center",
-                  });
 
                   console.log(
                     "Resumen de reserva antes de navegar:",
@@ -1159,12 +1159,76 @@ export function CreateReserva() {
 
                   console.log("Resumen serializado:", serializedResumenReserva);
 
-                  // Enviar un objeto limpio y serializable al state
-                  navigate("/reserva/factura", {
-                    state: {
-                      resumenReserva: serializedResumenReserva,
-                    },
-                  });
+                  // Crear la reserva
+
+                  console.log("Datos a enviar para crear la reserva")
+
+                  // Traer el id del Usuario 
+
+                  const formData = {
+                    ...serializedResumenReserva,
+                    idUsuario: parseInt(usuario.idUsuario),
+                    cantHabitaciones: resumenReserva.habitaciones.length,
+                    cantHuespedes: parseInt(
+                      resumenReserva.habitaciones.reduce(
+                        (total, habitacion) => total + habitacion.cantidad,
+                        0
+                      )
+                    ),
+                  };
+                  
+                  //Enviar datos de la reserva para crearla 
+
+                  console.log ("Enviando datos de reserva a crear: ", formData);
+
+                  ReservaService.createReserva(formData)
+                    .then((response) => {
+                      if (response.data) {
+                        console.log("Reserva creada correctamente");
+
+                        // Obtener el id de la Reserva para poder actualizarla
+                        // en la página de facturación
+                        console.log(
+                          "Id de la reserva creada: ",
+                          response.data.idReserva
+                        );
+                        resumenReserva.idReserva = response.data.idReserva;
+
+                        console.log(
+                          "Id de la reserva: ",
+                          resumenReserva.idReserva
+                        );
+
+                        toast.success(
+                          `Reserva #${resumenReserva.idReserva} gestionada correctamente`,
+                          {
+                            duration: 2000,
+                            position: "top-center",
+                          }
+                        );
+
+                        // incluir idReserva en el objeto de reserva final
+
+                        const resumenReservaCompleta = {
+                          ...serializedResumenReserva,
+                          idReserva: parseInt(resumenReserva.idReserva),
+                        };
+
+                        console.log(
+                          "Enviando reserva completa a facturación",
+                          resumenReservaCompleta
+                        );
+                        // Enviar un objeto limpio y serializable al state
+                        navigate("/reserva/factura", {
+                          state: {
+                            resumenReserva: resumenReservaCompleta,
+                          },
+                        });
+                      }
+                    })
+                    .catch((error) =>
+                      console.error("Error al crear la reserva: ", error)
+                    );
                 }}
                 // Deshabilita el botón si no hay complementos o habitaciones seleccionadas
                 disabled={habitacionesSeleccionadas.length > 0 ? false : true}

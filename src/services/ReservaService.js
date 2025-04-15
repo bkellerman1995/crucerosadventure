@@ -22,18 +22,20 @@ class ReservaService {
         return axios.get(BASE_URL + '/'+ ReservaId);
     }
 
-    // createHabitacion(Habitacion) {
-    //     return axios.post(BASE_URL, JSON.stringify(Habitacion));
-    //   }
-      
-    //   updateHabitacion(Habitacion) {
-    //     return axios({
-    //       method: 'put',
-    //       url: BASE_URL,
-    //       data: JSON.stringify(Habitacion)
-    
-    //     })
-    //   }
+    // crear Reserva
+    createReserva (reserva) {
+      return axios.post(BASE_URL, JSON.stringify(reserva));
+    }
+
+    // actualizar reserva
+    updateReserva(reserva) {
+        return axios({
+          method: "put",
+          url: BASE_URL,
+          data: JSON.stringify(reserva),
+        });
+      }
+
 }
 
 export default new ReservaService()
