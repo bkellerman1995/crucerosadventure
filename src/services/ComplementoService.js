@@ -40,6 +40,7 @@ class ComplementoService {
       data: JSON.stringify(complemento),
     });
   }
+
 }
 
 export default new ComplementoService();

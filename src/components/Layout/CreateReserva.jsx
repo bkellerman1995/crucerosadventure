@@ -24,6 +24,7 @@ import HabitacionService from "../../services/HabitacionService";
 import HabitacionDisponibleFecha from "../../services/HabitacionDisponibleFechaService";
 import {useUsuarioContext} from "../../context/usuarioContext";
 import ReservaService from "../../services/ReservaService";
+import ReservaComplementoService from "../../services/ReservaComplementoService";
 
 export function CreateReserva() {
   // Usar el contexto para acceder al usuario
@@ -1213,6 +1214,37 @@ export function CreateReserva() {
                           ...serializedResumenReserva,
                           idReserva: parseInt(resumenReserva.idReserva),
                         };
+
+                        // Enviar los complementos a la reserva
+
+                        resumenReserva.complementos.forEach((complemento) => {
+                          if (complemento) {
+                            console.log(
+                              "Agregar a la reserva complemento con ID: ",
+                              complemento.idComplemento
+                            );
+
+                            const complementoform = {
+                              idReserva : resumenReserva.idReserva, 
+                              idComplemento : complemento.idComplemento,
+                            }
+
+                            ReservaComplementoService.agregarComplementoReserva(complementoform)
+                              .then((response) => {
+                                if (response?.data) {
+                                  console.log(
+                                    `Complemento con id ${complemento.idComplemento} agregado exitosamente`
+                                  );
+                                }
+                              })
+                              .catch((error) => {
+                                console.error(
+                                  `Error al agregar complemento con ID ${complemento.idComplemento} en la reserva`,
+                                  error
+                                );
+                              });
+                          }
+                        });
 
                         console.log(
                           "Enviando reserva completa a facturación",

@@ -36,6 +36,7 @@ require_once "models/HabitacionDisponibleFechaModel.php";
 require_once "models/HuespedModel.php";
 require_once "models/ComplementoModel.php";
 require_once "models/UsuarioModel.php";
+require_once "models/ReservaComplementoModel.php";
 
 
 /***--- Agregar todos los controladores*/
@@ -55,6 +56,7 @@ require_once "controllers/HabitacionDisponibleFecha.php";
 require_once "controllers/HuespedController.php";
 require_once "controllers/ComplementoController.php";
 require_once "controllers/UsuarioController.php";
+require_once "controllers/ReservaComplementoController.php";
 
 //Enrutador
 require_once "routes/RoutesController.php";
