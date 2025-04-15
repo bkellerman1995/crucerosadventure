@@ -25,19 +25,34 @@ export function Facturacion() {
   const { usuario } = useUsuarioContext();
   console.log("Usuario cargado: ", usuario);
 
-  if (isLoading) {
-    return <CircularProgress />; // Spinner mientras se cargan los datos
-  }
-
-  // Estado para cargar un spinner
-  const [isLoading, setIsLoading] = useState(true);
+  //Booleano para establecer sí se ha recibido respuesta
+  const [loaded, setLoaded] = useState(false);
 
   // Para recibir el estado de resumenReserva cuando
   // se navega a esta sección
+  
   const { state } = useLocation();
 
-  // Acceder al estado de resumenReserva
-  const { resumenReserva } = state;
+  if (!loaded || state == null) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+
+  const {resumenReserva} = state;
 
   // Array con las formas de pago
   const formasPago = [
@@ -109,7 +124,8 @@ export function Facturacion() {
       .string()
       .required("El teléfono es requerido")
       .matches(/^\d{8,15}$/, "El teléfono debe tener entre 8 y 15 dígitos"),
-    selectedOption: yup.object()
+    selectedOption: yup
+      .object()
       .shape({
         label: yup.string().required("Seleccione una opción"),
         value: yup.string().required("Seleccione una opción"),
@@ -136,7 +152,6 @@ export function Facturacion() {
 
   // Accion submit
   const onSubmit = async (DataForm) => {
-
     try {
       // Validar el objeto con Yup de manera asíncrona
       const isValid = await reservaSchema.isValid(DataForm);
@@ -151,30 +166,34 @@ export function Facturacion() {
     }
   };
 
+
   useEffect(() => {
-    // Establecer isLoading en false cuando los datos del usuario estén disponibles
+    // Establecer loaded en false cuando los datos del usuario estén disponibles
     if (usuario !== null) {
-      setIsLoading(false);
+      setLoaded(false);
     }
   }, [usuario]);
 
   //use Effect para cargar la fecha límite de pagos del crucero
   useEffect(() => {
-    CruceroFechaService.getFechaLimiteDePago(
-      resumenReserva.crucero,
-      fechaFormateada
-    )
-      .then((response) => {
-        console.log("Fecha límite de pago: ", response.data.fechaLimitePagos);
-        setFechaLimite(response.data.fechaLimitePagos);
-      })
-      .catch((error) => {
-        if (error instanceof SyntaxError) {
-          console.log(error);
-          setError(error);
-          throw new Error("Respuesta no válida del servidor");
-        }
-      });
+    if (resumenReserva !== null) {
+      CruceroFechaService.getFechaLimiteDePago(
+        resumenReserva.crucero,
+        fechaFormateada
+      )
+        .then((response) => {
+          console.log("Fecha límite de pago: ", response.data.fechaLimitePagos);
+          setLoaded(true);
+          setFechaLimite(response.data.fechaLimitePagos);
+        })
+        .catch((error) => {
+          if (error instanceof SyntaxError) {
+            console.log(error);
+            setError(error);
+            throw new Error("Respuesta no válida del servidor");
+          }
+        });
+    }
   }, []);
 
   //Cargar el grid del componente.
@@ -214,7 +233,7 @@ export function Facturacion() {
                 </Typography>
                 <Grid item sx={{ width: "60%", marginLeft: "20px" }}>
                   <Select
-                    name = "pago"
+                    name="pago"
                     options={formasPago.map((pago) => ({
                       label: `${pago.tipo} = $${pago.monto}`,
                       value: pago.monto,
