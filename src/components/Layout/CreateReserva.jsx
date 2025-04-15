@@ -1331,9 +1331,7 @@ export function CreateReserva() {
                   <Typography variant="subtitle1">
                     <b>Complementos seleccionados:</b>
                   </Typography>
-                  {/* <Typography variant="subtitle1">
-                    <b>{resumenReserva.complementos}</b>
-                  </Typography> */}
+
                   <List>
                     {resumenReserva.complementos.map((complemento, index) => (
                       <ListItem key={index}>

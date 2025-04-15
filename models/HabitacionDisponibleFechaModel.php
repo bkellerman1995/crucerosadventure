@@ -137,7 +137,8 @@ class HabitacionDisponibleFechaModel
                         h.maxHuesped,
                         h.idCategoriaHabitacion,
                         ch.nombre as nombreCategoria,
-                        phf.precio    
+                        phf.precio,
+                        (SELECT COUNT(*) FROM huesped hu WHERE hu.idHabitacion = h.idHabitacion) AS cantidadHuespedes
                     FROM habitacion h
                     JOIN habitacion_disponible hd ON h.idHabitacion = hd.idHabitacion
                     JOIN precio_habitacion_fecha phf ON h.idHabitacion = phf.idHabitacion

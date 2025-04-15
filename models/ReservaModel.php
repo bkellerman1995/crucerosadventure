@@ -144,24 +144,8 @@ class ReservaModel
                 $habitacionesReservadas = $habitacionDisponibleFechaModel->getHabitacionesReservadas($crucero->idCrucero, $cruceroFecha->fechaSalida);
                 $vResultado->habitacionesReservadas = $habitacionesReservadas;
 
-                foreach ($vResultado->habitaciones as &$habitacion) { // Referencia para modificar el objeto
-                    $vSql = "SELECT precioHabitacion from crucero_fecha WHERE idCrucero='$cruceroFecha->idCrucero' and fechaSalida = '$vResultado->fechaInicio' order by idCruceroFecha desc;";
-                    $resultado = $this->enlace->executeSQL($vSql);
-    
-                    // Verificar que la consulta devolvió resultados válidos
-                    $precioPagar = (!empty($resultado) && isset($resultado[0]->precioHabitacion)) ? $resultado[0]->precioHabitacion : 0;
-    
-                    // Asignar el valor correctamente
-                    $habitacion->precio = $precioPagar;
-    
-                    //Sumar al total de pagar para las habitaciones
-                    $totalHabitaciones += $precioPagar;
-                }
-
-                //Extraer la información de los complementos del crucero
-                // $complementos = $cruceroModel->getComplementosPorCrucero($cruceroFecha->idCrucero);
-                // $vResultado->complementos = $complementos;
-                //Retornar la respuesta
+                //Extraer la información de los complementos añadidos
+                // $complementosAdicionales = 
             }
 
             return $vResultado;
