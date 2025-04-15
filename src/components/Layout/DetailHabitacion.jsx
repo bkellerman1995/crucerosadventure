@@ -12,6 +12,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Grid from "@mui/material/Grid2";
 import HabitacionService from "../../services/HabitacionService";
+import { CircularProgress } from "@mui/material";
+
 
 export function DetailHabitacion() {
   const routeParams = useParams();
@@ -40,7 +42,25 @@ export function DetailHabitacion() {
       });
   }, [routeParams.id]);
 
-  if (!loaded) return <p>Cargando...</p>;
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center", 
+          alignItems: "center", 
+          height: "100vh", 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+  
   if (error) return <p>Error: {error.message}</p>;
   return (
     <Container component="main" sx={{ mt: 8, mb: 2 }}>

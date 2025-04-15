@@ -16,6 +16,7 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import Divider from "@mui/material/Divider";
 import BarcoService from "../../services/BarcoService";
+import { CircularProgress } from "@mui/material";
 
 export function DetailBarco() {
   const { id } = useParams();
@@ -37,8 +38,25 @@ export function DetailBarco() {
       });
   }, [id]);
 
-  if (!loaded) return <Typography>Cargando...</Typography>;
-  if (error) return <Typography>Error: {error.message}</Typography>;
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center", 
+          alignItems: "center", 
+          height: "100vh", 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+    if (error) return <Typography>Error: {error.message}</Typography>;
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>

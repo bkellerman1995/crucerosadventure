@@ -2,24 +2,35 @@ import React from "react";
 import {useLocation} from "react-router-dom";
 import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useForm, Controller} from "react-hook-form";
-import { Tooltip, List, ListItem,Box, TextField} from "@mui/material";
+import {List, ListItem,Box, TextField} from "@mui/material";
 import Select from "react-select";
 import dayjs from "dayjs";
+import { es } from 'date-fns/locale';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import CruceroFechaService from "../../services/CruceroFechaService";
 import {useUsuarioContext} from "../../context/usuarioContext";
 import { format, addDays } from 'date-fns';
+import { CircularProgress } from "@mui/material";
 
 export function Facturacion() {
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
   console.log("Usuario cargado: ", usuario);
+
+  if (isLoading) {
+    return <CircularProgress />; // Spinner mientras se cargan los datos
+  }
+
+  // Estado para cargar un spinner
+  const [isLoading, setIsLoading] = useState(true);
 
   // Para recibir el estado de resumenReserva cuando
   // se navega a esta sección
@@ -44,8 +55,9 @@ export function Facturacion() {
     return `${año}-${mes}-${dia}`; // Reordenar las partes en formato YYYY-MM-DD
   }
 
+  // Fecha formateada a "yyyy-mm-dd"
   const fechaFormateada = formatearFecha(resumenReserva.fechaInicio);
-  console.log("Fecha formateada a enviar",fechaFormateada); 
+  console.log("Fecha formateada a enviar", fechaFormateada);
 
   // Estado de fecha del dia de hoy
   const [fechaSeleccionada, setFechaSeleccionada] = useState(
@@ -75,7 +87,7 @@ export function Facturacion() {
       borderColor: "gray",
       boxShadow: "none",
       "&:hover": {
-        borderColor: "#16537e", // Cambia el borde cuando pasas el mouse
+        borderColor: "#16537e", // Cambia el borde cuando pasa el mouse
       },
     }),
 
@@ -85,20 +97,34 @@ export function Facturacion() {
     }),
   };
 
+  // Esquema de validación
+  const reservaSchema = yup.object({
+    numero: yup
+      .string()
+      .required("El número de tarjeta es requerido")
+      .min(16, "El número de tarjeta no puede tener menos de 16 dígitos"),
+    apellido1: yup.string().required("El primer apellido es requerido"),
+    apellido2: yup.string().required("El segundo apellido es requerido"),
+    telefono: yup
+      .string()
+      .required("El teléfono es requerido")
+      .matches(/^\d{8,15}$/, "El teléfono debe tener entre 8 y 15 dígitos"),
+    selectedOption: yup.object()
+      .shape({
+        label: yup.string().required("Seleccione una opción"),
+        value: yup.string().required("Seleccione una opción"),
+      })
+      .required("Seleccione un método de pago"),
+  });
+
   //Función para manejar el form
   const {
     control,
-    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      nombre: "",
-      foto: "",
-      cantDias: 7,
-      idBarco: null,
-      estado: "",
-    },
+    resolver: yupResolver(reservaSchema),
+    mode: "onSubmit", //validar al salir del campo
   });
 
   //Hooks de control de errores
@@ -110,16 +136,6 @@ export function Facturacion() {
 
   // Accion submit
   const onSubmit = async (DataForm) => {
-    //Validar si se ha seleccionado un barco
-
-    if (!selectedCrucero) {
-      setTimeout(() => {
-        if (!selectedCrucero) {
-          alert("Debe seleccionar un crucero");
-        }
-      }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
-      return;
-    }
 
     try {
       // Validar el objeto con Yup de manera asíncrona
@@ -134,6 +150,13 @@ export function Facturacion() {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    // Establecer isLoading en false cuando los datos del usuario estén disponibles
+    if (usuario !== null) {
+      setIsLoading(false);
+    }
+  }, [usuario]);
 
   //use Effect para cargar la fecha límite de pagos del crucero
   useEffect(() => {
@@ -191,6 +214,7 @@ export function Facturacion() {
                 </Typography>
                 <Grid item sx={{ width: "60%", marginLeft: "20px" }}>
                   <Select
+                    name = "pago"
                     options={formasPago.map((pago) => ({
                       label: `${pago.tipo} = $${pago.monto}`,
                       value: pago.monto,
@@ -201,7 +225,6 @@ export function Facturacion() {
                         selectedOption.value
                       );
                       setSelectedFormaPago(selectedOption.value);
-                      setValue("pago", selectedOption.value);
                     }}
                     styles={{
                       ...customStyles,
@@ -218,7 +241,6 @@ export function Facturacion() {
 
               <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <Grid container spacing={2} direction="column">
-
                   {/* Texto de Fecha limite de pagos*/}
                   <Grid container direction="column" xs={12} sm={6}>
                     <Typography variant="subtitle1">
@@ -299,7 +321,10 @@ export function Facturacion() {
                   {/* Campo fecha Caducidad */}
                   <Grid item size={4} xs={12} sm={6}>
                     <FormControl fullWidth>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <LocalizationProvider
+                        dateAdapter={AdapterDayjs}
+                        locale={es}
+                      >
                         <Controller
                           name="fechaCaducidad"
                           control={control} // Control de react-hook-form

@@ -22,6 +22,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { format } from "date-fns";
 import CrucerosService from "../../services/CrucerosService";
+import { CircularProgress } from "@mui/material";
+
 
 export function DetailCrucero() {
   const { id } = useParams();
@@ -41,7 +43,25 @@ export function DetailCrucero() {
       });
   }, [id]);
 
-  if (!loaded) return <Typography>Cargando...</Typography>;
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center", 
+          alignItems: "center", 
+          height: "100vh", 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+  
   if (error) return <Typography>Error: {error.message}</Typography>;
 
   return (

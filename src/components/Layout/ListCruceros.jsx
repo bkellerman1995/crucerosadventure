@@ -2,6 +2,9 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { ListCardCruceros } from './ListCardCruceros';
 import CruceroService from '../../services/CrucerosService';
+import {Box,Typography} from "@mui/material";
+import { CircularProgress } from "@mui/material";
+
 
 export function ListCruceros() {
   //Resultado de consumo del API, respuesta
@@ -28,8 +31,26 @@ export function ListCruceros() {
         }
       });
   }, []);
-  if(!loaded) return <p>Cargando..</p>
-  if(error) return <p>Error: {error.message}</p>
+
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center", 
+          alignItems: "center", 
+          height: "100vh", 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+    if(error) return <p>Error: {error.message}</p>
   return <>{data && <ListCardCruceros data={data}/>}</>
  
 }

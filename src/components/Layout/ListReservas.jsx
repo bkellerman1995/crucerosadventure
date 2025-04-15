@@ -26,6 +26,7 @@ import Button from "@mui/material/Button";
 import { IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import {useUsuarioContext} from "../../context/usuarioContext";
+import { CircularProgress } from "@mui/material";
 
 ListReservas.propTypes = {
   data: PropTypes.array,
@@ -310,7 +311,25 @@ export function ListReservas() {
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
 
-  if (!loaded) return <p>Cargando...</p>;
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center", 
+          alignItems: "center", 
+          height: "100vh", 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+
   if (error) return <p>Error: {error.message}</p>;
 
   return (

@@ -15,7 +15,6 @@ import BarcoService from "../../services/BarcoService";
 import HabitacionService from "../../services/HabitacionService";
 import CatHabitacionService from "../../services/CatHabitacionService";
 import toast from "react-hot-toast";
-import { ForkRight } from "@mui/icons-material";
 
 export function CreateHabitacion() {
   const navigate = useNavigate();

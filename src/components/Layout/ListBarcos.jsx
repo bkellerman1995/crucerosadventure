@@ -25,6 +25,8 @@ import { Visibility } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
+import { CircularProgress } from "@mui/material";
+
 
 // Ordenar descendente
 function descendingComparator(a, b, orderBy) {
@@ -249,7 +251,25 @@ export function ListBarcos() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
-  if (!loaded) return <p>Cargando...</p>;
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center", 
+          alignItems: "center", 
+          height: "100vh", 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+  
   if (error) return <p>Error: {error.message}</p>;
 
   return (

@@ -11,6 +11,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Grid from "@mui/material/Grid2";
 import ReservaService from "../../services/ReservaService";
+import { CircularProgress } from "@mui/material";
+
 
 export function DetailReserva() {
   const routeParams = useParams();
@@ -52,7 +54,25 @@ export function DetailReserva() {
       });
   }, [routeParams.id]);
 
-  if (!loaded) return <p>Cargando...</p>;
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center", 
+          alignItems: "center", 
+          height: "100vh", 
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+  
   if (error) return <p>Error: {error.message}</p>;
 
   console.log("datos del crucero", data);
