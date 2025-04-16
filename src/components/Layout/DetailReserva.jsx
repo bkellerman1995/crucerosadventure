@@ -48,13 +48,13 @@ export function DetailReserva() {
 
     // Opciones de configuración de html2pdf.js
     const options = {
-      margin: 10, // Márgenes
+      margin: 20, // Márgenes
       filename: "detalle_reserva.pdf", // Nombre del archivo PDF
       image: { type: "jpeg", quality: 0.98 }, // Opciones de imagen
-      html2canvas: { scale: 2 }, // Aumenta la escala de la renderización
+      html2canvas: { scale: 2,logging: true, dpi: 300, letterRendering: true }, // Aumenta la escala de la renderización
       jsPDF: {
         unit: "mm", // Unidades en milímetros
-        format: "a3", // Formato de la página
+        format: "a4", // Formato de la página
         orientation: "portrait", // Orientación de la página
         putOnlyUsedFonts: true, // Solo usar las fuentes necesarias
         callback: function (doc) {
@@ -73,40 +73,44 @@ export function DetailReserva() {
     };
 
     // Generar el PDF
-    html2pdf().from(contenido).set(options).toPdf().get('pdf').then((pdf) => {
-      var totalPaginas = pdf.internal.getNumberOfPages();
+    html2pdf()
+      .from(contenido)
+      .set(options)
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        var totalPaginas = pdf.internal.getNumberOfPages();
+        const pageHeight = pdf.internal.pageSize.height;
+        const pageWidth = pdf.internal.pageSize.width;
+        // Para generar el footer
+        for (let i = 1; i <= totalPaginas; i++) {
+          // Agregar el footer a cada página
+          pdf.setPage(i);
+          pdf.setFontSize(10);
 
-    // Para generar el footer
-    for (let i = 1; i <= totalPaginas; i++) {
-      // Agregar el footer a cada página
-      const pageHeight = pdf.internal.pageSize.height;
-      const pageWidth = pdf.internal.pageSize.width;
-      pdf.setPage(i);
-      pdf.setFontSize(10);
+          //Total de páginas
+          pdf.text(
+            pageWidth - 40,
+            pageHeight - 10,
+            `Página ${i} de ${totalPaginas}`
+          );
+        }
 
-      // Establecer la posición inicial para la primera línea (X: 10, Y: pageHeight - 20)
-      let yPosition = pageHeight - 20;
+        // Establecer la posición inicial para la primera línea (X: 10, Y: pageHeight - 20)
+        let yPosition = pageHeight - 20;
 
-      // Datos de la empresa alineados a la izquierda
-      pdf.text(10, yPosition, "CRuceros Adventure");
-      yPosition += 5; // Aumentar el valor de Y para la siguiente línea
-      pdf.text(10, yPosition, "Correo: administracion@crucerosadventure.com");
-      yPosition += 5;
-      pdf.text(10, yPosition, "Teléfono: +50624420002");
-      yPosition += 5;
-      pdf.text(10, yPosition, "Sitio web: crucerosadventure.com");
+        // Datos de la empresa alineados a la izquierda
+        pdf.text(10, yPosition, "CRuceros Adventure");
+        yPosition += 5; // Aumentar el valor de Y para la siguiente línea
+        pdf.text(10, yPosition, "Correo: administracion@crucerosadventure.com");
+        yPosition += 5;
+        pdf.text(10, yPosition, "Teléfono: +50624420002");
+        yPosition += 5;
+        pdf.text(10, yPosition, "Sitio web: crucerosadventure.com");
+      })
+      .save();
 
-      //Total de páginas
-      pdf.text(
-        pageWidth - 40,
-        pageHeight - 10,
-        `Página ${i} de ${totalPaginas}`
-      );
-    }
-   
-  }).save();
-
-  this.elementPDF.clear();
+    this.elementPDF.clear();
   };
 
   if (!loaded) {
