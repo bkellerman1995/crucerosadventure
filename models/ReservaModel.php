@@ -150,6 +150,10 @@ class ReservaModel
                 //Extraer la información de los complementos añadidos
                 $complementosAdicionales = $reservaComplementoModel->get($id);
                 $vResultado->complementosAdicionales = $complementosAdicionales;
+
+                //Extraer la fecha limite de pagos
+                $fechaLimitePagos = $cruceroFechaModel->obtenerCruceroFecha($cruceroFecha->idCrucero,$cruceroFecha->fechaSalida);
+                $vResultado->fechaLimitePagos = $fechaLimitePagos;
             }
 
             return $vResultado;

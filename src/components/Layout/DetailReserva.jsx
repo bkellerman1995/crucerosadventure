@@ -1,21 +1,17 @@
 import React from "react";
-import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItemText from "@mui/material/ListItemText";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemButton from "@mui/material/ListItemButton";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import Grid from "@mui/material/Grid2";
 import ReservaService from "../../services/ReservaService";
 import { CircularProgress } from "@mui/material";
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+// import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { jsPDF } from "jspdf";
+import html2pdf from "html2pdf.js"; 
 import {Card, ListGroup, Row, Col, Table, Button } from 'react-bootstrap';
 import ContainerBootStrap from 'react-bootstrap/Container';
-import {format} from 'date-fns';
+import {format, addDays} from 'date-fns';
 
 
 export function DetailReserva() {
@@ -29,18 +25,6 @@ export function DetailReserva() {
   const [error, setError] = useState("");
   //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
-
-  //variable para almacenar el total a pagar solo por los complementos
-  let totalComplementos = 0;
-
-  //variable para almacenar el impuesto (IVA)
-  const impuesto = 0.13;
-
-  //variable para almacenar tarifas de servicios
-  const tarifaServicio = 100;
-
-  //variable para almacenar la fecha de pago (si la reserva está pendiente de pago)
-  let fechaPago = new Date();
 
   useEffect(() => {
     //Llamar al API y obtener una reserva por su id
@@ -58,15 +42,47 @@ export function DetailReserva() {
       });
   }, [routeParams.id]);
 
+  //Función para exportar reserva a PDF
+  const exportarAPDF = () => {
+    const contenido = document.getElementById("contenido");
+
+    // Opciones de configuración de html2pdf.js
+    const options = {
+      margin: 10, // Márgenes
+      filename: "detalle_reserva.pdf", // Nombre del archivo PDF
+      image: { type: "jpeg", quality: 0.98 }, // Opciones de imagen
+      html2canvas: { scale: 2 }, // Aumenta la escala de la renderización
+      jsPDF: {
+        unit: "mm", // Unidades en milímetros
+        format: "a3", // Formato de la página
+        orientation: "portrait", // Orientación de la página
+        putOnlyUsedFonts: true, // Solo usar las fuentes necesarias
+        callback: function (doc) {
+          const pageHeight = doc.internal.pageSize.height;
+          const pageWidth = doc.internal.pageSize.width;
+
+          // Agregar pie de página
+          const footerText = `Página ${doc.internal.getNumberOfPages()}`;
+          doc.setFontSize(10);
+          doc.text(footerText, pageWidth - 20, pageHeight - 10, {
+            align: "right",
+          });
+        },
+      },
+    };
+    // Generar el PDF
+    html2pdf().from(contenido).set(options).save();
+  };
+
   if (!loaded) {
     return (
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center", 
-          alignItems: "center", 
-          height: "100vh", 
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
         <CircularProgress />
@@ -76,10 +92,10 @@ export function DetailReserva() {
       </Box>
     );
   }
-  
+
   if (error) return <p>Error: {error.message}</p>;
 
-  //Obtener la fecha de hoy 
+  //Obtener la fecha de hoy
   const hoy = new Date();
 
   console.log("Datos de la reserva", data);
@@ -88,222 +104,236 @@ export function DetailReserva() {
     <ContainerBootStrap component="main" className="mt-5">
       {data && (
         // Envolver todo el contenido de la reserva en un card
-        <Card>
-          {/* Encabezado */}
-          <Card.Header>
-            <h2>
-              <b>Resumen de Reserva - Crucero #{data.idReserva}</b>
-            </h2>
-            <img
-              src="../uploads/LogoTransparente.png"
-              alt="Logo"
-              style={{ width: "80px", height: "80px" }} // Ajusta el tamaño según sea necesario
-            ></img>
-            <h6>
-              <b>Fecha de emisión</b>: {format(hoy, "dd/MM/yyyy")}
-            </h6>
-          </Card.Header>
+        <>
+          <Card id="contenido">
+            {/* Encabezado */}
+            <Card.Header>
+              <h2>
+                <b>Resumen de Reserva - Crucero #{data.idReserva}</b>
+              </h2>
+              <img
+                src="../uploads/LogoTransparente.png"
+                alt="Logo"
+                style={{ width: "80px", height: "80px" }} // Ajusta el tamaño según sea necesario
+              ></img>
+              <h6>
+                <b>Fecha de emisión</b>: {format(hoy, "dd/MM/yyyy")}
+              </h6>
+            </Card.Header>
 
-          {/* Cuerpo/Contenido */}
-          <Card.Body>
-            <h4>
-              <b>Detalles de la Reserva</b>
-            </h4>
-            <br />
-            <h5>
-              <b>Nombre del crucero: </b>
-              {data.nombreCrucero}
-            </h5>
-            <br />
-
-            {/* Puerto de salida y de regreso */}
-            <Row className="mb-3">
-              <Col xs={12} md={6}>
-                <h5>
-                  <b>Puertos (salida y regreso):</b>
-                </h5>
-                <ListGroup>
-                  {data.itinerarioPuertos.map((item) => (
-                    <ListGroup.Item key={item.idItinerario}>
-                      <ArrowRightIcon /> {item.puerto.nombre} -{" "}
-                      {item.puerto.pais.descripcion}
-                      <div>{item.puerto.descripcion}</div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-                <br />
-              </Col>
-
-              {/* Fecha de salida y de regreso */}
-              <Col xs={12} md={6}>
-                <h5>
-                  <b>Fechas:</b>
-                </h5>
-                <ListGroup>
-                  <ListGroup.Item>
-                    <div>
-                      <strong>Fecha de salida:</strong>{" "}
-                      {new Date(data.fechaInicio).toLocaleDateString("en-GB")}
-                    </div>
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <div>
-                      <strong>Fecha de llegada:</strong>{" "}
-                      {new Date(data.fechaFinal.date).toLocaleDateString(
-                        "en-GB"
-                      )}
-                    </div>
-                  </ListGroup.Item>
-                </ListGroup>
-              </Col>
-            </Row>
-
-            <Row className="mb-3">
-            {/* Habitaciones reservadas */}
-            <Col xs={12} md={6}>
-              <h5>
-                <b>Habitaciones reservadas:</b>
-              </h5>
-              <Table striped bordered hover responsive>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.habitacionesReservadas.map((item) => (
-                    <tr key={item.idHabitacion}>
-                      <td>
-                        {item.nombre}
-                        <p>
-                          <ArrowRightIcon />
-                          Número de huéspedes: {item.cantidadHuespedes}
-                        </p>
-                      </td>
-                      <td>${item.precio}</td>
-                    </tr>
-                  ))}
-                  <tr>
-                    <td colSpan="3" className="text-right">
-                      <b>Total:</b>
-                    </td>
-                    <td className="text-right">
-                      {`$${data.totalHabitaciones}`}
-                    </td>
-                  </tr>
-                </tbody>
-              {/* </Table> */}
+            {/* Cuerpo/Contenido */}
+            <Card.Body>
+              <h4>
+                <b>Detalles de la Reserva</b>
+              </h4>
               <br />
-
-              {/* Complementos adicionales */}
               <h5>
-                <b>Complementos adicionales:</b>
+                <b>Nombre del crucero: </b>
+                {data.nombreCrucero}
               </h5>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Total a pagar por complemento</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.complementosAdicionales.map((item) => (
-                    <tr key={item.idComplemento}>
-                      <td>
-                        {item.nombre}
-                        <p>
-                          <ArrowRightIcon />
-                          Cantidad: {item.cantidad}
-                        </p>
-                      </td>
-                      <td>${(item.precio * item.cantidad).toFixed(2)}</td>
+              <br />
+              {/* Puerto de salida y de regreso */}
+              <Row className="mb-3">
+                <Col xs={12} md={6}>
+                  <h5>
+                    <b>Puertos (salida y regreso):</b>
+                  </h5>
+                  <ListGroup>
+                    {data.itinerarioPuertos.map((item) => (
+                      <ListGroup.Item key={item.idItinerario}>
+                        <ArrowRightIcon /> {item.puerto.nombre} -{" "}
+                        {item.puerto.pais.descripcion}
+                        <div>{item.puerto.descripcion}</div>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                  <br />
+                </Col>
+
+                {/* Fecha de salida y de regreso */}
+                <Col xs={12} md={6}>
+                  <h5>
+                    <b>Fechas:</b>
+                  </h5>
+                  <ListGroup>
+                    <ListGroup.Item>
+                      <div>
+                        <strong>Fecha de salida:</strong>{" "}
+                        {new Date(data.fechaInicio).toLocaleDateString("en-GB")}
+                      </div>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <div>
+                        <strong>Fecha de llegada:</strong>{" "}
+                        {new Date(data.fechaFinal.date).toLocaleDateString(
+                          "en-GB"
+                        )}
+                      </div>
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Col>
+              </Row>
+              {/* Habitaciones reservadas */}
+              <Col xs={12} md={12}>
+                <h5>
+                  <b>Habitaciones reservadas:</b>
+                </h5>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Precio</th>
                     </tr>
-                  ))}
-                  <tr>
-                    <td colSpan="3" className="text-right">
-                      <b>Total:</b>
-                    </td>
-                    <td className="text-right">
-                      {`$${data.totalComplementos}`}
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {data.habitacionesReservadas.map((item) => (
+                      <tr key={item.idHabitacion}>
+                        <td>
+                          {item.nombre}
+                          <p>
+                            <ArrowRightIcon />
+                            Número de huéspedes: {item.cantidadHuespedes}
+                          </p>
+                        </td>
+                        <td>${item.precio}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td colSpan="3" className="text-right">
+                        <b>Costo total por habitaciones:</b>
+                      </td>
+                      <td className="text-right">
+                        {`$${data.totalHabitaciones}`}
+                      </td>
+                    </tr>
+                  </tbody>
+                  <br />
 
-            </Col>
+                  {/* Complementos adicionales */}
+                  <h5>
+                    <b>Complementos adicionales:</b>
+                  </h5>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Total a pagar por complemento</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.complementosAdicionales.map((item) => (
+                      <tr key={item.idComplemento}>
+                        <td>
+                          {item.nombre}
+                          <p>
+                            <ArrowRightIcon />
+                            Cantidad: {item.cantidad}
+                          </p>
+                        </td>
+                        <td>${(item.precio * item.cantidad).toFixed(2)}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td colSpan="3" className="text-right">
+                        <b>Costo total por complementos:</b>
+                      </td>
+                      <td className="text-right">
+                        {`$${data.totalComplementos}`}
+                      </td>
+                    </tr>
+                  </tbody>
+                  <br />
 
-            <Col xs={12} md={6}>
-            
-            <br></br>
-            <Typography component="span" variant="subtitle1" gutterBottom>
-              <b>Subtotal:</b>{" "}
-              {`$${data.totalHabitaciones + data.totalComplementos}`} <br></br>
-            </Typography>
-            <br></br>
-            <Typography component="span" variant="subtitle1" gutterBottom>
-              <b>Impuesto (IVA):</b> {`${impuesto * 100}%`} <br></br>
-            </Typography>
-            <Typography component="span" variant="subtitle1" gutterBottom>
-              <b>Tarifa de servicio:</b> {`$${tarifaServicio}`} <br></br>
-            </Typography>
-            <br></br>
-            <Typography component="span" variant="subtitle1" gutterBottom>
-              <b>Precio Total: </b>
-              {`$${
-                data.totalHabitaciones +
-                totalComplementos +
-                tarifaServicio +
-                (data.totalHabitaciones + totalComplementos + tarifaServicio) *
-                  impuesto
-              }`}{" "}
-              <br></br>
-            </Typography>
-            <Typography component="span" variant="subtitle1" gutterBottom>
-              <b>Estado de pago: </b>
-              {/* Operador ternario para desplegar el estado de pago de la reserva en detalle de reserva */}
-              {data.idEstadoPago == 2 ? "Pendiente" : "Pagada en totalidad"}{" "}
-              <br></br>
-              <br></br>
-            </Typography>
-            <Typography component="span" variant="subtitle1" gutterBottom>
-              {/* Operador ternario para desplegar el total a pagar si está pendiente */}
-              {data.idEstadoPago === 2
-                ? //Setear la fecha de pago en 3 dias
-                  (fechaPago.setDate(fechaPago.getDate() + 3),
-                  (
-                    <>
-                      <b>Pendiente de pago: </b>
-                      {`$${
-                        data.totalHabitaciones +
-                        totalComplementos +
-                        tarifaServicio +
-                        fechaPago.getDate() * 50 +
-                        (data.totalHabitaciones +
-                          totalComplementos +
-                          tarifaServicio +
-                          fechaPago.getDate() * 50) *
-                          impuesto
-                      }`}
-                      <br></br>
-                      {console.log(
-                        "fecha de pago",
-                        fechaPago.toISOString().split("T")[0]
-                      )}
-                      <b>Fecha limite de pago:</b>{" "}
-                      {new Date(fechaPago).toLocaleDateString("en-GB")}
-                    </>
-                  ))
-                : ""}
-              <br></br>
-              <br></br>
-            </Typography>
-            </Col>
-            </Row>
-          </Card.Body>
-        </Card>
-        // </Grid>
+                  <h5>
+                    <b>Totales:</b>
+                  </h5>
+
+                  <tbody>
+                    {/* Subtotal */}
+                    <tr>
+                      <td colSpan="2" className="text-right">
+                        <b>Subtotal:</b>
+                      </td>
+                      <td colSpan="3" className="text-right">
+                        ${data.subTotal}
+                      </td>
+                    </tr>
+
+                    {/* Impuesto */}
+                    <tr>
+                      <td colSpan="2" className="text-right">
+                        <b>Impuesto (IVA):</b>
+                      </td>
+                      <td colSpan="3" className="text-right">
+                        {data.impuestos * 100}%
+                      </td>
+                    </tr>
+
+                    {/* Tarifa portuaria */}
+                    <tr>
+                      <td colSpan="2" className="text-right">
+                        <b>Tarifa portuaria:</b>
+                      </td>
+                      <td colSpan="3" className="text-right">
+                        ${data.tarifaPortuaria}
+                      </td>
+                    </tr>
+
+                    {/* Total a pagar */}
+                    <tr>
+                      <td colSpan="2" className="text-right">
+                        <b>Precio Total:</b>
+                      </td>
+                      <td colSpan="3" className="text-right">
+                        ${data.precioTotal}
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </Col>
+              {/* Estado de pago */}
+              <Typography component="span" variant="subtitle1" gutterBottom>
+                <b>Estado de pago: </b>
+                {/* Operador ternario para desplegar el estado de pago de la reserva en detalle de reserva */}
+                {data.idEstadoPago == 2 ? "Pendiente" : "Pagada en totalidad"}{" "}
+                <br></br>
+              </Typography>
+              {/* Fecha límite de pago */}
+              <Typography
+                component="span"
+                variant="subtitle1"
+                gutterBottom
+                display={
+                  data.idEstadoPago === 2
+                    ? { display: "none" }
+                    : { display: "block" }
+                }
+              >
+                <b>Fecha límite de pago: </b>
+                {format(
+                  addDays(new Date(data.fechaLimitePagos.fechaLimitePagos), 1),
+                  "dd/MM/yyyy"
+                )}
+              </Typography>
+              {/* Saldo */}
+              <Typography
+                component="span"
+                variant="subtitle1"
+                gutterBottom
+                display={
+                  data.idEstadoPago === 2
+                    ? { display: "none" }
+                    : { display: "block" }
+                }
+              >
+                <b>Saldo: </b>${data.saldo}
+              </Typography>
+            </Card.Body>
+          </Card>
+          <Button variant="primary" className="mt-4" onClick={exportarAPDF}>
+            Generar PDF
+          </Button>
+        </>
       )}
     </ContainerBootStrap>
   );
-
 }
