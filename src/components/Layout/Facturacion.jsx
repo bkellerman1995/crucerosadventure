@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import {useLocation} from "react-router-dom";
 import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
@@ -23,7 +24,11 @@ import { CircularProgress } from "@mui/material";
 import ReservaService from "../../services/ReservaService";
 
 export function Facturacion() {
-  // Usar el contexto para acceder al usuario
+
+  //UseNavigate para navegar a la página de Facturación
+  const navigate = useNavigate();
+  
+    // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
   console.log("Usuario cargado: ", usuario);
 
@@ -205,6 +210,8 @@ export function Facturacion() {
                   position: "top-center",
                 }
               );
+              navigate("/reserva");
+
             }
           })
           .catch((error) =>

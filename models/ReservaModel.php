@@ -82,9 +82,9 @@ class ReservaModel
 
 
     /**
-     * Obtener un crucero
-     * @param $id del crucero
-     * @return $vresultado - Objeto crucero
+     * Obtener una reserva
+     * @param $id de la reserva
+     * @return $vresultado - Objeto reserva
      */
     //
     public function get($id)
@@ -106,6 +106,9 @@ class ReservaModel
 
             //Obtener información de las habitaciones reservadas
             $habitacionDisponibleFechaModel = new HabitacionDisponibleFechaModel();
+
+            //Obtener información de los complementos
+            $reservaComplementoModel = new ReservaComplementoModel();
 
             $vSql = "SELECT * FROM reserva WHERE idReserva=$id;";
 
@@ -145,7 +148,8 @@ class ReservaModel
                 $vResultado->habitacionesReservadas = $habitacionesReservadas;
 
                 //Extraer la información de los complementos añadidos
-                // $complementosAdicionales = 
+                $complementosAdicionales = $reservaComplementoModel->get($id);
+                $vResultado->complementosAdicionales = $complementosAdicionales;
             }
 
             return $vResultado;

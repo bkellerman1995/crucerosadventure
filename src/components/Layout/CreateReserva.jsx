@@ -1227,6 +1227,7 @@ export function CreateReserva() {
                             const complementoform = {
                               idReserva : resumenReserva.idReserva, 
                               idComplemento : complemento.idComplemento,
+                              cantidad : resumenReserva.habitaciones.length,
                             }
 
                             ReservaComplementoService.agregarComplementoReserva(complementoform)

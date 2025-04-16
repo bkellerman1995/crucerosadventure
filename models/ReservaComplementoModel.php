@@ -42,7 +42,16 @@ class ReservaComplementoModel
         try {
 
             //Consulta para obtener complementos por reserva
-            $vSql = "SELECT * FROM reserva_complemento where idReserva=$idReserva";
+            $vSql = "SELECT 
+                    c.nombre, 
+                    c.precio,
+                    rc.cantidad
+                 FROM 
+                    reserva_complemento rc
+                 JOIN 
+                    complemento c ON rc.idComplemento = c.idComplemento
+                 WHERE 
+                    rc.idReserva = $idReserva;";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
@@ -58,8 +67,8 @@ class ReservaComplementoModel
     {
         try {
 
-            $sql = "INSERT INTO reserva_complemento (idReserva, idComplemento) 
-            VALUES ('$objeto->idReserva', '$objeto->idComplemento');";
+            $sql = "INSERT INTO reserva_complemento (idReserva, idComplemento, cantidad) 
+            VALUES ('$objeto->idReserva', '$objeto->idComplemento', '$objeto->cantidad');";
 
             $idReserva = $this->enlace->executeSQL_DML_last($sql);
 

@@ -6,36 +6,35 @@ console.log ('BASE_URL: ', BASE_URL);
 
 
 class ReservaService {
-    //Definición para llamar al API y obtener el listado de los cruceros}
-    
-    //Lista de todas las reservas.
-    //localhost:81/crucerosadventure/reserva
-    getReservas() {
-        return axios.get(BASE_URL);
-    }
+  //Definición para llamar al API y obtener el listado de los cruceros}
 
-    //Obtener la informacion de una habitacion por su id
-    //localhost:81/crucerosadventure/reserva/{id}
-    getReservaById(ReservaId){
-        console.log('BASE_URL RESERVA: ', BASE_URL+ '/'+ ReservaId);
-        console.log('ReservaId: ', ReservaId);
-        return axios.get(BASE_URL + '/'+ ReservaId);
-    }
+  //Lista de todas las reservas.
+  //localhost:81/crucerosadventure/reserva
+  getReservas() {
+    return axios.get(BASE_URL);
+  }
 
-    // crear Reserva
-    createReserva (reserva) {
-      return axios.post(BASE_URL, JSON.stringify(reserva));
-    }
+  //Obtener la informacion de una habitacion por su id
+  //localhost:81/crucerosadventure/reserva/{id}
+  getReservaById(ReservaId) {
+    console.log("BASE_URL RESERVA: ", BASE_URL + "/" + ReservaId);
+    console.log("ReservaId: ", ReservaId);
+    return axios.get(BASE_URL + "/" + ReservaId);
+  }
 
-    // actualizar reserva
-    updateReserva(reserva) {
-        return axios({
-          method: "put",
-          url: BASE_URL,
-          data: JSON.stringify(reserva),
-        });
-      }
+  // crear Reserva
+  createReserva(reserva) {
+    return axios.post(BASE_URL, JSON.stringify(reserva));
+  }
 
+  // actualizar reserva
+  updateReserva(reserva) {
+    return axios({
+      method: "put",
+      url: BASE_URL,
+      data: JSON.stringify(reserva),
+    });
+  }
 }
 
 export default new ReservaService()
