@@ -10,7 +10,7 @@ export function Footer() {
       <Toolbar
         sx={{
           px: 2,
-          position: "static", // Si deseas que el footer esté fijo en la parte inferior
+          position: "static", 
           bottom: 0,
           width: "100%",
           backgroundColor: "primary.main",

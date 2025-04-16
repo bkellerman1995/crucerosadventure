@@ -63,6 +63,7 @@ export function DetailReserva() {
 
           // Agregar pie de página
           const footerText = `Página ${doc.internal.getNumberOfPages()}`;
+          console.log("Footer: ", footerText);
           doc.setFontSize(10);
           doc.text(footerText, pageWidth - 20, pageHeight - 10, {
             align: "right",
@@ -70,8 +71,42 @@ export function DetailReserva() {
         },
       },
     };
+
     // Generar el PDF
-    html2pdf().from(contenido).set(options).save();
+    html2pdf().from(contenido).set(options).toPdf().get('pdf').then((pdf) => {
+      var totalPaginas = pdf.internal.getNumberOfPages();
+
+    // Para generar el footer
+    for (let i = 1; i <= totalPaginas; i++) {
+      // Agregar el footer a cada página
+      const pageHeight = pdf.internal.pageSize.height;
+      const pageWidth = pdf.internal.pageSize.width;
+      pdf.setPage(i);
+      pdf.setFontSize(10);
+
+      // Establecer la posición inicial para la primera línea (X: 10, Y: pageHeight - 20)
+      let yPosition = pageHeight - 20;
+
+      // Datos de la empresa alineados a la izquierda
+      pdf.text(10, yPosition, "CRuceros Adventure");
+      yPosition += 5; // Aumentar el valor de Y para la siguiente línea
+      pdf.text(10, yPosition, "Correo: administracion@crucerosadventure.com");
+      yPosition += 5;
+      pdf.text(10, yPosition, "Teléfono: +50624420002");
+      yPosition += 5;
+      pdf.text(10, yPosition, "Sitio web: crucerosadventure.com");
+
+      //Total de páginas
+      pdf.text(
+        pageWidth - 40,
+        pageHeight - 10,
+        `Página ${i} de ${totalPaginas}`
+      );
+    }
+   
+  }).save();
+
+  this.elementPDF.clear();
   };
 
   if (!loaded) {
