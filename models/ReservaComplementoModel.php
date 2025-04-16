@@ -42,7 +42,8 @@ class ReservaComplementoModel
         try {
 
             //Consulta para obtener complementos por reserva
-            $vSql = "SELECT 
+            $vSql = "SELECT
+                    rc.idComplemento,
                     c.nombre, 
                     c.precio,
                     rc.cantidad
@@ -51,7 +52,8 @@ class ReservaComplementoModel
                  JOIN 
                     complemento c ON rc.idComplemento = c.idComplemento
                  WHERE 
-                    rc.idReserva = $idReserva;";
+                    rc.idReserva = $idReserva
+                 order by rc.idComplemento desc";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);

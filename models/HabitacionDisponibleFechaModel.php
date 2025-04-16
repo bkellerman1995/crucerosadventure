@@ -100,16 +100,20 @@ class HabitacionDisponibleFechaModel
                         h.maxHuesped,
                         h.idCategoriaHabitacion,
                         ch.nombre as nombreCategoria,
-                        phf.precio    
+                        phf.precio
+                        (SELECT COUNT(*) FROM huesped hu WHERE hu.idHabitacion = h.idHabitacion) AS cantidadHuespedes,
+                         GROUP_CONCAT(hu.nombre, ' ', hu.apellido1, ' ', hu.apellido2, ' ',hu.telefono) AS huespedes
                     FROM habitacion h
                     JOIN habitacion_disponible hd ON h.idHabitacion = hd.idHabitacion
                     JOIN precio_habitacion_fecha phf ON h.idHabitacion = phf.idHabitacion
                     JOIN crucero_fecha cf ON phf.idCruceroFecha = cf.idCruceroFecha
                     JOIN categoriahabitacion ch ON h.idcategoriaHabitacion = ch.idcategoriaHabitacion
+                    LEFT JOIN huesped hu ON hu.idHabitacion = h.idHabitacion
                     WHERE hd.idCruceroFecha = cf.idCruceroFecha
                         AND cf.idCrucero = $idCrucero
                         AND cf.fechaSalida = '$fecha'    
                         AND hd.disponible = 1
+                    GROUP BY h.idHabitacion
                     order by idHabitacion desc";
 
             //Ejecutar la consulta

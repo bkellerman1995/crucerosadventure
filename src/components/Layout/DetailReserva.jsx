@@ -12,6 +12,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Grid from "@mui/material/Grid2";
 import ReservaService from "../../services/ReservaService";
 import { CircularProgress } from "@mui/material";
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import {Card, ListGroup, Row, Col, Table, Button } from 'react-bootstrap';
+import ContainerBootStrap from 'react-bootstrap/Container';
+import {format} from 'date-fns';
 
 
 export function DetailReserva() {
@@ -75,217 +79,231 @@ export function DetailReserva() {
   
   if (error) return <p>Error: {error.message}</p>;
 
-  console.log("datos del crucero", data);
+  //Obtener la fecha de hoy 
+  const hoy = new Date();
+
+  console.log("Datos de la reserva", data);
 
   return (
-    <Container component="main" sx={{ mt: 8, mb: 2 }}>
+    <ContainerBootStrap component="main" className="mt-5">
       {data && (
-        <Grid size={7}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Detalles de la reserva
-          </Typography>
-          <Typography variant="h5" component="h1" gutterBottom>
-            {data.nombreCrucero}
-          </Typography>
-          <Typography component="span" variant="h6">
-            <Box>Puertos (salida y regreso):</Box>
-            <List
-              sx={{
-                width: "100%",
-                maxWidth: 360,
-                bgcolor: "background.paper",
-              }}
-            >
-              {data.itinerarioPuertos.map((item) => (
-                <ListItemButton key={item.idItinerario}>
-                  <ListItemIcon>
-                    <ArrowRightIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`${item.puerto.nombre} - ${item.puerto.pais.descripcion}`}
-                    secondary={item.puerto.descripcion}
-                  />
-                </ListItemButton>
-              ))}
-            </List>
-          </Typography>
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Fecha de salida:</b>{" "}
-            {new Date(data.fechaInicio).toLocaleDateString("en-GB")}
-            <br></br>
-          </Typography>
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Fecha de llegada:</b>{" "}
-            {new Date(data.fechaFinal.date).toLocaleDateString("en-GB")}
-            <br></br>
-          </Typography>
-          <br></br>
+        // Envolver todo el contenido de la reserva en un card
+        <Card>
+          {/* Encabezado */}
+          <Card.Header>
+            <h2>
+              <b>Resumen de Reserva - Crucero #{data.idReserva}</b>
+            </h2>
+            <img
+              src="../uploads/LogoTransparente.png"
+              alt="Logo"
+              style={{ width: "80px", height: "80px" }} // Ajusta el tamaño según sea necesario
+            ></img>
+            <h6>
+              <b>Fecha de emisión</b>: {format(hoy, "dd/MM/yyyy")}
+            </h6>
+          </Card.Header>
 
-          <Typography component="span" variant="h6">
-            <Box>Habitaciones reservadas:</Box>
-            <List
-              sx={{
-                width: "100%",
-                maxWidth: 360,
-                bgcolor: "background.paper",
-              }}
-            >
-              {data.habitaciones.map((item) => (
-                <React.Fragment key={item.id}>
-                  <ListItemButton key={item.idHabitacion}>
-                    <ListItemIcon>
-                      <ArrowRightIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={item.Descripcion} />
-                    <ListItemText
-                      secondary={`Cantidad de huéspedes: ${item.cantHuespedes}`}
-                    />
-                  </ListItemButton>
-                </React.Fragment>
-              ))}
-            </List>
-          </Typography>
-          <br></br>
+          {/* Cuerpo/Contenido */}
+          <Card.Body>
+            <h4>
+              <b>Detalles de la Reserva</b>
+            </h4>
+            <br />
+            <h5>
+              <b>Nombre del crucero: </b>
+              {data.nombreCrucero}
+            </h5>
+            <br />
 
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Total por habitaciones:</b> {`$${data.totalHabitaciones}`}{" "}
+            {/* Puerto de salida y de regreso */}
+            <Row className="mb-3">
+              <Col xs={12} md={6}>
+                <h5>
+                  <b>Puertos (salida y regreso):</b>
+                </h5>
+                <ListGroup>
+                  {data.itinerarioPuertos.map((item) => (
+                    <ListGroup.Item key={item.idItinerario}>
+                      <ArrowRightIcon /> {item.puerto.nombre} -{" "}
+                      {item.puerto.pais.descripcion}
+                      <div>{item.puerto.descripcion}</div>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+                <br />
+              </Col>
+
+              {/* Fecha de salida y de regreso */}
+              <Col xs={12} md={6}>
+                <h5>
+                  <b>Fechas:</b>
+                </h5>
+                <ListGroup>
+                  <ListGroup.Item>
+                    <div>
+                      <strong>Fecha de salida:</strong>{" "}
+                      {new Date(data.fechaInicio).toLocaleDateString("en-GB")}
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div>
+                      <strong>Fecha de llegada:</strong>{" "}
+                      {new Date(data.fechaFinal.date).toLocaleDateString(
+                        "en-GB"
+                      )}
+                    </div>
+                  </ListGroup.Item>
+                </ListGroup>
+              </Col>
+            </Row>
+
+            <Row className="mb-3">
+            {/* Habitaciones reservadas */}
+            <Col xs={12} md={6}>
+              <h5>
+                <b>Habitaciones reservadas:</b>
+              </h5>
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.habitacionesReservadas.map((item) => (
+                    <tr key={item.idHabitacion}>
+                      <td>
+                        {item.nombre}
+                        <p>
+                          <ArrowRightIcon />
+                          Número de huéspedes: {item.cantidadHuespedes}
+                        </p>
+                      </td>
+                      <td>${item.precio}</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td colSpan="3" className="text-right">
+                      <b>Total:</b>
+                    </td>
+                    <td className="text-right">
+                      {`$${data.totalHabitaciones}`}
+                    </td>
+                  </tr>
+                </tbody>
+              {/* </Table> */}
+              <br />
+
+              {/* Complementos adicionales */}
+              <h5>
+                <b>Complementos adicionales:</b>
+              </h5>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Total a pagar por complemento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.complementosAdicionales.map((item) => (
+                    <tr key={item.idComplemento}>
+                      <td>
+                        {item.nombre}
+                        <p>
+                          <ArrowRightIcon />
+                          Cantidad: {item.cantidad}
+                        </p>
+                      </td>
+                      <td>${(item.precio * item.cantidad).toFixed(2)}</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td colSpan="3" className="text-right">
+                      <b>Total:</b>
+                    </td>
+                    <td className="text-right">
+                      {`$${data.totalComplementos}`}
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+
+            </Col>
+
+            <Col xs={12} md={6}>
+            
             <br></br>
-          </Typography>
-          <br></br>
-
-          {/* Rubros por complementos */}
-          <Typography component="span" variant="h6">
-            <Box>Complementos:</Box>
-            <List
-              sx={{
-                width: "100%",
-                maxWidth: 360,
-                bgcolor: "background.paper",
-              }}
-            >
-              {data.complementos.map(
-                (item) =>
+            <Typography component="span" variant="subtitle1" gutterBottom>
+              <b>Subtotal:</b>{" "}
+              {`$${data.totalHabitaciones + data.totalComplementos}`} <br></br>
+            </Typography>
+            <br></br>
+            <Typography component="span" variant="subtitle1" gutterBottom>
+              <b>Impuesto (IVA):</b> {`${impuesto * 100}%`} <br></br>
+            </Typography>
+            <Typography component="span" variant="subtitle1" gutterBottom>
+              <b>Tarifa de servicio:</b> {`$${tarifaServicio}`} <br></br>
+            </Typography>
+            <br></br>
+            <Typography component="span" variant="subtitle1" gutterBottom>
+              <b>Precio Total: </b>
+              {`$${
+                data.totalHabitaciones +
+                totalComplementos +
+                tarifaServicio +
+                (data.totalHabitaciones + totalComplementos + tarifaServicio) *
+                  impuesto
+              }`}{" "}
+              <br></br>
+            </Typography>
+            <Typography component="span" variant="subtitle1" gutterBottom>
+              <b>Estado de pago: </b>
+              {/* Operador ternario para desplegar el estado de pago de la reserva en detalle de reserva */}
+              {data.idEstadoPago == 2 ? "Pendiente" : "Pagada en totalidad"}{" "}
+              <br></br>
+              <br></br>
+            </Typography>
+            <Typography component="span" variant="subtitle1" gutterBottom>
+              {/* Operador ternario para desplegar el total a pagar si está pendiente */}
+              {data.idEstadoPago === 2
+                ? //Setear la fecha de pago en 3 dias
+                  (fechaPago.setDate(fechaPago.getDate() + 3),
                   (
-                    //ir sumando en totalComplementos el precio
-                    //del item (complmemento) por la cantidad
-                    //en cada iteración de data.complementos,map
-                    (totalComplementos += item.precio * item.cantidad),
-                    (
-                      <React.Fragment key={item.id}>
-                        <ListItemButton key={item.idComplemento}>
-                          <ListItemIcon>
-                            <ArrowRightIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={item.Descripcion} />
-                          <ListItemText
-                            sx={{ textAlign: "left", ml: 0 }}
-                            secondary={
-                              <>
-                                <Typography
-                                  variant="body1"
-                                  sx={{ textAlign: "left" }}
-                                >
-                                  {item.descripcion}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {`Cantidad: ${item.cantidad}`}
-                                </Typography>
-                                <br></br>
-                                <Typography
-                                  variant="caption"
-                                  sx={{ textAlign: "left" }}
-                                  color="text.secondary"
-                                >
-                                  {`Total: $${item.precio * item.cantidad}`}
-                                </Typography>
-                              </>
-                            }
-                          />
-                        </ListItemButton>
-                      </React.Fragment>
-                    )
-                  )
-              )}
-            </List>
-          </Typography>
-          <br></br>
-
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Subtotal:</b> {`$${data.totalHabitaciones + totalComplementos}`}{" "}
-            <br></br>
-          </Typography>
-          <br></br>
-
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Impuesto (IVA):</b> {`${impuesto * 100}%`} <br></br>
-          </Typography>
-
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Tarifa de servicio:</b> {`$${tarifaServicio}`} <br></br>
-          </Typography>
-          <br></br>
-
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Precio Total: </b>
-            {`$${
-              data.totalHabitaciones +
-              totalComplementos +
-              tarifaServicio +
-              (data.totalHabitaciones + totalComplementos + tarifaServicio) *
-                impuesto
-            }`}{" "}
-            <br></br>
-          </Typography>
-
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            <b>Estado de pago: </b>
-            {/* Operador ternario para desplegar el estado de pago de la reserva en detalle de reserva */}
-            {data.estadoPago === "Pendiente"
-              ? "Pendiente"
-              : "Pagada en totalidad"}{" "}
-            <br></br>
-            <br></br>
-          </Typography>
-
-          <Typography component="span" variant="subtitle1" gutterBottom>
-            {/* Operador ternario para desplegar el total a pagar si está pendiente */}
-            {data.estadoPago === "Pendiente"
-              ? //Setear la fecha de pago en 3 dias
-                (fechaPago.setDate(fechaPago.getDate() + 3),
-                (
-                  <>
-                    <b>Pendiente de pago: </b>
-                    {`$${
-                      data.totalHabitaciones +
-                      totalComplementos +
-                      tarifaServicio +
-                      fechaPago.getDate() * 50 +
-                      (data.totalHabitaciones +
+                    <>
+                      <b>Pendiente de pago: </b>
+                      {`$${
+                        data.totalHabitaciones +
                         totalComplementos +
                         tarifaServicio +
-                        fechaPago.getDate() * 50) *
-                        impuesto
-                    }`}
-                    <br></br>
-                    {console.log(
-                      "fecha de pago",
-                      fechaPago.toISOString().split("T")[0]
-                    )}
-                    <b>Fecha limite de pago:</b>{" "}
-                    {new Date(fechaPago).toLocaleDateString("en-GB")}
-                  </>
-                ))
-              : ""}
-            <br></br>
-            <br></br>
-          </Typography>
-        </Grid>
+                        fechaPago.getDate() * 50 +
+                        (data.totalHabitaciones +
+                          totalComplementos +
+                          tarifaServicio +
+                          fechaPago.getDate() * 50) *
+                          impuesto
+                      }`}
+                      <br></br>
+                      {console.log(
+                        "fecha de pago",
+                        fechaPago.toISOString().split("T")[0]
+                      )}
+                      <b>Fecha limite de pago:</b>{" "}
+                      {new Date(fechaPago).toLocaleDateString("en-GB")}
+                    </>
+                  ))
+                : ""}
+              <br></br>
+              <br></br>
+            </Typography>
+            </Col>
+            </Row>
+          </Card.Body>
+        </Card>
         // </Grid>
       )}
-    </Container>
+    </ContainerBootStrap>
   );
 
 }
