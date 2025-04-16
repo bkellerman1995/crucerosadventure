@@ -105,11 +105,16 @@ export function DetailReserva() {
       {data && (
         // Envolver todo el contenido de la reserva en un card
         <>
+          <Button variant="primary" className="mt-4" onClick={exportarAPDF}>
+            Generar PDF
+          </Button>
+          <br></br>
+          <br></br>
           <Card id="contenido">
             {/* Encabezado */}
             <Card.Header>
               <h2>
-                <b>Resumen de Reserva - Crucero #{data.idReserva}</b>
+                <b>Resumen de reserva - Crucero #{data.idReserva}</b>
               </h2>
               <img
                 src="../uploads/LogoTransparente.png"
@@ -124,7 +129,7 @@ export function DetailReserva() {
             {/* Cuerpo/Contenido */}
             <Card.Body>
               <h4>
-                <b>Detalles de la Reserva</b>
+                <b>Detalles de la reserva</b>
               </h4>
               <br />
               <h5>

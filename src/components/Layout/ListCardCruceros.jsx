@@ -15,6 +15,7 @@ import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
+import {format} from 'date-fns';
 
 ListCardCruceros.propTypes = {
   data: PropTypes.array,
@@ -94,28 +95,25 @@ export function ListCardCruceros({ data }) {
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    mb={2}
+                    width="100%"
                   >
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      style={{
-                        fontWeight: "bold",
-                      }}
                     >
                       {/* Verificación de que hayan fechas asignadas
                       antes de acceder al primer elemento */}
-                      Próxima salida:{" "}
+                      <b>Próxima salida: </b>
+                      {/* {console.log("Fecha asignada: ",item.fechasAsignadas[0])} */}
                       {item.fechasAsignadas && item.fechasAsignadas.length > 0
-                        ? item.fechasAsignadas[0]
+                        ? format(item.fechasAsignadas[0],"dd/MM/yyyy")
                         : "No hay fechas asignadas"}
-                    
                     </Typography>
                     <IconButton
                       component={Link}
                       to={`/crucero/${item.idCrucero}`}
                       aria-label="Detalle"
-                      sx={{ marginLeft: "175px" }}
+                      sx={{ marginLeft:"auto" }}
                     >
                       <Info />
                     </IconButton>

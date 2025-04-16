@@ -35,6 +35,9 @@ class CruceroModel
 
                     $barco = $barcoModel->get($row->idbarco);
                     $row->barco = $barco;
+                    //Chequear si el crucero tiene fechas de salida asignadas
+                    $fechasAsignadas = $this->chequearCruceroFechaByCrucero($row->idCrucero);
+                    $row->fechasAsignadas = $fechasAsignadas;
                 }
             }
 

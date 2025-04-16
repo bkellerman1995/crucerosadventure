@@ -23,7 +23,8 @@ import ReservaService from "../../services/ReservaService";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Button from "@mui/material/Button";
-import { IconButton } from "@mui/material";
+import { IconButton} from "@mui/material";
+import { Visibility } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import {useUsuarioContext} from "../../context/usuarioContext";
 import { CircularProgress } from "@mui/material";
@@ -382,7 +383,11 @@ export function ListReservas() {
                             {row.title}
                           </TableCell>
                           <TableCell align="left">{row.idReserva}</TableCell>
-                          <TableCell align="left">{usuario ? `${usuario.nombre} (${usuario.correoElectronico})` : ""}</TableCell>
+                          <TableCell align="left">
+                            {usuario
+                              ? `${usuario.nombre} (${usuario.correoElectronico})`
+                              : ""}
+                          </TableCell>
                           <TableCell align="left">{row.crucero}</TableCell>
                           <TableCell align="left">
                             {new Date(row.fechaInicio).toLocaleDateString(
@@ -413,8 +418,22 @@ export function ListReservas() {
                               component={Link}
                               to={`/reserva/${row.idReserva}`}
                               aria-label="Detalle"
-                              sx={{ ml: "auto", backgroundColor: "#00304E" }}
-                            ></IconButton>
+                              sx={{
+                                ml: "auto",
+                                backgroundColor: "#00304E", // Color base
+                                "&:hover": {
+                                  backgroundColor: "#1E2A3A", // Color de fondo cuando el mouse pasa sobre el botón
+                                },
+                                "& .MuiSvgIcon-root": {
+                                  color: "white", // Color del ícono por defecto
+                                  "&:hover": {
+                                    color: "gray", // Color del ícono al pasar el mouse
+                                  },
+                                },
+                              }}
+                            >
+                              <Visibility />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       );

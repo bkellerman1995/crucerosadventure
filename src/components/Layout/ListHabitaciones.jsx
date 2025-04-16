@@ -368,10 +368,18 @@ export function ListHabitaciones() {
                                 to={`/admin/habitacion/editar?id=${row.idHabitacion}`}
                                 aria-label="Editar"
                                 sx={{
-                                  backgroundColor: "#00304E",
-                                  color: "white",
-                                }}
-                              >
+                                  ml: "auto",
+                                  backgroundColor: "#00304E", // Color base
+                                  "&:hover": {
+                                    backgroundColor: "#1E2A3A", // Color de fondo cuando el mouse pasa sobre el botón
+                                  },
+                                  "& .MuiSvgIcon-root": {
+                                    color: "white", // Color del ícono por defecto
+                                    "&:hover": {
+                                      color: "gray", // Color del ícono al pasar el mouse
+                                    },
+                                  },
+                                }}                               >
                                 <EditIcon />
                               </IconButton>
                             </TableCell>
@@ -393,11 +401,23 @@ export function ListHabitaciones() {
                           <TableCell>
                             <IconButton
                               component={Link}
-                              to={`/habitacion/${row.idHabitacion}`}
+                              to={`/reserva/${row.idReserva}`}
                               aria-label="Detalle"
-                              sx={{ ml: "auto", backgroundColor: "#00304E" }}
+                              sx={{
+                                ml: "auto",
+                                backgroundColor: "#00304E", // Color base
+                                "&:hover": {
+                                  backgroundColor: "#1E2A3A", // Color de fondo cuando el mouse pasa sobre el botón
+                                },
+                                "& .MuiSvgIcon-root": {
+                                  color: "white", // Color del ícono por defecto
+                                  "&:hover": {
+                                    color: "gray", // Color del ícono al pasar el mouse
+                                  },
+                                },
+                              }}
                             >
-                              <Visibility sx={{ color: "white" }} />
+                              <Visibility />
                             </IconButton>
                           </TableCell>
                         </TableRow>

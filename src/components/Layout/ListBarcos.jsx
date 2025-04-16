@@ -308,7 +308,7 @@ export function ListBarcos() {
                       tabIndex={-1}
                       key={row.id}
                       selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
+                      sx={{ cursor: "pointer" }}
                     >
                       {/* ICONO EDITAR */}
                       <TableCell>
@@ -316,13 +316,29 @@ export function ListBarcos() {
                           component={Link}
                           to={`/admin/barco/editar?id=${row.idbarco}`}
                           aria-label="Editar"
-                          sx={{ backgroundColor: "#00304E", color: "white" }}
-                        >
+                          sx={{
+                            ml: "auto",
+                            backgroundColor: "#00304E", // Color base
+                            "&:hover": {
+                              backgroundColor: "#1E2A3A", // Color de fondo cuando el mouse pasa sobre el botón
+                            },
+                            "& .MuiSvgIcon-root": {
+                              color: "white", // Color del ícono por defecto
+                              "&:hover": {
+                                color: "gray", // Color del ícono al pasar el mouse
+                              },
+                            },
+                          }}                        >
                           <EditIcon />
                         </IconButton>
                       </TableCell>
 
-                      <TableCell component="th" id={labelId} scope="data" padding="none">
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="data"
+                        padding="none"
+                      >
                         {row.idbarco}
                       </TableCell>
                       <TableCell align="left">{row.nombre}</TableCell>
@@ -331,11 +347,23 @@ export function ListBarcos() {
                       <TableCell>
                         <IconButton
                           component={Link}
-                          to={`/barco/${row.idbarco}`}
+                          to={`/reserva/${row.idReserva}`}
                           aria-label="Detalle"
-                          sx={{ ml: "auto", backgroundColor: "#00304E" }}
+                          sx={{
+                            ml: "auto",
+                            backgroundColor: "#00304E", // Color base
+                            "&:hover": {
+                              backgroundColor: "#1E2A3A", // Color de fondo cuando el mouse pasa sobre el botón
+                            },
+                            "& .MuiSvgIcon-root": {
+                              color: "white", // Color del ícono por defecto
+                              "&:hover": {
+                                color: "gray", // Color del ícono al pasar el mouse
+                              },
+                            },
+                          }}
                         >
-                          <Visibility sx={{ color: "white" }} />
+                          <Visibility />
                         </IconButton>
                       </TableCell>
                     </TableRow>

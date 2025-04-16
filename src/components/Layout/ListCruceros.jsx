@@ -51,6 +51,6 @@ export function ListCruceros() {
     );
   }
     if(error) return <p>Error: {error.message}</p>
-  return <>{data && <ListCardCruceros data={data}/>}</>
+  return <>{data && <ListCardCruceros data={data} />}</>;
  
 }
