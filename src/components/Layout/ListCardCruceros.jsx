@@ -15,7 +15,7 @@ import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
-import {format} from 'date-fns';
+import {format, addDays} from 'date-fns';
 
 ListCardCruceros.propTypes = {
   data: PropTypes.array,
@@ -106,7 +106,7 @@ export function ListCardCruceros({ data }) {
                       <b>Próxima salida: </b>
                       {/* {console.log("Fecha asignada: ",item.fechasAsignadas[0])} */}
                       {item.fechasAsignadas && item.fechasAsignadas.length > 0
-                        ? format(item.fechasAsignadas[0],"dd/MM/yyyy")
+                        ? format(addDays(item.fechasAsignadas[0],1),"dd/MM/yyyy")
                         : "No hay fechas asignadas"}
                     </Typography>
                     <IconButton
