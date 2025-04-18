@@ -132,7 +132,7 @@ class ReservaModel
                 //Extraer la fecha de inicio del crucero
                 //y cambiarle el formato a Y-m-d
                 $fechaInicio = new DateTime($cruceroFecha->fechaSalida);
-                $fechaInicioFormateada = $fechaInicio->modify("+1 day");
+                // $fechaInicioFormateada = $fechaInicio->modify("+1 day");
                 $fechaInicioFormateada = $fechaInicio->format('Y-m-d');
                 $vResultado->fechaInicio = $fechaInicioFormateada;
 
@@ -147,6 +147,7 @@ class ReservaModel
                 $habitacionesReservadas = $habitacionDisponibleFechaModel->getHabitacionesReservadas($crucero->idCrucero, $cruceroFecha->fechaSalida);
                 $vResultado->habitacionesReservadas = $habitacionesReservadas;
 
+                
                 //Extraer la información de los complementos añadidos
                 $complementosAdicionales = $reservaComplementoModel->get($id);
                 $vResultado->complementosAdicionales = $complementosAdicionales;

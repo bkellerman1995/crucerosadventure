@@ -7,7 +7,6 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ReservaService from "../../services/ReservaService";
 import { CircularProgress } from "@mui/material";
 // import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { jsPDF } from "jspdf";
 import html2pdf from "html2pdf.js"; 
 import {Card, ListGroup, Row, Col, Table, Button } from 'react-bootstrap';
 import ContainerBootStrap from 'react-bootstrap/Container';
@@ -57,18 +56,6 @@ export function DetailReserva() {
         format: "a4", // Formato de la página
         orientation: "portrait", // Orientación de la página
         putOnlyUsedFonts: true, // Solo usar las fuentes necesarias
-        callback: function (doc) {
-          const pageHeight = doc.internal.pageSize.height;
-          const pageWidth = doc.internal.pageSize.width;
-
-          // Agregar pie de página
-          const footerText = `Página ${doc.internal.getNumberOfPages()}`;
-          console.log("Footer: ", footerText);
-          doc.setFontSize(10);
-          doc.text(footerText, pageWidth - 20, pageHeight - 10, {
-            align: "right",
-          });
-        },
       },
     };
 
@@ -203,15 +190,13 @@ export function DetailReserva() {
                     <ListGroup.Item>
                       <div>
                         <strong>Fecha de salida:</strong>{" "}
-                        {new Date(data.fechaInicio).toLocaleDateString("en-GB")}
+                        {format(addDays(data.fechaInicio, 1), "dd/MM/yyyy")}
                       </div>
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <div>
                         <strong>Fecha de llegada:</strong>{" "}
-                        {new Date(data.fechaFinal.date).toLocaleDateString(
-                          "en-GB"
-                        )}
+                        {format(data.fechaFinal.date, "dd/MM/yyyy")}
                       </div>
                     </ListGroup.Item>
                   </ListGroup>
@@ -264,18 +249,26 @@ export function DetailReserva() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.complementosAdicionales.map((item) => (
-                      <tr key={item.idComplemento}>
-                        <td>
-                          {item.nombre}
-                          <p>
-                            <ArrowRightIcon />
-                            Cantidad: {item.cantidad}
-                          </p>
-                        </td>
-                        <td>${(item.precio * item.cantidad).toFixed(2)}</td>
+                    {/* Validar si complementosAdicionales no es null o vacío */}
+                    {data.complementosAdicionales &&
+                    data.complementosAdicionales.length > 0 ? (
+                      data.complementosAdicionales.map((item) => (
+                        <tr key={item.idComplemento}>
+                          <td>
+                            {item.nombre}
+                            <p>
+                              <ArrowRightIcon />
+                              Cantidad: {item.cantidad}
+                            </p>
+                          </td>
+                          <td>${(item.precio * item.cantidad).toFixed(2)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="2"><i>No hay complementos adicionales.</i></td>
                       </tr>
-                    ))}
+                    )}
                     <tr>
                       <td colSpan="3" className="text-right">
                         <b>Costo total por complementos:</b>

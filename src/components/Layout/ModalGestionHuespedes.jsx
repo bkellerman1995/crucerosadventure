@@ -18,6 +18,7 @@ import HuespedService from "../../services/HuespedService";
 export function ModalGestionHuespedes({
   open,
   handleClose,
+  minHuespedes,
   maxHuespedes,
   idHabitacion,
   eliminarHabitacionSeleccionada,
@@ -39,12 +40,13 @@ export function ModalGestionHuespedes({
   const [selectedHuespedIndex, setSelectedHuespedIndex] = useState(null); // Para seleccionar un huésped dentro del array 
 
   useEffect(() => {
-    if (open && maxHuespedes > 0) {
+    if (open && minHuespedes > 0 && maxHuespedes > 0) {
+      console.log ("Cant. Huéspedes mínima recibida: ", minHuespedes);
       console.log ("Cant. Huéspedes máxima recibida: ", maxHuespedes);
       console.log ("ID de habitación recibida: ", idHabitacion);
       console.log ("Valor contador de huéspedes", huespedesContador);
     }
-  }, [open, maxHuespedes]);
+  }, [open, minHuespedes, maxHuespedes,]);
 
 
   const handleModalClose = (event, reason) => {
@@ -262,7 +264,8 @@ export function ModalGestionHuespedes({
           variant="contained"
           onClick={() => {
             console.log ("Contador de huespedes:" , huespedesContador);
-            if (huespedesContador >= 1) {
+            console.log("Valor de minHuespedes: ", minHuespedes);
+            if (huespedesContador >= minHuespedes) {
               setHuespedesContador(0);
               //Eliminar todos los registros de huéspedes en el estado local
               setHuespedes(
@@ -282,7 +285,7 @@ export function ModalGestionHuespedes({
             } else {
               // Si no hay huéspedes, mostrar un mensaje de error
               toast.error(
-                "Debe agregar al menos un huésped antes de confirmar.",
+                `Debe agregar la cantidad mínima de huéspedes (${minHuespedes}) antes de confirmar.`,
                 {
                   duration: 1500,
                   position: "top-center",
@@ -329,6 +332,7 @@ export function ModalGestionHuespedes({
 ModalGestionHuespedes.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
+  minHuespedes: PropTypes.number.isRequired,
   maxHuespedes: PropTypes.number.isRequired,
   control: PropTypes.object.isRequired,
   idHabitacion: PropTypes.number.isRequired,

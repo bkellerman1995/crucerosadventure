@@ -24,11 +24,10 @@ import { CircularProgress } from "@mui/material";
 import ReservaService from "../../services/ReservaService";
 
 export function Facturacion() {
-
   //UseNavigate para navegar a la página de Facturación
   const navigate = useNavigate();
-  
-    // Usar el contexto para acceder al usuario
+
+  // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
   console.log("Usuario cargado: ", usuario);
 
@@ -80,7 +79,7 @@ export function Facturacion() {
   // Array con las formas de pago
   const formasPago = [
     { tipo: "Contado", monto: resumenReserva.total },
-    { tipo: "Mínimo por huésped (c/u)", monto: 500 },
+    { tipo: "Mínimo por huésped (c/u)", monto: 50 },
   ];
 
   // Estado de forma de pago seleccionada
@@ -168,27 +167,41 @@ export function Facturacion() {
 
   //Hooks de control de errores
   const [error, setError] = useState("");
-  const onError = (errors, e) => console.log(errors, e);
 
   //Control de errores
   if (error) return <p>Error: {error.message}</p>;
 
+  // Función para calcular el saldo
+  const calcularSaldo = () => {
+    // Calculamos el saldo dependiendo de la condición
+    if (selectedFormaPago === resumenReserva.total) {
+      return 0; // Si es igual, el saldo es 0
+    } else {
+      // Si no es igual, calculamos el saldo
+      return (
+        parseInt(resumenReserva.total) -
+        resumenReserva.habitaciones.reduce(
+          (totalHuespedes, habitacion) =>
+            totalHuespedes + parseInt(habitacion.cantidad),
+          0
+        ) *
+          parseInt(selectedFormaPago)
+      );
+    }
+  };
+
+  
+  //Constante para almacenar el saldo calculado
+  const saldo = calcularSaldo();
+
+  console.log("Saldo =", saldo);
   // Accion submit
   const onSubmit = async (data) => {
     try {
       // Validar el objeto con Yup de manera asíncrona
       const isValid = await facturaSchema.isValid(data);
 
-      // constante para salvar el saldo
-      const saldo = parseInt(resumenReserva.total) -
-      resumenReserva.habitaciones.reduce(
-        (totalHuespedes, habitacion) =>
-          totalHuespedes + parseInt(habitacion.cantidad),
-        0
-      ) * parseInt(selectedFormaPago);
-
       if (isValid) {
-
         const formData = {
           idReserva: resumenReserva.idReserva,
           idCruceroFecha: parseInt(resumenReserva.idCruceroFecha),
@@ -196,22 +209,20 @@ export function Facturacion() {
           idEstadoPago: saldo === 0 ? 1 : 2,
         };
 
-        console.log("Enviando datos de pago al form para actualizar reserva: ", formData);
-
+        console.log(
+          "Enviando datos de pago al form para actualizar reserva: ",
+          formData
+        );
 
         ReservaService.updateReserva(formData)
           .then((response) => {
             if (response.data) {
               console.log("Reserva actualizada correctamente");
-              toast.success(
-                `¡Pago exitoso!`,
-                {
-                  duration: 2000,
-                  position: "top-center",
-                }
-              );
+              toast.success(`¡Pago exitoso!`, {
+                duration: 2000,
+                position: "top-center",
+              });
               navigate("/reserva");
-
             }
           })
           .catch((error) =>
@@ -221,7 +232,6 @@ export function Facturacion() {
               error
             )
           );
-
       } else {
         console.error("Datos inválidos");
       }
@@ -301,7 +311,7 @@ export function Facturacion() {
                         }))}
                         onChange={(selectedOption) => {
                           console.log(
-                            "Tipo de pago seleccionado: ",
+                            "Monto seleccionado a pagar hoy : ",
                             selectedOption.value
                           );
                           setSelectedFormaPago(selectedOption.value); // Actualiza el valor seleccionado
@@ -338,7 +348,6 @@ export function Facturacion() {
                       {errors.pago.message}
                     </Typography>
                   )}
-
                 </FormControl>
               </Grid>
             </Grid>
@@ -357,19 +366,14 @@ export function Facturacion() {
                   </Typography>
                   <Typography variant="subtitle1">
                     <b>Saldo:</b> $
+                    {console.log("Valor de selectedFormaPago",selectedFormaPago)}
                     {
                       // Verificar que resumenReserva, total, habitaciones y selectedFormaPago existan
                       resumenReserva &&
                       resumenReserva.total &&
-                      selectedFormaPago
-                        ? parseInt(resumenReserva.total) -
-                          resumenReserva.habitaciones.reduce(
-                            (totalHuespedes, habitacion) =>
-                              totalHuespedes + parseInt(habitacion.cantidad),
-                            0
-                          ) *
-                            parseInt(selectedFormaPago)
-                        : 0 // Si falta algún valor, mostrar 0
+                      selectedFormaPago === resumenReserva.total
+                        ? 0
+                        : saldo
                     }
                   </Typography>
                 </Grid>

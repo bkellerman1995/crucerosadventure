@@ -100,7 +100,7 @@ class HabitacionDisponibleFechaModel
                         h.maxHuesped,
                         h.idCategoriaHabitacion,
                         ch.nombre as nombreCategoria,
-                        phf.precio
+                        phf.precio,
                         (SELECT COUNT(*) FROM huesped hu WHERE hu.idHabitacion = h.idHabitacion) AS cantidadHuespedes,
                          GROUP_CONCAT(hu.nombre, ' ', hu.apellido1, ' ', hu.apellido2, ' ',hu.telefono) AS huespedes
                     FROM habitacion h

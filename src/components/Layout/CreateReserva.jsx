@@ -82,18 +82,8 @@ export function CreateReserva() {
 
   //Función para manejar el form
   const {
-    control,
     setValue,
-    handleSubmit,
-    formState: { errors },
   } = useForm({
-    defaultValues: {
-      nombre: "",
-      foto: "",
-      cantDias: 7,
-      idBarco: null,
-      estado: "",
-    },
   });
 
   //UseNavigate para navegar a la página de Facturación
@@ -103,7 +93,6 @@ export function CreateReserva() {
 
   //Hooks de control de errores
   const [error, setError] = useState("");
-  const onError = (errors, e) => console.log(errors, e);
 
   //Estado de cruceros cargados en el select
   const [selectedCrucero, setSelectedCrucero] = useState(null);
@@ -115,6 +104,9 @@ export function CreateReserva() {
 
   // Estado para almacenar el id de habitación
   const [idHabitacion, setIdHabitacion] = useState(null);
+
+  // Estado para almacenar la cantidad mínima de huéspedes
+  const [minHuespedes, setMinHuespedes] = useState(null);
 
   // Estado para almacenar la cantidad máxima de huéspedes
   const [maxHuespedes, setMaxHuespedes] = useState(null);
@@ -421,37 +413,11 @@ export function CreateReserva() {
     );
   };
 
-  // Accion submit
-  const onSubmit = async (DataForm) => {
-    //Validar si se ha seleccionado un barco
-
-    if (!selectedCrucero) {
-      setTimeout(() => {
-        if (!selectedCrucero) {
-          alert("Debe seleccionar un crucero");
-        }
-      }, 100); // Retrasa la validación 100ms para dar tiempo a la actualización
-      return;
-    }
-
-    try {
-      // Validar el objeto con Yup de manera asíncrona
-      const isValid = await reservaSchema.isValid(DataForm);
-
-      if (isValid) {
-        console.log("Enviando datos de la reserva al form: ", DataForm);
-      } else {
-        //Configurar el estado de crucero creado a false
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   //Cargar el grid del componente.
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+      <form noValidate>
         <Grid container spacing={3}>
           <Grid size={12} sm={12}>
             <Typography variant="h5" gutterBottom>
@@ -609,7 +575,7 @@ export function CreateReserva() {
                   {habitacionesDisponibles.length > 0 ? (
                     <>
                       <ListBox
-                        // multiple
+                        style={{ marginLeft: "-30px" }}
                         options={habitacionesDisponibles.map((habitacion) => ({
                           label: `${habitacion.nombre}/ $${habitacion.precio} 
                       /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
@@ -708,6 +674,13 @@ export function CreateReserva() {
                           selectedHabitacionDisponible,
                         ]); // Agregar habitación seleccionada al nuevo listbox
                         setSelectedHabitacionAgregada(null);
+                        setMinHuespedes(
+                          selectedHabitacionDisponible.minHuesped
+                        );
+                        console.log(
+                          "Enviando la cant Mínima de huéspedes al modal: ",
+                          minHuespedes
+                        );
                         setMaxHuespedes(
                           selectedHabitacionDisponible.maxHuesped
                         );
@@ -829,6 +802,7 @@ export function CreateReserva() {
                 <br />
                 <FormControl fullWidth>
                   <ListBox
+                    style={{ marginLeft: "-30px" }}
                     options={habitacionesSeleccionadas.map((habitacion) => ({
                       label: `${habitacion.nombre}/ $${habitacion.precio}`,
                       // /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
@@ -886,7 +860,7 @@ export function CreateReserva() {
                   {complementosDisponibles.length > 0 ? (
                     <>
                       <ListBox
-                        // multiple
+                        style={{ marginLeft: "-30px" }}
                         options={complementosDisponibles.map((complemento) => ({
                           label: `${complemento.nombre}/ $${complemento.precio} 
                       /Aplica por: ${complemento.precioAplicado}`, // Mostrar información relevante
@@ -1064,6 +1038,7 @@ export function CreateReserva() {
                 <br />
                 <FormControl fullWidth>
                   <ListBox
+                    style={{ marginLeft: "-30px" }}
                     options={complementosSeleccionados.map((complemento) => ({
                       label: `${complemento.nombre}/ $${complemento.precio * habitacionesSeleccionadas.length} 
                       /Aplica por: ${complemento.precioAplicado}`, // Mostrar información relevante
@@ -1162,9 +1137,9 @@ export function CreateReserva() {
 
                   // Crear la reserva
 
-                  console.log("Datos a enviar para crear la reserva")
+                  console.log("Datos a enviar para crear la reserva");
 
-                  // Traer el id del Usuario 
+                  // Traer el id del Usuario
 
                   const formData = {
                     ...serializedResumenReserva,
@@ -1177,10 +1152,10 @@ export function CreateReserva() {
                       )
                     ),
                   };
-                  
-                  //Enviar datos de la reserva para crearla 
 
-                  console.log ("Enviando datos de reserva a crear: ", formData);
+                  //Enviar datos de la reserva para crearla
+
+                  console.log("Enviando datos de reserva a crear: ", formData);
 
                   ReservaService.createReserva(formData)
                     .then((response) => {
@@ -1225,12 +1200,14 @@ export function CreateReserva() {
                             );
 
                             const complementoform = {
-                              idReserva : resumenReserva.idReserva, 
-                              idComplemento : complemento.idComplemento,
-                              cantidad : resumenReserva.habitaciones.length,
-                            }
+                              idReserva: resumenReserva.idReserva,
+                              idComplemento: complemento.idComplemento,
+                              cantidad: resumenReserva.habitaciones.length,
+                            };
 
-                            ReservaComplementoService.agregarComplementoReserva(complementoform)
+                            ReservaComplementoService.agregarComplementoReserva(
+                              complementoform
+                            )
                               .then((response) => {
                                 if (response?.data) {
                                   console.log(
@@ -1451,6 +1428,7 @@ export function CreateReserva() {
       <ModalGestionHuespedes
         open={openModalGestHuespedes}
         handleClose={() => setOpenModalGestHuespedes(false)}
+        minHuespedes = {minHuespedes}
         maxHuespedes={maxHuespedes}
         idHabitacion={idHabitacion} // Pasar el id de la habitación
         eliminarHabitacionSeleccionada={eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
