@@ -6,7 +6,7 @@ import {Box,Typography} from "@mui/material";
 import { CircularProgress } from "@mui/material";
 
 
-export function ListCruceros() {
+export function ListCruceros({searchQuery}) {
   //Resultado de consumo del API, respuesta
   const [data, setData] = useState(null);
   //Error del API
