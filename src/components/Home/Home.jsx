@@ -11,7 +11,7 @@ export function Home() {
       <div
         style={{
           position: "absolute",
-          width: "105%",
+          width: "110%",
           marginLeft: -30,
           height: "100vh", // Hace que el video cubra toda la altura de la pantalla
           top: 0,
