@@ -63,12 +63,11 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
                 <CardHeader
                   className="cardHeader"
                   sx={{ p: 0 }}
-                  style={{ textAlign: "center", fontWeight: "bold" }}
+                  style={{ textAlign: "center", fontWeight: "bold", padding:8 }}
                   title={item.nombre}
                 />
                 <Typography variant="body2" color="text.secondary">
                   <span>
-                    <br></br>
                   </span>
                 </Typography>
 

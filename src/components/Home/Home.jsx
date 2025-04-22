@@ -163,7 +163,7 @@ export function Home() {
         }}
       >
         <TextField
-          label="Buscar Crucero por destino"
+          label="Buscar crucero por destino"
           variant="outlined"
           fullWidth
           value={searchQuery}
@@ -179,7 +179,7 @@ export function Home() {
         />
 
         <TextField
-          label="Buscar Crucero por puerto de salida"
+          label="Buscar crucero por puerto de salida"
           variant="outlined"
           fullWidth
           value={searchQuery}
@@ -195,7 +195,7 @@ export function Home() {
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
-            label="Buscar Crucero por puerto de salida"
+            label="Buscar crucero por fecha de salida"
             variant="outlined"
             fullWidth
             // value={searchQuery}
