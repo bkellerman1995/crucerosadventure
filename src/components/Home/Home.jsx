@@ -169,7 +169,7 @@ export function Home() {
       > */}
       <Typography
         component="h1"
-        variant="subtitle4"
+        variant="subtitle6"
         align="center"
         gutterBottom
         style={{

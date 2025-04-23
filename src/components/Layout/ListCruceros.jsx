@@ -102,7 +102,7 @@ export function ListCruceros({searchQuery}) {
 
   return (
     <>
-      <ListCardCruceros data={filteredCruceros} />
+      <ListCardCruceros data={filteredCruceros}/>
     </>
   );
 }
