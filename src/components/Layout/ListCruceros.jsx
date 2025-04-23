@@ -44,13 +44,13 @@ export function ListCruceros({searchQuery}) {
         sx={{
           display: "flex",
           flexDirection: "column",
-          // justifyContent: "center",
+          justifyContent: "center",
           alignItems: "center",
           height: "100vh",
         }}
       >
-        <CircularProgress style={{ color: "green" }} />
-        <Typography variant="h5" gutterBottom style={{ color: "white" }}>
+        <CircularProgress />
+        <Typography variant="h5">
           <b>Cargando</b>
         </Typography>
       </Box>
@@ -61,48 +61,64 @@ export function ListCruceros({searchQuery}) {
   // Filtrar los cruceros con los valores de búsqueda
   // Se usa una ternaria para saber si se envió
   // el prop de searchQuery como parámetro
-  const filteredCruceros = searchQuery
-    ? data?.filter((crucero) => {
-        //Búsqueda de crucero por nombre (destino)
-        const matchesDestino =
-          searchQuery.destino 
-          && crucero.nombre
-            ? crucero.nombre
-                .toLowerCase()
-                .includes(searchQuery.destino.toLowerCase())
-            : false;
+  const filteredCruceros =
+    searchQuery.destino || searchQuery.puerto || searchQuery.fecha
+      ? data?.filter((crucero) => {
+          //Búsqueda de crucero por nombre (destino)
+          const matchesDestino =
+            searchQuery.destino && crucero.nombre
+              ? crucero.nombre
+                  .toLowerCase()
+                  .includes(searchQuery.destino.toLowerCase())
+              : false;
 
-        //Búsqueda de crucero por puerto salida (primer puerto de itinerario)
-        const matchesPuerto =
-          searchQuery.puerto &&
-          crucero.puertosItinerario &&
-          crucero.puertosItinerario[0] &&
-          crucero.puertosItinerario[0].puerto
-            ? crucero.puertosItinerario[0].puerto.nombre
-                .toLowerCase()
-                .includes(searchQuery.puerto.toLowerCase())
-            : false;
+          //Búsqueda de crucero por puerto salida (primer puerto de itinerario)
+          const matchesPuerto =
+            searchQuery.puerto &&
+            crucero.puertosItinerario &&
+            crucero.puertosItinerario[0] &&
+            crucero.puertosItinerario[0].puerto
+              ? crucero.puertosItinerario[0].puerto.nombre
+                  .toLowerCase()
+                  .includes(searchQuery.puerto.toLowerCase())
+              : false;
 
-        // Búsqueda de crucero por fecha
-        const matchesFecha =
-          searchQuery.fecha &&
-          crucero.fechasAsignadas &&
-          crucero.fechasAsignadas.length > 0
-            ? crucero.fechasAsignadas[0] === searchQuery.fecha
-            : false;
+          // Búsqueda de crucero por fecha
+          const matchesFecha =
+            searchQuery.fecha &&
+            crucero.fechasAsignadas &&
+            crucero.fechasAsignadas.length > 0
+              ? crucero.fechasAsignadas[0] === searchQuery.fecha
+              : false;
 
-        return matchesDestino || matchesPuerto || matchesFecha;
-      })
-    : data; // Si no hay searchQuery, no se filtra y se usan todos los cruceros
+          return matchesDestino && matchesPuerto && matchesFecha;
+        })
+      : data; // Si no hay searchQuery, no se filtra y se usan todos los cruceros
 
-  // Si no hay resultados de búsqueda, muestra todos los cruceros
-  if (filteredCruceros.length === 0) {
-    return <ListCardCruceros data={data} />;
+  // Si hay búsqueda y no hay resultados
+  if (searchQuery.destino || searchQuery.puerto || searchQuery.fecha) {
+    if (filteredCruceros.length === 0) {
+      return (
+        <Box sx={{ textAlign: "center", color: "white" }}>
+          <Typography variant="h5" gutterBottom>
+            <b>No hay cruceros con los filtros especificados</b>
+          </Typography>
+        </Box>
+      );
+    }
   }
 
+  // Renderizar los cruceros filtrados o todos si no hay filtro
   return (
-    <>
-      <ListCardCruceros data={filteredCruceros}/>
-    </>
+    <ListCardCruceros
+      // data={filteredCruceros.length > 0 ? filteredCruceros : data}
+      data={filteredCruceros.length > 0 ? filteredCruceros : data}
+    />
   );
+
+  // return (
+  //   <>
+  //     <ListCardCruceros data={filteredCruceros}/>
+  //   </>
+  // );
 }
