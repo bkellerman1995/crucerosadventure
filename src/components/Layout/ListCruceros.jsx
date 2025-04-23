@@ -91,7 +91,7 @@ export function ListCruceros({searchQuery}) {
               ? crucero.fechasAsignadas[0] === searchQuery.fecha
               : false;
 
-          return matchesDestino && matchesPuerto && matchesFecha;
+          return matchesDestino || matchesPuerto || matchesFecha;
         })
       : data; // Si no hay searchQuery, no se filtra y se usan todos los cruceros
 

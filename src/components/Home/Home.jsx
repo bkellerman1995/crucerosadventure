@@ -3,7 +3,7 @@ import {useState} from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-// import Button from "@mui/material/Button";
+import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -44,11 +44,15 @@ export function Home() {
     console.log("Valor de búsqueda (fecha): ", fechaFormateada);
   };
 
-  // const handleSearchClick = () => {
-  //   // Esta función se ejecuta cuando el usuario hace clic en el botón de búsqueda
-  //   console.log("Datos del search query: ", searchQuery);
-  //   // setRenderListCrucerosSearch(true);
-  // };
+  const handleCleanBusqueda = () => {
+    // Esta función se ejecuta cuando el usuario hace clic en el botón de búsqueda
+    setSearchQuery({
+      destino: "",
+      puerto: "",
+      fecha: null,
+    });
+    console.log("Datos del search query luego de limpiar búsqueda: ", searchQuery);
+  };
 
   return (
     <Container
@@ -71,7 +75,7 @@ export function Home() {
           top: 0,
           left: 0,
           zIndex: -1, // Para poner el video en el fondo
-          flexGrow:1,
+          flexGrow: 1,
         }}
       >
         <video
@@ -199,6 +203,7 @@ export function Home() {
           label="Buscar crucero por destino"
           variant="outlined"
           fullWidth
+          value={searchQuery.destino}
           onChange={handleSearchChange}
           sx={{
             width: "40%",
@@ -213,6 +218,7 @@ export function Home() {
           label="Buscar crucero por puerto de salida"
           variant="outlined"
           fullWidth
+          value={searchQuery.puerto}
           onChange={handleSearchChange}
           sx={{
             width: "40%",
@@ -225,7 +231,9 @@ export function Home() {
           <DatePicker
             label="Buscar crucero por fecha de salida"
             variant="outlined"
+            format="DD/MM/YYYY"
             fullWidth
+            value={searchQuery.fecha ? dayjs(searchQuery.fecha) : null}
             onChange={handleDateChange}
             sx={{
               width: "40%",
@@ -235,16 +243,16 @@ export function Home() {
           />
         </LocalizationProvider>
 
-        {/* <Button
+        <Button
           variant="contained"
           type="submit"
           style={{
             backgroundColor: "#16537e",
           }}
-          onClick={handleSearchClick}
+          onClick={handleCleanBusqueda}
         >
-          Buscar
-        </Button> */}
+          Limpiar búsqueda
+        </Button>
       </Box>
 
       {/* Renderizar ListCruceros solo cuando el botón "Buscar" sea presionado
@@ -257,7 +265,6 @@ export function Home() {
         transition={{ delay: 2.0, duration: 1.5, ease: "easeOut" }}
       >
         <ListCruceros searchQuery={searchQuery} />{" "}
-
       </motion.div>
     </Container>
   );
