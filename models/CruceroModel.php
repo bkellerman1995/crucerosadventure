@@ -19,6 +19,11 @@ class CruceroModel
             //Obtener el nombre del barco
             $barcoModel = new BarcoModel();
 
+            //Obtener el itinerario
+            $itinerarioModel = new ItinerarioModel();
+
+            //Variable para obtener los puertos del itinerari
+            $itinerarioPuertosModel = new ItinerarioPuertoModel();
 
             // Consulta SQL
             $vSQL = "SELECT * FROM crucero where estado = 1 ORDER BY idCrucero asc;";
@@ -35,6 +40,49 @@ class CruceroModel
 
                     $barco = $barcoModel->get($row->idbarco);
                     $row->barco = $barco;
+
+
+                    //Revisar los puertos asignados al itinerario (si existe)
+
+                    if ($row->idItinerario != null) {
+
+                        //Extrar el objeto itinerario relacionado a este crucero
+                        $itinerario = $itinerarioModel->get($row->idItinerario);
+                        $row->itinerario = $itinerario;
+
+                        //Extraer la información de los puertos del itinerario
+                        $puertosItinerario = $itinerarioPuertosModel->getPuertosItinerario($row->idItinerario);
+                        $row->puertosItinerario = $puertosItinerario;
+                    } else {
+                        $row->itinerario = "";
+                        $row->puertos = "";
+                    }
+
+                    //Extraer las habitaciones que estan ligadas al crucero (barco)
+                    $habitacionModel = new HabitacionModel();
+                    $habitacionesCrucero = $habitacionModel->getHabitacionesCrucero($row->idbarco);
+                    $row->habitaciones = $habitacionesCrucero;
+
+                    //Extraer las diferentes fechas en las que se oferta el crucero
+                    //junto con el precio de las habitaciones
+                    foreach ($row->habitaciones as &$habitacion) { // Referencia para modificar el objeto
+                        $vSql = "SELECT COUNT(idHuesped) AS cantHuesped FROM huesped WHERE idHabitacion = $habitacion->idHabitacion;";
+                        $resultado = $this->enlace->executeSQL($vSql);
+
+                        // Verificar que la consulta devolvió resultados válidos
+                        $cantHuespedes = (!empty($resultado) && isset($resultado[0]->cantHuesped)) ? $resultado[0]->cantHuesped : 0;
+
+                        // Asignar el valor correctamente
+                        $habitacion->cantHuespedes = $cantHuespedes;
+
+
+                    }
+
+                    // Obtener las fechas y precios de las habitaciones
+
+                    $fechasPreciosHabitaciones = $this->getFechasPreciosHabitaciones($row->idCrucero, $row->habitaciones);
+                    $row->fechasPreciosHabitaciones = $fechasPreciosHabitaciones;
+
                     //Chequear si el crucero tiene fechas de salida asignadas
                     $fechasAsignadas = $this->chequearCruceroFechaByCrucero($row->idCrucero);
                     $row->fechasAsignadas = $fechasAsignadas;
@@ -89,6 +137,7 @@ class CruceroModel
                 //Revisar los puertos asignados al itinerario (si existe)
 
                 if ($vResultado->idItinerario != null) {
+                    
                     //Extrar el objeto itinerario relacionado a este crucero
                     $itinerario = $itinerarioModel->get($vResultado->idItinerario);
                     $vResultado->itinerario = $itinerario;

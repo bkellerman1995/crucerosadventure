@@ -3,23 +3,53 @@ import {useState} from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+// import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { motion } from "framer-motion";
 import {ListCruceros} from "../Layout/ListCruceros";
+import dayjs from "dayjs";
 
 export function Home() {
+  //Estado para cargar el componente de List Cruceros con criterios de búsqueda
+  // const [renderListCrucerosSearch, setRenderListCrucerosSearch] =
+    useState(false);
 
   //Estado para manejar la búsqueda
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState({
+    destino: "",
+    puerto: "",
+    fecha: null,
+  });
 
-  //Función para manejar la búsqueda
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  
+  //Función para manejar la búsqueda (destino y puerto de salida)
+  const handleSearchChange = (e) => {
+    const { name, value } = e.target;
+    setSearchQuery({
+      ...searchQuery,
+      [name]: value,
+    });
+    console.log("Valor de búsqueda: ", searchQuery);
   };
+
+  //Función para manejar la búsqueda (fecha de salida)
+  const handleDateChange = (newValue) => {
+    const fechaFormateada = dayjs(newValue).format("YYYY-MM-DD");
+    setSearchQuery({
+      ...searchQuery,
+      fecha: fechaFormateada,
+    });
+    console.log("Valor de búsqueda (fecha): ", fechaFormateada);
+  };
+
+  // const handleSearchClick = () => {
+  //   // Esta función se ejecuta cuando el usuario hace clic en el botón de búsqueda
+  //   console.log("Datos del search query: ", searchQuery);
+  //   // setRenderListCrucerosSearch(true);
+  // };
+
   return (
     <Container
       maxWidth="100%"
@@ -34,13 +64,14 @@ export function Home() {
       {/* Video de fondo o en la parte superior */}
       <div
         style={{
-          position: "absolute",
+          position: "fixed",
           width: "110%",
           marginLeft: -30,
-          height: "175vh", // Hace que el video cubra toda la altura de la pantalla
+          height: "100vh", // Hace que el video cubra toda la altura de la pantalla
           top: 0,
           left: 0,
           zIndex: -1, // Para poner el video en el fondo
+          flexGrow:1,
         }}
       >
         <video
@@ -162,57 +193,62 @@ export function Home() {
           gap: "1rem",
         }}
       >
+        {/* Buscar crucero por destino (nombre) */}
         <TextField
+          name="destino"
           label="Buscar crucero por destino"
           variant="outlined"
           fullWidth
-          value={searchQuery}
           onChange={handleSearchChange}
           sx={{
             width: "40%",
             maxWidth: "350px",
             backgroundColor: "white",
-            // "& .MuiOutlinedInput-root": {
-            //   backgroundColor: "white",
-            // },
           }}
         />
 
+        {/* Buscar crucero por puerto de salida (nombre) */}
         <TextField
+          name="puerto"
           label="Buscar crucero por puerto de salida"
           variant="outlined"
           fullWidth
-          value={searchQuery}
           onChange={handleSearchChange}
           sx={{
             width: "40%",
             maxWidth: "350px",
             backgroundColor: "white",
-            // "& .MuiOutlinedInput-root": {
-            //   backgroundColor: "white",
-            // },
           }}
         />
+
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             label="Buscar crucero por fecha de salida"
             variant="outlined"
             fullWidth
-            // value={searchQuery}
-            onChange={handleSearchChange}
+            onChange={handleDateChange}
             sx={{
               width: "40%",
               maxWidth: "350px",
               backgroundColor: "white",
-              // "& .MuiOutlinedInput-root": {
-              //   backgroundColor: "white",
-              // },
             }}
           />
         </LocalizationProvider>
+
+        {/* <Button
+          variant="contained"
+          type="submit"
+          style={{
+            backgroundColor: "#16537e",
+          }}
+          onClick={handleSearchClick}
+        >
+          Buscar
+        </Button> */}
       </Box>
 
-      {/* </motion.div> */}
+      {/* Renderizar ListCruceros solo cuando el botón "Buscar" sea presionado
+      {renderListCrucerosSearch && <ListCruceros searchQuery={searchQuery} />} */}
 
       {/* animacion de los cards del crucero */}
       <motion.div
@@ -220,7 +256,8 @@ export function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.0, duration: 1.5, ease: "easeOut" }}
       >
-        <ListCruceros />
+        <ListCruceros searchQuery={searchQuery} />{" "}
+
       </motion.div>
     </Container>
   );

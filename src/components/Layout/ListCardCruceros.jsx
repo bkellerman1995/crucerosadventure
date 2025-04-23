@@ -89,6 +89,14 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
                       <b>Cantidad de Días: </b> {item.cantDias}
                     </span>
                   </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <span>
+                      <b>Puerto de salida: </b> 
+                      {item.puertosItinerario && item.puertosItinerario.length > 0
+                        ? item.puertosItinerario[0].puerto.nombre
+                        : "No hay puertos disponibles"}
+                    </span>
+                  </Typography>
                 </CardContent>
 
                 <CardActions

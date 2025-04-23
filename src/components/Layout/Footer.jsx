@@ -10,12 +10,12 @@ export function Footer() {
       <Toolbar
         sx={{
           px: 2,
-          position: "static", 
+          position: "relative", 
           bottom: 0,
           width: "100%",
           backgroundColor: "primary.main",
           py: 1,
-          height: "auto",
+          // height: "auto",
         }}
       >
         <Container>

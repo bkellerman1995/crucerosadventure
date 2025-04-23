@@ -19,8 +19,8 @@ export function Layout({ children }) {
           paddingBottom: '4.5rem',
           minHeight: '100vh', // Ocupa todo el alto de la pantalla
           display: 'flex',
-          flexDirection: 'column'
-          
+          flexDirection: 'column',
+          flexGrow: 1,
         }}
       >
         <Toaster position="top-center" />
