@@ -108,6 +108,25 @@ export function ListCruceros({searchQuery}) {
     }
   }
 
+  // Ordenar por fecha o precio, según el valor de searchQuery.ordenFecha y searchQuery.ordenPrecio
+  if (searchQuery.ordenFecha) {
+    filteredCruceros.sort((a, b) => {
+      const fechaA = new Date(a.fechasAsignadas[0]);
+      const fechaB = new Date(b.fechasAsignadas[b.fechasAsignadas.length - 1]);
+      return searchQuery.ordenFecha === "Más cercana"
+        ? fechaA - fechaB
+        : fechaB - fechaA;
+    });
+  }
+
+  if (searchQuery.ordenPrecio) {
+    filteredCruceros.sort((a, b) => {
+      return searchQuery.ordenPrecio === "Menor a mayor"
+        ? a.precio - b.precio
+        : b.precio - a.precio;
+    });
+  }
+
   // Renderizar los cruceros filtrados o todos si no hay filtro
   return (
     <ListCardCruceros
@@ -116,9 +135,4 @@ export function ListCruceros({searchQuery}) {
     />
   );
 
-  // return (
-  //   <>
-  //     <ListCardCruceros data={filteredCruceros}/>
-  //   </>
-  // );
 }

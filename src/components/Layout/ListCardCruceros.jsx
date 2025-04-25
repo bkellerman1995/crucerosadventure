@@ -102,7 +102,7 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
                       <b>Precios desde: </b>
                       {item.fechasPreciosHabitaciones && item.fechasPreciosHabitaciones.length > 0
                       && item.fechasPreciosHabitaciones[0].precio
-                        ? `$${item.fechasPreciosHabitaciones[0].precio}`
+                        ? `$${item.fechasPreciosHabitaciones[0].precio} (por habitación)`
                         : "No hay precios disponibles"}
                     </span>
                   </Typography>

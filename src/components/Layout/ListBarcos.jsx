@@ -347,7 +347,7 @@ export function ListBarcos() {
                       <TableCell>
                         <IconButton
                           component={Link}
-                          to={`/reserva/${row.idReserva}`}
+                          to={`/barco/${row.idbarco}`}
                           aria-label="Detalle"
                           sx={{
                             ml: "auto",

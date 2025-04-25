@@ -14,15 +14,22 @@ import {ListCruceros} from "../Layout/ListCruceros";
 import dayjs from "dayjs";
 
 export function Home() {
-  //Estado para cargar el componente de List Cruceros con criterios de búsqueda
-  // const [renderListCrucerosSearch, setRenderListCrucerosSearch] =
-  useState(false);
+  //Estado para
 
   //Arreglo de opciones para ordenar las búsquedas
-  const ordenarBusqueda = ["Precio", "Fecha"];
+  const ordenarBusquedaFecha = ["Más cercana", "Más lejana"];
 
   //Arreglo de opciones para ordenar los precios
   const ordenarBusquedaPrecio = ["Menor a mayor", "Mayor a menor"];
+
+  // Manejar los cambios en los selects
+  const handleSelectChange = (e) => {
+    const { name, value } = e;
+    setSearchQuery({
+      ...searchQuery,
+      [name]: value,
+    });
+  };
 
   //Estilos personalizados para el select
   const customStyles = {
@@ -40,6 +47,7 @@ export function Home() {
 
     control: (provided) => ({
       ...provided,
+      width: "250px",
       borderColor: "gray",
       boxShadow: "none",
       "&:hover": {
@@ -50,7 +58,6 @@ export function Home() {
     menu: (provided) => ({
       ...provided,
       zIndex: 9999, // Asegura que el menú esté visible sobre otros elementos
-      
     }),
   };
 
@@ -59,6 +66,8 @@ export function Home() {
     destino: "",
     puerto: "",
     fecha: null,
+    ordenFecha: "",
+    ordenPrecio: "",
   });
 
   //Función para manejar la búsqueda (destino y puerto de salida)
@@ -128,7 +137,7 @@ export function Home() {
           loop
           muted
         >
-          <source src="../uploads/videoCrucero3.mp4" type="video/mp4" />
+          <source src="../uploads/videoCrucero.mp4" type="video/mp4" />
           El navegador no soporta el formato de video.
         </video>
       </div>
@@ -321,21 +330,21 @@ export function Home() {
             textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
           }} // Aquí se aplica la sombra al texto }}
         >
-          Ordenar por:
+          Fecha:
         </Typography>
 
+        {/* Ordenamiento de búsqueda (por fecha) */}
         <Select
-          options={ordenarBusqueda.map((item) => ({
+          options={ordenarBusquedaFecha.map((item) => ({
             label: item,
             value: item,
           }))}
-          // onChange={(selectedOption) => {
-          // }}
-          // // value={selectedOption}
-          // styles={customStyles}
+          onChange={handleSelectChange}
+          value={searchQuery.ordenFecha}
           placeholder="Seleccione una opción"
           styles={customStyles}
         />
+
         <Typography
           component="subtitle"
           variant="outlined"
@@ -349,19 +358,19 @@ export function Home() {
           Precio:
         </Typography>
 
+        {/* Ordenamiento de búsqueda (por precio) */}
         <Select
           options={ordenarBusquedaPrecio.map((item) => ({
             label: item,
             value: item,
           }))}
-          // onChange={(selectedOption) => {
-          // }}
-          // // value={selectedOption}
-          // styles={customStyles}
+          onChange={handleSelectChange}
+          value={searchQuery.ordenPrecio}
           placeholder="Seleccione una opción"
           styles={customStyles}
         />
       </Box>
+      <br></br>
 
       {/* Renderizar ListCruceros solo cuando el botón "Buscar" sea presionado
       {renderListCrucerosSearch && <ListCruceros searchQuery={searchQuery} />} */}
@@ -372,7 +381,13 @@ export function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.0, duration: 1.5, ease: "easeOut" }}
       >
-        <ListCruceros searchQuery={searchQuery} />{" "}
+        <ListCruceros
+          searchQuery={{
+            ...searchQuery,
+            ordenFecha: searchQuery.ordenFecha, // "ascendente" o "descendente"
+            ordenPrecio: searchQuery.ordenPrecio, // "ascendente" o "descendente"
+          }}
+        />{" "}
       </motion.div>
     </Container>
   );
