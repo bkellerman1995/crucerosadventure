@@ -2,6 +2,7 @@ import React from "react";
 import {useState} from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
+import Select from "react-select";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -15,7 +16,43 @@ import dayjs from "dayjs";
 export function Home() {
   //Estado para cargar el componente de List Cruceros con criterios de búsqueda
   // const [renderListCrucerosSearch, setRenderListCrucerosSearch] =
-    useState(false);
+  useState(false);
+
+  //Arreglo de opciones para ordenar las búsquedas
+  const ordenarBusqueda = ["Precio", "Fecha"];
+
+  //Arreglo de opciones para ordenar los precios
+  const ordenarBusquedaPrecio = ["Menor a mayor", "Mayor a menor"];
+
+  //Estilos personalizados para el select
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused
+        ? "#ADD8E6" // Color cuando se hace hover
+        : state.isSelected
+          ? "white" // Color cuando está seleccionado (blanco)
+          : "white", // Color normal
+      color: state.isSelected ? "black" : "black", // Asegura que el texto sea visible
+      cursor: "pointer", // Cambia el cursor al pasar el mouse
+      transition: "background-color 0.2s ease-in-out", // Suaviza la transición de color
+    }),
+
+    control: (provided) => ({
+      ...provided,
+      borderColor: "gray",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#16537e", // Cambia el borde cuando pasas el mouse
+      },
+    }),
+
+    menu: (provided) => ({
+      ...provided,
+      zIndex: 9999, // Asegura que el menú esté visible sobre otros elementos
+      
+    }),
+  };
 
   //Estado para manejar la búsqueda
   const [searchQuery, setSearchQuery] = useState({
@@ -51,7 +88,10 @@ export function Home() {
       puerto: "",
       fecha: null,
     });
-    console.log("Datos del search query luego de limpiar búsqueda: ", searchQuery);
+    console.log(
+      "Datos del search query luego de limpiar búsqueda: ",
+      searchQuery
+    );
   };
 
   return (
@@ -255,6 +295,74 @@ export function Home() {
         </Button>
       </Box>
 
+      {/* Ordenamiento de búsqueda */}
+      <Box
+        sx={{
+          padding: 1.5,
+          borderRadius: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "2rem",
+          width: "80%",
+          gap: "1rem",
+          backgroundColor: "gray",
+          marginLeft: "auto", // Centrado horizontal
+          marginRight: "auto", // Centrado horizontal
+        }}
+      >
+        <Typography
+          component="subtitle"
+          variant="outlined"
+          align="center"
+          gutterBottom
+          style={{
+            color: "white",
+            textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
+          }} // Aquí se aplica la sombra al texto }}
+        >
+          Ordenar por:
+        </Typography>
+
+        <Select
+          options={ordenarBusqueda.map((item) => ({
+            label: item,
+            value: item,
+          }))}
+          // onChange={(selectedOption) => {
+          // }}
+          // // value={selectedOption}
+          // styles={customStyles}
+          placeholder="Seleccione una opción"
+          styles={customStyles}
+        />
+        <Typography
+          component="subtitle"
+          variant="outlined"
+          align="center"
+          gutterBottom
+          style={{
+            color: "white",
+            textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
+          }} // Aquí se aplica la sombra al texto }}
+        >
+          Precio:
+        </Typography>
+
+        <Select
+          options={ordenarBusquedaPrecio.map((item) => ({
+            label: item,
+            value: item,
+          }))}
+          // onChange={(selectedOption) => {
+          // }}
+          // // value={selectedOption}
+          // styles={customStyles}
+          placeholder="Seleccione una opción"
+          styles={customStyles}
+        />
+      </Box>
+
       {/* Renderizar ListCruceros solo cuando el botón "Buscar" sea presionado
       {renderListCrucerosSearch && <ListCruceros searchQuery={searchQuery} />} */}
 
@@ -262,7 +370,7 @@ export function Home() {
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.0, duration: 1.5, ease: "easeOut" }}
+        transition={{ delay: 1.0, duration: 1.5, ease: "easeOut" }}
       >
         <ListCruceros searchQuery={searchQuery} />{" "}
       </motion.div>

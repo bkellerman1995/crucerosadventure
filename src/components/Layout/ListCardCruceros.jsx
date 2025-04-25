@@ -97,6 +97,16 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
                         : "No hay puertos disponibles"}
                     </span>
                   </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <span>
+                      <b>Precios desde: </b>
+                      {item.fechasPreciosHabitaciones && item.fechasPreciosHabitaciones.length > 0
+                      && item.fechasPreciosHabitaciones[0].precio
+                        ? `$${item.fechasPreciosHabitaciones[0].precio}`
+                        : "No hay precios disponibles"}
+                    </span>
+                  </Typography>
+
                 </CardContent>
 
                 <CardActions
