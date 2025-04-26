@@ -24,12 +24,64 @@ import { CircularProgress } from "@mui/material";
 import ReservaService from "../../services/ReservaService";
 
 export function Facturacion() {
-  //UseNavigate para navegar a la página de Facturación
-  const navigate = useNavigate();
-
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
   console.log("Usuario cargado: ", usuario);
+  //Estado para configurar el tipo de tarjeta
+  const [cardType, setCardType] = useState(null);
+
+  //Estado para configurar el icono de tipo de tarjeta
+  const [cardIcon, setCardIcon] = useState("");
+
+  //UseNavigate para navegar a la página de Facturación
+  const navigate = useNavigate();
+
+  // Función para obetener el bin de la tarjeta
+  const handleCardNumberChange = async (e) => {
+    const cardNumber = e.target.value;
+    const bin = cardNumber.slice(0, 6);
+
+    try {
+      const response = await fetch(`https://data.handyapi.com/bin/${bin}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.Scheme === "VISA") {
+          setCardType("VISA");
+          setCardIcon(
+            <img
+              src="../../assets/visa.png"
+              alt="Visa"
+              style={{ width: "30px" }}
+            />
+          );
+          document.getElementById("typeText").style.backgroundColor = "#D7FFE4"; // Color para Visa
+        } else if (data.Scheme === "MASTERCARD") {
+          setCardType("MASTERCARD");
+          setCardIcon(
+            <img
+              src="../../assets/mastercard.svg"
+              alt="Visa"
+              style={{ width: "30px" }}
+            />
+          );
+          document.getElementById("typeText").style.backgroundColor = "#D7FFE4"; // Color para Mastercard
+        } else {
+          setCardType(null);
+          setCardIcon("<span>Tarjeta no válida</span>");
+          document.getElementById("typeText").style.backgroundColor = "pink"; // Error
+        }
+      
+      } else {
+        console.error("La búsqueda del BIN falló.");
+        document.getElementById("typeText").style.backgroundColor = "pink";
+      }
+    } catch (error) {
+      console.error("Error fetching card data:", error);
+      setCardType(null);
+      setCardIcon("<span>Error al verificar la tarjeta</span>");
+      document.getElementById("typeText").style.backgroundColor = "pink";
+    }
+  };
 
   if (usuario == null) {
     return (
@@ -190,7 +242,6 @@ export function Facturacion() {
     }
   };
 
-  
   //Constante para almacenar el saldo calculado
   const saldo = calcularSaldo();
 
@@ -272,9 +323,6 @@ export function Facturacion() {
           <Box
             sx={{
               position: "relative",
-              top: "42%",
-              left: "30%",
-              transform: "translate(-50%, -50%)",
               width: "50vw",
               maxWidth: "600px",
               bgcolor: "background.paper",
@@ -366,7 +414,10 @@ export function Facturacion() {
                   </Typography>
                   <Typography variant="subtitle1">
                     <b>Saldo:</b> $
-                    {console.log("Valor de selectedFormaPago",selectedFormaPago)}
+                    {console.log(
+                      "Valor de selectedFormaPago",
+                      selectedFormaPago
+                    )}
                     {
                       // Verificar que resumenReserva, total, habitaciones y selectedFormaPago existan
                       resumenReserva &&
@@ -376,6 +427,17 @@ export function Facturacion() {
                         : saldo
                     }
                   </Typography>
+                </Grid>
+
+                {/* Mostrar si la tarjeta es Visa o Mastercard */}
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <Typography id="typeText" variant="subtitle1">
+                      {cardIcon && (
+                        <span dangerouslySetInnerHTML={{ __html: cardIcon }} />
+                      )}
+                    </Typography>
+                  </FormControl>
                 </Grid>
 
                 {/* Campo número de tarjeta */}
@@ -426,6 +488,7 @@ export function Facturacion() {
                                 e.target.value = e.target.value.slice(0, 16);
                               }
                             }}
+                            onChange={handleCardNumberChange}
                             error={Boolean(errors.numero)}
                             helperText={errors.numero?.message}
                           />

@@ -137,29 +137,14 @@ export function Home() {
           loop
           muted
         >
-          <source src="../uploads/videoCrucero.mp4" type="video/mp4" />
+          <source src="../uploads/videoCrucero3.mp4" type="video/mp4" />
           El navegador no soporta el formato de video.
         </video>
       </div>
 
-      {/* animacion del titulo */}
-      {/* <motion.div
-        initial={{ opacity: 0 }} // Empieza con el texto invisible
-        animate={{ opacity: 1 }} // Luego lo hace completamente visible
-        transition={{ delay: 1.5, duration: 1.5 }} // Retraso de 1 segundo antes de la animación y dura 1 segundo
-      > */}
       {/* Titulo  */}
       <Box
-      // sx={{
-      //   backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
-      //   color: "white", // Color del texto blanco
-      //   borderRadius: 2,
-      //   padding: 1,
-      //   marginTop: 15, // Separación con el título
-      //   width: "40%",
-      //   margin: "0 auto",
-      //   textAlign: "center", // Alinear el texto al centro
-      // }}
+
       >
         <Typography
           component="h1"
@@ -175,14 +160,7 @@ export function Home() {
         </Typography>
       </Box>
       <br></br>
-      {/* </motion.div> */}
 
-      {/* animacion de introduccion al negocio */}
-      {/* <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.5, duration: 2 }} // Este tiene un retraso de 2 segundos para que aparezca después
-      > */}
       {/* Introducción al negocio */}
 
       <Box
@@ -211,15 +189,7 @@ export function Home() {
           durarán toda la vida!
         </Typography>
       </Box>
-      {/* </motion.div> */}
 
-      {/* animacion de subitulo de "Echa un vistazo ..." al negocio */}
-      {/* <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-[40px] font-bold capitalize"
-        transition={{ delay: 4, duration: 1.5 }} // Este tiene un retraso de 2 segundos para que aparezca después
-      > */}
       <Typography
         component="h1"
         variant="subtitle6"
@@ -371,9 +341,6 @@ export function Home() {
         />
       </Box>
       <br></br>
-
-      {/* Renderizar ListCruceros solo cuando el botón "Buscar" sea presionado
-      {renderListCrucerosSearch && <ListCruceros searchQuery={searchQuery} />} */}
 
       {/* animacion de los cards del crucero */}
       <motion.div

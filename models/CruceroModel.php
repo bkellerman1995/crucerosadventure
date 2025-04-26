@@ -71,7 +71,7 @@ class CruceroModel
 
                         // Verificar que la consulta devolvió resultados válidos
                         $cantHuespedes = (!empty($resultado) && isset($resultado[0]->cantHuesped)) ? $resultado[0]->cantHuesped : 0;
-
+                            
                         // Asignar el valor correctamente
                         $habitacion->cantHuespedes = $cantHuespedes;
 
