@@ -15,7 +15,7 @@ export function Layout({ children }) {
       <Container
         maxWidth="xl"
         style={{ 
-          // paddingTop: '1rem', 
+          paddingTop: '1rem', 
           paddingBottom: '4.5rem',
           minHeight: '100vh', // Ocupa todo el alto de la pantalla
           display: 'flex',

@@ -22,8 +22,11 @@ import {useUsuarioContext} from "../../context/usuarioContext";
 import { format, addDays } from 'date-fns';
 import { CircularProgress } from "@mui/material";
 import ReservaService from "../../services/ReservaService";
+import visa from "../../assets/visa.png";
+import mastercard from "../../assets/mastercard.svg";
 
 export function Facturacion() {
+
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
   console.log("Usuario cargado: ", usuario);
@@ -49,7 +52,7 @@ export function Facturacion() {
           setCardType("VISA");
           setCardIcon(
             <img
-              src="../../assets/visa.png"
+              src= {visa}
               alt="Visa"
               style={{ width: "30px" }}
             />
@@ -59,15 +62,15 @@ export function Facturacion() {
           setCardType("MASTERCARD");
           setCardIcon(
             <img
-              src="../../assets/mastercard.svg"
-              alt="Visa"
+              src={mastercard}
+              alt="Mastercard"
               style={{ width: "30px" }}
             />
           );
           document.getElementById("typeText").style.backgroundColor = "#D7FFE4"; // Color para Mastercard
         } else {
           setCardType(null);
-          setCardIcon("<span>Tarjeta no válida</span>");
+          setCardIcon(<span style={{ color: "red" }}>Tarjeta no válida</span>);
           document.getElementById("typeText").style.backgroundColor = "pink"; // Error
         }
       
@@ -327,7 +330,7 @@ export function Facturacion() {
               maxWidth: "600px",
               bgcolor: "background.paper",
               borderRadius: 2,
-              boxShadow: 10,
+              backgroundColor: "#f5f5f5",
               p: 4,
             }}
           >
@@ -433,9 +436,7 @@ export function Facturacion() {
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <Typography id="typeText" variant="subtitle1">
-                      {cardIcon && (
-                        <span dangerouslySetInnerHTML={{ __html: cardIcon }} />
-                      )}
+                      {cardIcon}
                     </Typography>
                   </FormControl>
                 </Grid>
