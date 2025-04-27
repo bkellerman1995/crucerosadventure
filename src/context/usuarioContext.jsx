@@ -8,6 +8,7 @@ const UsuarioContext = createContext();
 
 // Crear un proveedor para envolver los componentes que necesitan acceso al contexto
 export default function UserProvider({ children }) {
+  
   const [usuario, setUsuario] = useState(null);
 
   //useEffect para cargar el usuario por defecto desde la base
@@ -18,6 +19,7 @@ export default function UserProvider({ children }) {
         // OBTENER SOLO EL PRIMER USUARIO PARA EFECTOS DEL AVANCE 5
         const primerUsuario = response.data[0];
         setUsuario(primerUsuario);
+        console.log("Usuario cargado:", primerUsuario);
       })
       .catch((error) => {
         console.error("Error al obtener los usuarios", error);

@@ -15,6 +15,8 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Tooltip from "@mui/material/Tooltip";
+import { useUsuarioContext } from "../../context/usuarioContext";
+import { motion } from "framer-motion";
 
 export default function Header() {
   //Gestión menu usuario
@@ -50,50 +52,80 @@ export default function Header() {
   const handleOpcionesMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
+
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
+  // Verificar si usuario es null antes de intentar acceder a 'tipo'
+  if (!usuario) {
+    return <div></div>; // Puedes mostrar un mensaje o spinner mientras se carga
+  }
+
+  let navItems = [];
+
   //Lista enlaces menu usuario
   const userItems = [
     { name: "Login", link: "/user/login", login: false },
     { name: "Registrarse", link: "/user/create", login: false },
     { name: "Logout", link: "/user/logout", login: true },
   ];
- // Lista enlaces menu principal
-const navItems = [
-  { name: "Home", image: "../../uploads/LogoTransparente.png", link: "/" },
-  { name: "Admin", link: "/admin" },
-  { name: "Habitaciones", link: "/habitacion" },
-  { name: "Barcos", link: "/barco" },
-  { name: "Cruceros", link: "/crucero" },
-  { name: "Reservas", link: "/reserva" }
-];
 
-// Identificador menu principal
-const menuIdPrincipal = "menu-appbar";
+  //Filtrar el navbar segun el tipo de usuario
+  usuario.tipo === "admin"
+    ? // Lista enlaces menu principal
+      (navItems = [
+        {
+          name: "Home",
+          image: "../../uploads/LogoTransparente.png",
+          link: "/",
+        },
+        { name: "Admin", link: "/admin" },
+        { name: "Habitaciones", link: "/habitacion" },
+        { name: "Barcos", link: "/barco" },
+        { name: "Cruceros", link: "/crucero" },
+        { name: "Reservas", link: "/reserva" },
+      ])
+    : (navItems = [
+        {
+          name: "Home",
+          image: "../../uploads/LogoTransparente.png",
+          link: "/",
+        },
+        { name: "Habitaciones", link: "/habitacion" },
+        { name: "Barcos", link: "/barco" },
+        { name: "Cruceros", link: "/crucero" },
+        { name: "Reservas", link: "/reserva" },
+      ]);
 
-// Menu Principal
-const menuPrincipal = (
-  <Box sx={{ display: { xs: "none", sm: "block" } }}>
-    {navItems &&
-      navItems.map((item, index) => {
-        return (
-          <Button
-            key={index}
-            component={Link}
-            to={item.link}
-            color="secondary"
-          >
-            {item.name === "Home" ? (
-              <img
-                src={item.image}
-                alt="Logo"
-                style={{ width: '80px', height: '80px' }} // Ajusta el tamaño según sea necesario
-              />
-            ) : (
-              <Typography textAlign="center">{item.name}</Typography>
-            )}
-          </Button>
-        );
-      })}
-  </Box>
+  // Identificador menu principal
+  const menuIdPrincipal = "menu-appbar";
+
+  // Menu Principal
+  const menuPrincipal = (
+    <Box sx={{ display: { xs: "none", sm: "block" } }}>
+      {navItems &&
+        usuario &&
+        navItems.map((item, index) => {
+          return (
+            <Button
+              key={index}
+              component={Link}
+              to={item.link}
+              color="secondary"
+            >
+              {item.name === "Home" ? (
+                <img
+                  src={item.image}
+                  alt="Logo"
+                  style={{ width: "80px", height: "80px" }} // Ajusta el tamaño según sea necesario
+                />
+              ) : (
+                <Typography textAlign="center">{item.name}</Typography>
+              )}
+            </Button>
+          );
+        })}
+    </Box>
   );
   //Menu Principal responsivo
   const menuPrincipalMobile = navItems.map((page, index) => (
@@ -192,87 +224,98 @@ const menuPrincipal = (
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar
-        position="static"
-        color="primaryLight"
-        sx={{ backgroundColor: "primaryLight.main" }}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.5,
+          duration: 1,
+          ease: "easeIn",
+        }}
+        style={{ overflow: "hidden" }} // Para que no se vean los elementos durante la animación
       >
-        <Toolbar>
-          <IconButton
-            size="large"
-            color="inherit"
-            aria-controls={menuIdPrincipal}
-            aria-haspopup="true"
-            sx={{ mr: 2 }}
-            onClick={handleOpenPrincipalMenu}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Menu
-            id={menuIdPrincipal}
-            anchorEl={anchorElPrincipal}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            open={Boolean(anchorElPrincipal)}
-            onClose={handleClosePrincipalMenu}
-            sx={{ display: { xs: "block", md: "none" } }}
-          >
-            {menuPrincipalMobile}
-          </Menu>
-
-          {/* Enlace página inicio */}
-          <Tooltip title="Cruceros Adventure">
+        <AppBar
+          position="static"
+          color="primaryLight"
+          sx={{ backgroundColor: "primaryLight.main" }}
+        >
+          <Toolbar>
             <IconButton
               size="large"
-              edge="end"
-              component="a"
-              href="/"
-              aria-label="Cruceros Adventure"
-              color="primary"
-            >
-              <LiveTvIcon />
-            </IconButton>
-          </Tooltip>
-
-          {/* Enlace página inicio */}
-          {menuPrincipal}
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton size="large" color="inherit">
-              <Badge badgeContent={4} color="primary">
-                <ShoppingCartIcon />
-              </Badge>
-            </IconButton>
-            <IconButton size="large" color="inherit">
-              <Badge badgeContent={17} color="primary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-          </Box>
-          <div>{userMenu}</div>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={menuOpcionesId}
-              aria-haspopup="true"
-              onClick={handleOpcionesMenuOpen}
               color="inherit"
+              aria-controls={menuIdPrincipal}
+              aria-haspopup="true"
+              sx={{ mr: 2 }}
+              onClick={handleOpenPrincipalMenu}
             >
-              <MoreIcon />
+              <MenuIcon />
             </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
+            <Menu
+              id={menuIdPrincipal}
+              anchorEl={anchorElPrincipal}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              open={Boolean(anchorElPrincipal)}
+              onClose={handleClosePrincipalMenu}
+              sx={{ display: { xs: "block", md: "none" } }}
+            >
+              {menuPrincipalMobile}
+            </Menu>
+
+            {/* Enlace página inicio */}
+            <Tooltip title="Cruceros Adventure">
+              <IconButton
+                size="large"
+                edge="end"
+                component="a"
+                href="/"
+                aria-label="Cruceros Adventure"
+                color="primary"
+              >
+                <LiveTvIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* Enlace página inicio */}
+            {menuPrincipal}
+            <Box sx={{ flexGrow: 1 }} />
+            <Box sx={{ display: { xs: "none", md: "flex" } }}>
+              <IconButton size="large" color="inherit">
+                <Badge badgeContent={4} color="primary">
+                  <ShoppingCartIcon />
+                </Badge>
+              </IconButton>
+              <IconButton size="large" color="inherit">
+                <Badge badgeContent={17} color="primary">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Box>
+            <div>{userMenu}</div>
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="show more"
+                aria-controls={menuOpcionesId}
+                aria-haspopup="true"
+                onClick={handleOpcionesMenuOpen}
+                color="inherit"
+              >
+                <MoreIcon />
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </AppBar>
+      </motion.div>
+
       {menuOpcionesMobile}
     </Box>
   );
 }
-
