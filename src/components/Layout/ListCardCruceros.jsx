@@ -1,4 +1,4 @@
-import React from "react";
+import {React, useState} from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
@@ -16,6 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import {format, addDays} from 'date-fns';
 import {useUsuarioContext} from "../../context/usuarioContext";
+import {ModalInfoReservas} from "./ModalInfoReservas";
 
 ListCardCruceros.propTypes = {
   data: PropTypes.array,
@@ -24,11 +25,16 @@ ListCardCruceros.propTypes = {
 };
 
 export function ListCardCruceros({ data, botonCrearActivo, tituloActivo }) {
-  
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
 
   console.log("Usuario desde el contexto:", usuario);
+
+  // Estado para controlar la apertura del modal de Info Reservas
+  const [openModalInfoReservas, setOpenModalInfoReservas] = useState(false);
+
+  // Estado para configurar el id del crucero de la tarjeta seleccionada
+  const [idCrucero, setIdCrucero] = useState(null);
 
   return (
     <>
@@ -176,9 +182,34 @@ export function ListCardCruceros({ data, botonCrearActivo, tituloActivo }) {
                   </Box>
                 </CardActions>
               </Card>
+              <br />
+
+              {/* Botón ver reservas crucero*/}
+              <Grid size={6} sm={4} spacing={1}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  style={{
+                    backgroundColor: "#16537e",
+                  }}
+                  onClick={() => {
+                    setIdCrucero(item.idCrucero);
+                    console.log("ID del crucero:", item.idCrucero);
+                    setOpenModalInfoReservas(true);
+                  }}
+                >
+                  Ver reservas
+                </Button>
+              </Grid>
             </Grid>
           ))}
       </Grid>
+
+      <ModalInfoReservas
+        open={openModalInfoReservas}
+        handleClose={() => setOpenModalInfoReservas(false)}
+        idCrucero={idCrucero}
+      />
     </>
   );
 }
