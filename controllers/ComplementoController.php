@@ -34,6 +34,41 @@ class complemento
         }
     }
 
+    public function create()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $complemento = new ComplementoModel();
+            //Acción del modelo a ejecutar
+            $result = $complemento->create($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $complemento = new ComplementoModel();
+            //Acción del modelo a ejecutar
+            $result = $complemento->update($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
     // DELETE eliminar (ESTO ES SOLO PARA EL FRONTEND Y ELIMINAR DATOS BASURA EN BD) 
     public function delete($idHabitacion)
     {

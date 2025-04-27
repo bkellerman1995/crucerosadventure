@@ -7,6 +7,7 @@ import { Home } from "./components/Home/Home.jsx";
 import { ListHabitaciones } from "./components/Layout/ListHabitaciones.jsx";
 import { ListBarcos } from "./components/Layout/ListBarcos.jsx";
 import { ListCruceros } from "./components/Layout/ListCruceros.jsx";
+import { ListComplementos } from "./components/Layout/ListComplementos.jsx";
 import { ListReservas } from "./components/Layout/ListReservas.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PageNotFound } from "./components/Home/PageNotFound.jsx";
@@ -18,11 +19,14 @@ import { AdminView } from "./components/Layout/AdminView";
 import { CreateBarco } from "./components/Layout/CreateBarco";
 import { CreateCrucero } from "./components/Layout/CreateCrucero";
 import { CreateHabitacion } from "./components/Layout/CreateHabitacion";
+import { CreateComplemento } from "./components/Layout/CreateComplemento";
 import { UpdateBarco } from "./components/Layout/UpdateBarco";
 import { UpdateHabitacion } from "./components/Layout/UpdateHabitacion";
+import { UpdateComplemento } from "./components/Layout/UpdateComplemento";
 import { CreateReserva } from "./components/Layout/CreateReserva";
 import { Facturacion} from "./components/Layout/Facturacion";
 import UserProvider from "./context/usuarioContext";
+import { DetailComplemento } from "./components/Layout/DetailComplemento";
 // import "bootstrap/dist/css/bootstrap.min.css";
 
 const rutas = createBrowserRouter([
@@ -103,6 +107,9 @@ const rutas = createBrowserRouter([
         element: <CreateHabitacion />,
       },
 
+      //Página Complemento by ID
+      { path: "/complemento/:id", element: <DetailComplemento /> },
+
       {
         //Página AdminView
         path: "/admin",
@@ -115,6 +122,11 @@ const rutas = createBrowserRouter([
           { path: "barco", element: <ListBarcos botonCrearActivo={true} botonEditarActivo={true} /> },
           { path: "barco/crear", element: <CreateBarco /> },
           { path: "barco/editar", element: <UpdateBarco /> },
+
+          { path: "complemento", element: <ListComplementos botonCrearActivo={true} botonEditarActivo={true} /> },
+          { path: "complemento/crear", element: <CreateComplemento /> },
+          { path: "complemento/editar", element: <UpdateComplemento /> },
+
 
           {
             path: "crucero",

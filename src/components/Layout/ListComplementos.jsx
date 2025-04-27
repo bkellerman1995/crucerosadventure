@@ -1,0 +1,427 @@
+/* eslint-disable no-unused-vars */
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { alpha } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { visuallyHidden } from '@mui/utils';
+import { useEffect, useState } from 'react';
+import ComplementoService from '../../services/ComplementoService';
+import { useNavigate, Link } from 'react-router-dom';
+import { IconButton } from "@mui/material";
+import { Visibility } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import { CircularProgress } from "@mui/material";
+import {useUsuarioContext} from "../../context/usuarioContext";
+
+ListComplementos.propTypes = {
+  data: PropTypes.array,
+  botonCrearActivo: PropTypes.bool.isRequired,
+  botonEditarActivo: PropTypes.bool.isRequired,
+};
+
+// Ordenar descendente
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+// Comparar para ordenar
+function getComparator(order, orderBy) {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+// Ordenar
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
+// Encabezados de la tabla
+const headCells = [
+  {
+    id: 'idComplemento',
+    numeric: true,
+    disablePadding: true,
+    label: 'Número',
+  },
+  {
+    id: 'nombre',
+    numeric: false,
+    disablePadding: true,
+    label: 'Nombre',
+  },
+  {
+    id: 'descripcion',
+    numeric: false,
+    disablePadding: true,
+    label: 'Descripción',
+  },
+  {
+    id: 'precio',
+    numeric: true,
+    disablePadding: false,
+    label: 'Precio',
+  },
+];
+
+// Encabezado tabla
+function TableHabitacionesHead(props) {
+  const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const createSortHandler = (property) => (event) => {
+    onRequestSort(event, property);
+  };
+
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell /> {/* espacio para el icono de editar */}
+        {headCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            padding={headCell.disablePadding ? "none" : "normal"}
+            sortDirection={orderBy === headCell.id ? order : false}
+          >
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : "asc"}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {order === "desc" ? "sorted descending" : "sorted ascending"}
+                </Box>
+              ) : null}
+            </TableSortLabel>
+          </TableCell>
+        ))}
+        <TableCell /> {/* espacio para el icono de ver */}
+      </TableRow>
+    </TableHead>
+  );
+}
+
+TableHabitacionesHead.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+  onRequestSort: PropTypes.func.isRequired,
+  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  orderBy: PropTypes.string.isRequired,
+  rowCount: PropTypes.number.isRequired,
+};
+
+// Barra de opciones
+function TableHabitacionesToolbar(props) {
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
+  const { numSelected, idSelected, botonCrearActivo } = props;
+  const navigate = useNavigate();
+  const update = () => {
+    return navigate(`/admin/complemento/editar/${idSelected}`);
+  };
+  return (
+    <Toolbar
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+        ...(numSelected > 0 && {
+          bgcolor: (theme) =>
+            alpha(
+              theme.palette.primary.main,
+              theme.palette.action.activatedOpacity
+            ),
+        }),
+      }}
+    >
+      {numSelected > 0 ? (
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
+          {numSelected} seleccionado(s)
+        </Typography>
+      ) : (
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
+          Lista de Complementos
+        </Typography>
+      )}
+      <Button
+        style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+        component={Link}
+        to="/admin/complemento/crear"
+        variant="contained"
+        endIcon={<AddIcon />}
+      >
+        Crear
+      </Button>
+    </Toolbar>
+  );
+}
+
+TableHabitacionesToolbar.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+  idSelected: PropTypes.number.isRequired,
+  botonCrearActivo: PropTypes.bool.isRequired,
+  
+};
+
+// Componente tabla con hooks
+export function ListComplementos({
+  botonCrearActivo = false,
+  botonEditarActivo = false,
+}) {
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
+  const [data, setData] = useState([]);
+  const [error, setError] = useState("");
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    ComplementoService.getComplementos()
+      .then((response) => {
+        setData(response.data);
+        setError(response.error);
+        setLoaded(true);
+      })
+      .catch((error) => {
+        if (error instanceof SyntaxError) {
+          setError(error);
+          console.log(error);
+          setLoaded(false);
+          throw new Error("Respuesta no válida del servidor");
+        }
+      });
+  }, []);
+
+  const [order, setOrder] = React.useState("asc");
+  const [orderBy, setOrderBy] = React.useState("year");
+  const [selected, setSelected] = React.useState([]);
+  const [page, setPage] = React.useState(0);
+  const [dense, setDense] = React.useState(false);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const handleClick = (event, name) => {
+    let newSelected = [name];
+    const selectedIndex = selected.indexOf(name);
+    if (selectedIndex === 0) {
+      newSelected = [];
+    }
+    setSelected(newSelected);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleChangeDense = (event) => {
+    setDense(event.target.checked);
+  };
+
+  const isSelected = (name) => selected.indexOf(name) !== -1;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <Box sx={{ width: "100%" }}>
+      <Paper sx={{ width: "100%", mb: 2, borderRadius: 2, overflow: "hidden" }}>
+        <TableHabitacionesToolbar
+          botonCrearActivo={botonCrearActivo}
+          numSelected={selected.length}
+          idSelected={Number(selected[0]) || 0}
+        />
+        <TableContainer>
+          <Table
+            sx={{ minWidth: 750 }}
+            aria-labelledby="tableTitle"
+            size={dense ? "small" : "medium"}
+          >
+            <TableHabitacionesHead
+              numSelected={selected.length}
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+              rowCount={data.length}
+            />
+            <TableBody>
+              {stableSort(data, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => {
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
+
+                  return (
+                    <TableRow
+                      hover
+                      onClick={(event) => handleClick(event, row.id)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {/* ICONO EDITAR */}
+                      <TableCell>
+                        <IconButton
+                          component={Link}
+                          to={`/admin/complemento/editar?id=${row.idComplemento}`}
+                          aria-label="Editar"
+                          sx={{
+                            ml: "auto",
+                            backgroundColor: "#00304E", // Color base
+                            "&:hover": {
+                              backgroundColor: "#1E2A3A", // Color de fondo cuando el mouse pasa sobre el botón
+                            },
+                            "& .MuiSvgIcon-root": {
+                              color: "white", // Color del ícono por defecto
+                              "&:hover": {
+                                color: "gray", // Color del ícono al pasar el mouse
+                              },
+                            },
+                            display:
+                              usuario.tipo === "admin" &&
+                              botonEditarActivo === true
+                                ? "inline-flex"
+                                : "none",
+                          }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </TableCell>
+
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="data"
+                        padding="none"
+                      >
+                        {row.idComplemento}
+                      </TableCell>
+                      <TableCell align="left">{row.nombre}</TableCell>
+                      <TableCell align="left">{row.descripcion}</TableCell>
+                      <TableCell align="left">{"$"+row.precio}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          component={Link}
+                          to={`/complemento/${row.idComplemento}`}
+                          aria-label="Detalle"
+                          sx={{
+                            ml: "auto",
+                            backgroundColor: "#00304E", // Color base
+                            "&:hover": {
+                              backgroundColor: "#1E2A3A", // Color de fondo cuando el mouse pasa sobre el botón
+                            },
+                            "& .MuiSvgIcon-root": {
+                              color: "white", // Color del ícono por defecto
+                              "&:hover": {
+                                color: "gray", // Color del ícono al pasar el mouse
+                              },
+                            },
+                          }}
+                        >
+                          <Visibility />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={data.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Filas por página"
+          labelDisplayedRows={({ from, to, count }) =>
+            `${from}-${to} de ${count} página(s)`
+          }
+        />
+      </Paper>
+
+      <FormControlLabel
+        control={<Switch checked={dense} onChange={handleChangeDense} />}
+        label="Espaciado"
+      />
+    </Box>
+  );
+}
