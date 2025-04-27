@@ -22,15 +22,6 @@ export function Home() {
   //Arreglo de opciones para ordenar los precios
   const ordenarBusquedaPrecio = ["Menor a mayor", "Mayor a menor"];
 
-  // Manejar los cambios en los selects
-  const handleSelectChange = (e) => {
-    const { name, value } = e;
-    setSearchQuery({
-      ...searchQuery,
-      [name]: value,
-    });
-  };
-
   //Estilos personalizados para el select
   const customStyles = {
     option: (provided, state) => ({
@@ -90,12 +81,32 @@ export function Home() {
     console.log("Valor de búsqueda (fecha): ", fechaFormateada);
   };
 
+  // Función para manejar los cambios en el select de ordenamiento por fecha
+  const handleSelectFechaChange = (selectedOption) => {
+    setSearchQuery({
+      ...searchQuery,
+      ordenFecha: selectedOption.value,
+    });
+    console.log("Valor de ordenamiento (fecha): ", selectedOption.value);
+  };
+
+  // Función para manejar los cambios en el select de ordenamiento por precio
+  const handleSelectPrecioChange = (selectedOption) => {
+    setSearchQuery({
+      ...searchQuery,
+     ordenPrecio: selectedOption.value,
+    });
+    console.log("Valor de ordenamiento (precio): ", selectedOption.value);
+  };
+
+  // Función para limpiar la búsqueda
   const handleCleanBusqueda = () => {
-    // Esta función se ejecuta cuando el usuario hace clic en el botón de búsqueda
     setSearchQuery({
       destino: "",
       puerto: "",
       fecha: null,
+      ordenFecha: "",
+      ordenPrecio: "",
     });
     console.log(
       "Datos del search query luego de limpiar búsqueda: ",
@@ -143,9 +154,7 @@ export function Home() {
       </div>
 
       {/* Titulo  */}
-      <Box
-
-      >
+      <Box>
         <Typography
           component="h1"
           variant="h2"
@@ -259,6 +268,7 @@ export function Home() {
               maxWidth: "350px",
               backgroundColor: "white",
             }}
+            minDate={dayjs().add(1, "day")}
           />
         </LocalizationProvider>
 
@@ -309,8 +319,8 @@ export function Home() {
             label: item,
             value: item,
           }))}
-          onChange={handleSelectChange}
-          value={searchQuery.ordenFecha}
+          onChange={handleSelectFechaChange}
+          value={ordenarBusquedaFecha.ordenFecha}
           placeholder="Seleccione una opción"
           styles={customStyles}
         />
@@ -334,8 +344,8 @@ export function Home() {
             label: item,
             value: item,
           }))}
-          onChange={handleSelectChange}
-          value={searchQuery.ordenPrecio}
+          onChange={handleSelectPrecioChange}
+          value={ordenarBusquedaPrecio.ordenPrecio}
           placeholder="Seleccione una opción"
           styles={customStyles}
         />
@@ -351,10 +361,8 @@ export function Home() {
         <ListCruceros
           searchQuery={{
             ...searchQuery,
-            ordenFecha: searchQuery.ordenFecha, // "ascendente" o "descendente"
-            ordenPrecio: searchQuery.ordenPrecio, // "ascendente" o "descendente"
           }}
-        />{" "}
+        />
       </motion.div>
     </Container>
   );

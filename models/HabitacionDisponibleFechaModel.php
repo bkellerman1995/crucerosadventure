@@ -98,6 +98,8 @@ class HabitacionDisponibleFechaModel
                         h.descripcion,
                         h.minHuesped,
                         h.maxHuesped,
+                        hd.disponible,
+                        h.foto,
                         h.idCategoriaHabitacion,
                         ch.nombre as nombreCategoria,
                         phf.precio,
@@ -112,7 +114,7 @@ class HabitacionDisponibleFechaModel
                     WHERE hd.idCruceroFecha = cf.idCruceroFecha
                         AND cf.idCrucero = $idCrucero
                         AND cf.fechaSalida = '$fecha'    
-                        AND hd.disponible = 1
+                        -- AND hd.disponible = 1
                     GROUP BY h.idHabitacion
                     order by idHabitacion desc";
 
@@ -120,6 +122,16 @@ class HabitacionDisponibleFechaModel
             // $vResultado = $this->enlace->executeSQL($vSql, [$idCrucero, $fecha]);
             $vResultado = $this->enlace->executeSQL($vSql);
 
+            if (!empty($vResultado) && is_array($vResultado)) {
+                foreach ($vResultado as &$row) { // Usar referencia para modificar el array directamente
+                    
+                    //Codificar lfoto en formato base64
+                    if (!empty($row->foto)) {
+                        $row->foto = "data:image/jpeg;base64," . base64_encode($row->foto);
+                    }
+
+                }
+            }
 
             //Retornar la respuesta
             return $vResultado;

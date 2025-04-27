@@ -1,5 +1,4 @@
 import React from "react";
-//import { useEffect, useState } from 'react';
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
@@ -63,12 +62,15 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
                 <CardHeader
                   className="cardHeader"
                   sx={{ p: 0 }}
-                  style={{ textAlign: "center", fontWeight: "bold", padding:8 }}
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    padding: 8,
+                  }}
                   title={item.nombre}
                 />
                 <Typography variant="body2" color="text.secondary">
-                  <span>
-                  </span>
+                  <span></span>
                 </Typography>
 
                 <CardMedia
@@ -91,8 +93,9 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     <span>
-                      <b>Puerto de salida: </b> 
-                      {item.puertosItinerario && item.puertosItinerario.length > 0
+                      <b>Puerto de salida: </b>
+                      {item.puertosItinerario &&
+                      item.puertosItinerario.length > 0
                         ? item.puertosItinerario[0].puerto.nombre
                         : "No hay puertos disponibles"}
                     </span>
@@ -100,13 +103,22 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
                   <Typography variant="body2" color="text.secondary">
                     <span>
                       <b>Precios desde: </b>
-                      {item.fechasPreciosHabitaciones && item.fechasPreciosHabitaciones.length > 0
-                      && item.fechasPreciosHabitaciones[0].precio
-                        ? `$${item.fechasPreciosHabitaciones[0].precio} (por habitación)`
+                      {item.fechasPreciosHabitaciones &&
+                      item.fechasPreciosHabitaciones.length > 0
+                        ? `$${
+                            item.fechasPreciosHabitaciones.reduce(
+                              (min, current) => {
+                                // Comparar los precios y devolver el más bajo
+                                return parseFloat(current.precio) <
+                                  parseFloat(min.precio)
+                                  ? current
+                                  : min;
+                              }
+                            ).precio
+                          } (por habitación)`
                         : "No hay precios disponibles"}
                     </span>
                   </Typography>
-
                 </CardContent>
 
                 <CardActions

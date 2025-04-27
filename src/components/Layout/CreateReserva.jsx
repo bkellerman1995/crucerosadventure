@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import Select from "react-select";
 import { ListBox } from "primereact/listbox";
 import { ModalGestionHuespedes } from "./ModalGestionHuespedes";
+import { ModalDisponibilidadHabitaciones } from "./ModalDisponibilidadHabitaciones";
 import HabitacionDisponibleFechaService from "../../services/HabitacionDisponibleFechaService";
 import HuespedService from "../../services/HuespedService";
 import ComplementoService from "../../services/ComplementoService";
@@ -116,6 +117,9 @@ export function CreateReserva() {
 
   // Estado para la fecha seleccionada
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
+
+  // Estado para manejar el modal de habitaciones disponibles
+  const [openModalHabitaciones, setOpenModalHabitaciones] = useState(false);
 
   // Estado para almacenar las habitaciones disponibles
   const [habitacionesDisponibles, setHabitacionesDisponibles] = useState([]);
@@ -556,6 +560,34 @@ export function CreateReserva() {
 
             <br></br>
 
+            <Grid item>
+              {/* Botón Ver Mapa Habitaciones disponibles*/}
+              <Button
+                variant="contained"
+                // type="submit"
+                style={
+                  fechaSeleccionada === null
+                    ? {
+                        backgroundColor: "gray",
+                        color: "white",
+                      }
+                    : {
+                        backgroundColor: "#16537e",
+                        color: "white",
+                      }
+                }
+                onClick={() => {
+                  //Abrir el model de habitaciones disponibles
+                  setOpenModalHabitaciones(true);
+                }}
+                disabled={fechaSeleccionada === null ? true : false}
+              >
+                Ver habitaciones
+              </Button>
+            </Grid>
+
+            <br></br>
+
             {/* Grid contenedor de las habitaciones */}
             <Grid container spacing={2} alignItems="stretch" size={15}>
               <Grid
@@ -576,7 +608,9 @@ export function CreateReserva() {
                     <>
                       <ListBox
                         style={{ marginLeft: "-30px" }}
-                        options={habitacionesDisponibles.map((habitacion) => ({
+                        options={habitacionesDisponibles
+                          .filter(habitacion => habitacion.disponible === "1")
+                          .map((habitacion) => ({
                           label: `${habitacion.nombre}/ $${habitacion.precio} 
                       /Min: ${habitacion.minHuesped} /Max: ${habitacion.maxHuesped}
                       / ${habitacion.nombreCategoria}`, // Mostrar información relevante
@@ -1428,11 +1462,19 @@ export function CreateReserva() {
       <ModalGestionHuespedes
         open={openModalGestHuespedes}
         handleClose={() => setOpenModalGestHuespedes(false)}
-        minHuespedes = {minHuespedes}
+        minHuespedes={minHuespedes}
         maxHuespedes={maxHuespedes}
         idHabitacion={idHabitacion} // Pasar el id de la habitación
         eliminarHabitacionSeleccionada={eliminarHabitacionSeleccionada} // Enviar funcion para eliminar habitación seleccionada
         setHuespedesAgregados={setHuespedesAgregados} // Enviar función para controlar si se añadieron huéspedes o no.
+      />
+
+      {/* Modal importado para Gestión de Huéspedes */}
+      <ModalDisponibilidadHabitaciones
+        open={openModalHabitaciones}
+        handleClose={() => setOpenModalHabitaciones(false)}
+        idCrucero={idCrucero}
+        fechaSeleccionada={fechaSeleccionada}
       />
     </>
   );

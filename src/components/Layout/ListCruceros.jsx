@@ -108,7 +108,7 @@ export function ListCruceros({searchQuery}) {
     }
   }
 
-  // Ordenar por fecha o precio, según el valor de searchQuery.ordenFecha y searchQuery.ordenPrecio
+  // Ordenar por fecha , según el valor de searchQuery.ordenFecha
   if (searchQuery.ordenFecha) {
     filteredCruceros.sort((a, b) => {
       const fechaA = new Date(a.fechasAsignadas[0]);
@@ -119,11 +119,23 @@ export function ListCruceros({searchQuery}) {
     });
   }
 
+  // Ordenar por precio , según el valor de searchQuery.ordenPrecio
   if (searchQuery.ordenPrecio) {
     filteredCruceros.sort((a, b) => {
+
+      // Obtener el precio más bajo de cada crucero mediante reduce
+      const precioA = a.fechasPreciosHabitaciones.reduce((min, current) => {
+        return parseFloat(current.precio) < parseFloat(min.precio) ? current : min;
+      }, a.fechasPreciosHabitaciones[0]).precio;
+      
+      const precioB = b.fechasPreciosHabitaciones.reduce((min, current) => {
+        return parseFloat(current.precio) < parseFloat(min.precio) ? current : min;
+      }, b.fechasPreciosHabitaciones[0]).precio;
+
+      // Ordenar de acuerdo al valor de "ordenPrecio"
       return searchQuery.ordenPrecio === "Menor a mayor"
-        ? a.precio - b.precio
-        : b.precio - a.precio;
+        ? precioA - precioB
+        : precioB - precioA;
     });
   }
 
