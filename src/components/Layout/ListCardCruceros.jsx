@@ -15,6 +15,7 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import {format, addDays} from 'date-fns';
+import {useUsuarioContext} from "../../context/usuarioContext";
 
 ListCardCruceros.propTypes = {
   data: PropTypes.array,
@@ -22,7 +23,12 @@ ListCardCruceros.propTypes = {
   tituloActivo: PropTypes.bool.isRequired
 };
 
-export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
+export function ListCardCruceros({ data, botonCrearActivo, tituloActivo }) {
+  
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
+  console.log("Usuario desde el contexto:", usuario);
 
   return (
     <>
@@ -32,25 +38,38 @@ export function ListCardCruceros({ data, tituloActivo, botonCrearActivo }) {
         alignItems="center"
         mb={2}
       >
-        {tituloActivo && (
-          <Typography variant="h5" gutterBottom>
-            Cruceros disponibles
-          </Typography>
-        )}
+        <Typography
+          variant="h5"
+          gutterBottom
+          visibility={
+            usuario.tipo === "admin" && botonCrearActivo === true
+              ? "visible"
+              : "hidden"
+          }
+        >
+          Cruceros disponibles
+        </Typography>
 
-        {botonCrearActivo && (
-          <Tooltip title="Crear">
-            <Button
-              style={{ marginRight: "15px", backgroundColor: "#16537e" }}
-              component={Link}
-              to="/admin/crucero/crear"
-              variant="contained"
-              endIcon={<AddIcon />}
-            >
-              Crear
-            </Button>
-          </Tooltip>
-        )}
+        <Tooltip title="Crear">
+          <Button
+            style={{
+              marginRight: "15px",
+              backgroundColor: "#16537e",
+              display:
+                usuario.tipo === "admin" &&
+                botonCrearActivo === true &&
+                tituloActivo === true
+                  ? "flex"
+                  : "none",
+            }}
+            component={Link}
+            to="/admin/crucero/crear"
+            variant="contained"
+            endIcon={<AddIcon />}
+          >
+            Crear
+          </Button>
+        </Tooltip>
       </Box>
 
       <Grid container sx={{ p: 2 }} spacing={3}>

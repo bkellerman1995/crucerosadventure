@@ -28,11 +28,15 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import { CircularProgress } from "@mui/material";
+import {useUsuarioContext} from "../../context/usuarioContext";
 
 
 ListHabitaciones.propTypes = {
   data: PropTypes.array,
+  botonCrearActivo: PropTypes.bool.isRequired,
+  botonEditarActivo: PropTypes.bool.isRequired,
 };
+
 // Función para extraer el número de un string (ejemplo: "Habitacion10" -> 10)
 function extractNumber(text) {
   const match = text.match(/\d+/); // Busca números en el string
@@ -164,7 +168,10 @@ TableHabitacionesHead.propTypes = {
 
 //Barra de opciones
 function TableHabitacionesToolbar(props) {
-  const { numSelected, idSelected } = props;
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
+  const { numSelected, idSelected, botonCrearActivo } = props;
   const navigate = useNavigate();
   const update = () => {
     return navigate(`/habitacion/update/${idSelected}`);
@@ -203,7 +210,14 @@ function TableHabitacionesToolbar(props) {
         </Typography>
       )}
       <Button
-        style={{ marginRight: "15px", backgroundColor: "#16537e" }}
+        style={{
+          marginRight: "15px",
+          backgroundColor: "#16537e",
+          display:
+            usuario.tipo === "admin" && botonCrearActivo === true
+              ? "flex"
+              : "none",
+        }}
         component={Link}
         to="/admin/habitacion/crear"
         variant="contained"
@@ -219,10 +233,15 @@ function TableHabitacionesToolbar(props) {
 TableHabitacionesToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
   idSelected: PropTypes.number.isRequired,
+  botonCrearActivo: PropTypes.bool.isRequired,
 };
 
 //Componente tabla con hooks
-export function ListHabitaciones() {
+export function ListHabitaciones({botonCrearActivo = false, botonEditarActivo = false}) {
+  
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
   //Datos a cargar en la tabla
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
@@ -293,25 +312,25 @@ export function ListHabitaciones() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
-    if (!loaded) {
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center", 
-            alignItems: "center", 
-            height: "100vh", 
-          }}
-        >
-          <CircularProgress />
-          <Typography variant="h5" gutterBottom>
-            <b>Cargando</b>
-          </Typography>
-        </Box>
-      );
-    }
-  
+  if (!loaded) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="h5" gutterBottom>
+          <b>Cargando</b>
+        </Typography>
+      </Box>
+    );
+  }
+
   if (error) return <p>Error: {error.message}</p>;
 
   return (
@@ -320,6 +339,7 @@ export function ListHabitaciones() {
         <Box sx={{ width: "100%" }}>
           <Paper sx={{ width: "100%", mb: 2 }}>
             <TableHabitacionesToolbar
+              botonCrearActivo={botonCrearActivo}
               numSelected={selected.length}
               idSelected={Number(selected[0]) || 0}
             />
@@ -379,7 +399,13 @@ export function ListHabitaciones() {
                                       color: "gray", // Color del ícono al pasar el mouse
                                     },
                                   },
-                                }}                               >
+                                  display:
+                                    usuario.tipo === "admin" &&
+                                    botonEditarActivo === true
+                                      ? "flex"
+                                      : "none",
+                                }}
+                              >
                                 <EditIcon />
                               </IconButton>
                             </TableCell>
@@ -389,7 +415,9 @@ export function ListHabitaciones() {
                           <TableCell align="left">
                             {row.categoriaHabitacion}
                           </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>{row.maxHuesped}</TableCell>
+                          <TableCell sx={{ textAlign: "center" }}>
+                            {row.maxHuesped}
+                          </TableCell>
 
                           {/*<sup> para los metros cuadrados</sup> */}
 

@@ -108,15 +108,20 @@ const rutas = createBrowserRouter([
         path: "/admin",
         element: <AdminView />,
         children: [
-          { path: "habitacion", element: <ListHabitaciones /> },
+          { path: "habitacion", element: <ListHabitaciones botonCrearActivo={true} botonEditarActivo={true}/> },
           { path: "habitacion/crear", element: <CreateHabitacion /> },
           { path: "habitacion/editar", element: <UpdateHabitacion /> },
-          
-          { path: "barco", element: <ListBarcos /> },
+
+          { path: "barco", element: <ListBarcos botonCrearActivo={true} botonEditarActivo={true} /> },
           { path: "barco/crear", element: <CreateBarco /> },
           { path: "barco/editar", element: <UpdateBarco /> },
 
-          { path: "crucero", element: <ListCruceros /> },
+          {
+            path: "crucero",
+            element: (
+              <ListCruceros botonCrearActivo={true} tituloActivo={true} />
+            ),
+          },
           //Página create Crucero
           { path: "crucero/crear", element: <CreateCrucero /> },
         ],

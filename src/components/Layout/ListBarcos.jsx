@@ -26,7 +26,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import { CircularProgress } from "@mui/material";
+import {useUsuarioContext} from "../../context/usuarioContext";
 
+ListBarcos.propTypes = {
+  data: PropTypes.array,
+  botonCrearActivo: PropTypes.bool.isRequired,
+  botonEditarActivo: PropTypes.bool.isRequired,
+};
 
 // Ordenar descendente
 function descendingComparator(a, b, orderBy) {
@@ -134,7 +140,10 @@ TableHabitacionesHead.propTypes = {
 
 // Barra de opciones
 function TableHabitacionesToolbar(props) {
-  const { numSelected, idSelected } = props;
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
+  const { numSelected, idSelected, botonCrearActivo } = props;
   const navigate = useNavigate();
   const update = () => {
     return navigate(`/admin/barco/editar/${idSelected}`);
@@ -148,14 +157,14 @@ function TableHabitacionesToolbar(props) {
           bgcolor: (theme) =>
             alpha(
               theme.palette.primary.main,
-              theme.palette.action.activatedOpacity,
+              theme.palette.action.activatedOpacity
             ),
         }),
       }}
     >
       {numSelected > 0 ? (
         <Typography
-          sx={{ flex: '1 1 100%' }}
+          sx={{ flex: "1 1 100%" }}
           color="inherit"
           variant="subtitle1"
           component="div"
@@ -164,7 +173,7 @@ function TableHabitacionesToolbar(props) {
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%' }}
+          sx={{ flex: "1 1 100%" }}
           variant="h6"
           id="tableTitle"
           component="div"
@@ -188,12 +197,20 @@ function TableHabitacionesToolbar(props) {
 TableHabitacionesToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
   idSelected: PropTypes.number.isRequired,
+  botonCrearActivo: PropTypes.bool.isRequired,
+  
 };
 
 // Componente tabla con hooks
-export function ListBarcos() {
+export function ListBarcos({
+  botonCrearActivo = false,
+  botonEditarActivo = false,
+}) {
+  // Usar el contexto para acceder al usuario
+  const { usuario } = useUsuarioContext();
+
   const [data, setData] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -208,21 +225,21 @@ export function ListBarcos() {
           setError(error);
           console.log(error);
           setLoaded(false);
-          throw new Error('Respuesta no válida del servidor');
+          throw new Error("Respuesta no válida del servidor");
         }
       });
   }, []);
 
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('year');
+  const [order, setOrder] = React.useState("asc");
+  const [orderBy, setOrderBy] = React.useState("year");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
@@ -249,7 +266,8 @@ export function ListBarcos() {
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   if (!loaded) {
     return (
@@ -257,9 +275,9 @@ export function ListBarcos() {
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center", 
-          alignItems: "center", 
-          height: "100vh", 
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
         <CircularProgress />
@@ -269,13 +287,14 @@ export function ListBarcos() {
       </Box>
     );
   }
-  
+
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2, borderRadius: 2, overflow: 'hidden' }}>
+    <Box sx={{ width: "100%" }}>
+      <Paper sx={{ width: "100%", mb: 2, borderRadius: 2, overflow: "hidden" }}>
         <TableHabitacionesToolbar
+          botonCrearActivo={botonCrearActivo}
           numSelected={selected.length}
           idSelected={Number(selected[0]) || 0}
         />
@@ -283,7 +302,7 @@ export function ListBarcos() {
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
+            size={dense ? "small" : "medium"}
           >
             <TableHabitacionesHead
               numSelected={selected.length}
@@ -328,7 +347,13 @@ export function ListBarcos() {
                                 color: "gray", // Color del ícono al pasar el mouse
                               },
                             },
-                          }}                        >
+                            display:
+                              usuario.tipo === "admin" &&
+                              botonEditarActivo === true
+                                ? "inline-flex"
+                                : "none",
+                          }}
+                        >
                           <EditIcon />
                         </IconButton>
                       </TableCell>

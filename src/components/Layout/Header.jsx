@@ -226,19 +226,21 @@ const menuPrincipal = (
           >
             {menuPrincipalMobile}
           </Menu>
+
           {/* Enlace página inicio */}
-          <Tooltip title="Alquiler peliculas">
+          <Tooltip title="Cruceros Adventure">
             <IconButton
               size="large"
               edge="end"
               component="a"
               href="/"
-              aria-label="Alquiler peliculas"
+              aria-label="Cruceros Adventure"
               color="primary"
             >
               <LiveTvIcon />
             </IconButton>
           </Tooltip>
+
           {/* Enlace página inicio */}
           {menuPrincipal}
           <Box sx={{ flexGrow: 1 }} />

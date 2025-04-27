@@ -14,7 +14,12 @@ import {ListCruceros} from "../Layout/ListCruceros";
 import dayjs from "dayjs";
 
 export function Home() {
-  //Estado para
+  
+  //Estado para ocultar boton Crear y el titulo desde el home 
+  const [botonCrearActivo, setBotonCrearActivo] = useState(false);
+
+  //Estado para ocultar el titulo desde el home
+  const [tituloActivo, setTituloActivo] = useState(false);
 
   //Arreglo de opciones para ordenar las búsquedas
   const ordenarBusquedaFecha = ["Más cercana", "Más lejana"];
@@ -362,6 +367,9 @@ export function Home() {
           searchQuery={{
             ...searchQuery,
           }}
+          botonCrearActivo={botonCrearActivo}
+          tituloActivo={tituloActivo}
+          
         />
       </motion.div>
     </Container>
