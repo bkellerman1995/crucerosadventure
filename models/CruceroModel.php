@@ -209,7 +209,11 @@ class CruceroModel
                 //Chequear si el crucero tiene fechas de salida asignadas
                 $vResultado->fechasAsignadas = $this->chequearCruceroFechaByCrucero($id);
 
+                $vResultado->cantidadReservas = $this->obtenerCantidadReservasPorFecha($id);
 
+                $vResultado->habitacionesDisponiblesPorCategoria = $this->obtenerHabitacionesDisponiblesPorCategoria($id);
+
+                $vResultado->huespedesConReserva = $this->obtenerHuespedesConReserva($id);
                 //Retornar la respuesta
                 return $vResultado;
             }
@@ -342,6 +346,99 @@ class CruceroModel
         }
     }
 
+    //Obtener la cantidad de reservas por fecha de salida
+    public function obtenerCantidadReservasPorFecha($id)
+    {
+        try {
+
+            //Consulta sql
+            $sql = "SELECT
+                     cf.fechaSalida as fecha,
+                     COUNT(r.idReserva) AS cantidadReservas
+                    FROM
+                     reserva r
+                    JOIN
+                     crucero_fecha cf ON r.idCruceroFecha = cf.idCruceroFecha
+                    JOIN
+                     crucero c ON cf.idCrucero = c.idCrucero
+                    where c.idCrucero = $id
+                    GROUP BY
+                      cf.fechaSalida
+                    ORDER BY
+                     cf.fechaSalida;";
+
+            //Ejecutar la consulta
+            $vResultado = $this->enlace->ExecuteSQL($sql);
+
+            //Retornar resultado
+            return $vResultado;
+            
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    //Obtener la cantidad de habitaciones disponibles por categoria
+    public function obtenerHabitacionesDisponiblesPorCategoria($id)
+    {
+        try {
+            //Consulta sql
+            $sql = "SELECT
+            c.nombre AS nombreCategoria,    -- Nombre de la categoría de habitación
+            COUNT(*) AS habitaciones_disponibles   -- Contar las habitaciones disponibles
+            FROM
+               habitacion_disponible hd
+            JOIN
+               habitacion h ON hd.idHabitacion = h.idHabitacion  -- Relacionar con la tabla 'habitacion'
+            JOIN
+               categoriahabitacion c ON h.idcategoriaHabitacion = c.idcategoriaHabitacion  -- Obtener nombre de la categoría
+            JOIN
+              crucero_fecha cf ON hd.idCruceroFecha = cf.idCruceroFecha  -- Relacionar con 'crucero_fecha'
+            WHERE
+              hd.disponible = 1 and idCrucero = $id  -- Filtrar por habitaciones disponibles y id del crucero
+            GROUP BY
+             h.idcategoriaHabitacion, c.nombre;  -- Agrupar por categoría de habitación y su nombre ";
+
+            //Ejecutar la consulta
+            $vResultado = $this->enlace->ExecuteSQL($sql);
+
+            //Retornar resultado
+            return $vResultado;
+            
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+
+    
+    public function obtenerHuespedesConReserva($id)
+    {
+        try {
+            //Consulta sql
+            $sql = "SELECT
+                   c.idCrucero,                          -- ID del crucero
+                   COUNT(hu.idHuesped) AS cantidad_huespedes -- Contar los huéspedes asignados
+                   FROM 
+                     huesped hu 
+                   JOIN
+                     habitacion h ON hu.idHabitacion = h.idHabitacion  -- Relacionar con la tabla 'habitacion'
+                   JOIN
+                     crucero c ON h.idbarco = c.idbarco  -- Relacionar con la tabla 'crucero' a través del barco
+                   WHERE 
+                     c.idCrucero = $id  -- Filtrar por id de crucero 
+                   GROUP BY
+                     c.idCrucero;  -- Agrupar por crucero";
+
+            //Ejecutar la consulta
+            $vResultado = $this->enlace->ExecuteSQL($sql);
+
+            //Retornar resultado
+            return $vResultado;
+            
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     public function updateCrucero($crucero)
     {
         try {

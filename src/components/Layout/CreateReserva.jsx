@@ -1469,7 +1469,7 @@ export function CreateReserva() {
         setHuespedesAgregados={setHuespedesAgregados} // Enviar función para controlar si se añadieron huéspedes o no.
       />
 
-      {/* Modal importado para Gestión de Huéspedes */}
+      {/* Modal importado para visualizar disponibilidad de habitaciones */}
       <ModalDisponibilidadHabitaciones
         open={openModalHabitaciones}
         handleClose={() => setOpenModalHabitaciones(false)}
