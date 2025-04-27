@@ -23,6 +23,7 @@ class ComplementoService {
   //localhost:81/crucerosadventure/complemento/{id}
   getComplementobyId(complementoID) {
     console.log("Respuesta desde el API", BASE_URL + "/" + complementoID);
+    console.log('complemento ID: ', complementoID);
     return axios.get(BASE_URL + "/" + complementoID);
   }
 

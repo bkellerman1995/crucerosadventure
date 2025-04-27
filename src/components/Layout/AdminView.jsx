@@ -1,7 +1,7 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import "../../App.css";
-import { PiBoatFill } from "react-icons/pi";
+import { PiBoatFill, PiBagSimpleFill } from "react-icons/pi";
 import { MdOutlineBedroomParent } from "react-icons/md";
 import { SiMentorcruise } from "react-icons/si";
 import { AppProvider } from "@toolpad/core/AppProvider";
@@ -29,6 +29,12 @@ const NAVIGATION = [
     title: "Cruceros",
     icon: <SiMentorcruise />,
     link: "/admin/crucero", // Solo la ruta
+  },
+  {
+    segment: "complemento",
+    title: "Complementos",
+    icon: <PiBagSimpleFill />,
+    link: "/admin/complemento", // Solo la ruta
   },
 
 ];
