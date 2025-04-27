@@ -1,5 +1,5 @@
 import React from "react";
-import {useState} from "react";
+import { useState } from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Select from "react-select";
@@ -10,12 +10,11 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { motion } from "framer-motion";
-import {ListCruceros} from "../Layout/ListCruceros";
+import { ListCruceros } from "../Layout/ListCruceros";
 import dayjs from "dayjs";
 
 export function Home() {
-  
-  //Estado para ocultar boton Crear y el titulo desde el home 
+  //Estado para ocultar boton Crear y el titulo desde el home
   const [botonCrearActivo, setBotonCrearActivo] = useState(false);
 
   //Estado para ocultar el titulo desde el home
@@ -99,7 +98,7 @@ export function Home() {
   const handleSelectPrecioChange = (selectedOption) => {
     setSearchQuery({
       ...searchQuery,
-     ordenPrecio: selectedOption.value,
+      ordenPrecio: selectedOption.value,
     });
     console.log("Valor de ordenamiento (precio): ", selectedOption.value);
   };
@@ -158,203 +157,217 @@ export function Home() {
         </video>
       </div>
 
-      {/* Titulo  */}
-      <Box>
-        <Typography
-          component="h1"
-          variant="h2"
-          align="center"
-          gutterBottom
-          style={{
-            color: "white",
-            textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
-          }} // Aquí se aplica la sombra al texto }}
-        >
-          CRuceros Adventure
-        </Typography>
-      </Box>
-      <br></br>
-
-      {/* Introducción al negocio */}
-
-      <Box
-        sx={{
-          backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
-          color: "white", // Color del texto blanco
-          borderRadius: 2,
-          // marginTop: "30%",
-          // marginBottom: 4, // Separación con el título
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.5,
+          duration: 1,
+          ease: "easeIn",
         }}
+        style={{ overflow: "hidden" }} // Para que no se vean los elementos durante la animación
       >
-        <Typography
-          variant="h6"
-          align="center"
-          gutterBottom
-          style={{
-            color: "white",
-            textShadow: "8px 8px 8px rgba(0, 0, 0, 1)",
-          }}
-        >
-          Bienvenido a <strong>CRuceros Adventure</strong>, la mejor opción para
-          disfrutar de un viaje inolvidable por el mar. Ofrecemos una amplia
-          gama de cruceros a destinos impresionantes. Ya sea que estés buscando
-          unas vacaciones relajantes o una aventura llena de emoción, tenemos el
-          paquete perfecto para ti. ¡Embárcate con nosotros y crea recuerdos que
-          durarán toda la vida!
-        </Typography>
-      </Box>
+        <Box style={{ position: "static" }}>
+          {/* Titulo  */}
+          <Box style={{ position: "relative" }}>
+            <Typography
+              component="h1"
+              variant="h2"
+              align="center"
+              gutterBottom
+              style={{
+                color: "white",
+                textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
+              }} // Aquí se aplica la sombra al texto }}
+            >
+              CRuceros Adventure
+            </Typography>
+          </Box>
+          <br></br>
 
-      <Typography
-        component="h1"
-        variant="subtitle6"
-        align="center"
-        gutterBottom
-        style={{
-          color: "white",
-          textShadow: "2px 2px 8px rgba(0, 0, 0, 1)",
-        }}
-      >
-        Abajo encontrarás nuestros cruceros disponibles
-      </Typography>
+          {/* Introducción al negocio */}
 
-      {/* Búsquedas */}
-      <Box
-        sx={{
-          padding: 1.5,
-          borderRadius: 2,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: "2rem",
-          width: "100%",
-          gap: "1rem",
-        }}
-      >
-        {/* Buscar crucero por destino (nombre) */}
-        <TextField
-          name="destino"
-          label="Buscar crucero por destino"
-          variant="outlined"
-          fullWidth
-          value={searchQuery.destino}
-          onChange={handleSearchChange}
-          sx={{
-            width: "40%",
-            maxWidth: "350px",
-            backgroundColor: "white",
-          }}
-        />
-
-        {/* Buscar crucero por puerto de salida (nombre) */}
-        <TextField
-          name="puerto"
-          label="Buscar crucero por puerto de salida"
-          variant="outlined"
-          fullWidth
-          value={searchQuery.puerto}
-          onChange={handleSearchChange}
-          sx={{
-            width: "40%",
-            maxWidth: "350px",
-            backgroundColor: "white",
-          }}
-        />
-
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="Buscar crucero por fecha de salida"
-            variant="outlined"
-            format="DD/MM/YYYY"
-            fullWidth
-            value={searchQuery.fecha ? dayjs(searchQuery.fecha) : null}
-            onChange={handleDateChange}
+          <Box
             sx={{
-              width: "40%",
-              maxWidth: "350px",
-              backgroundColor: "white",
+              backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
+              color: "white", // Color del texto blanco
+              borderRadius: 2,
+              // marginTop: "30%",
+              // marginBottom: 4, // Separación con el título
             }}
-            minDate={dayjs().add(1, "day")}
-          />
-        </LocalizationProvider>
+          >
+            <Typography
+              variant="h6"
+              align="center"
+              gutterBottom
+              style={{
+                color: "white",
+                textShadow: "8px 8px 8px rgba(0, 0, 0, 1)",
+              }}
+            >
+              Bienvenido a <strong>CRuceros Adventure</strong>, la mejor opción
+              para disfrutar de un viaje inolvidable por el mar. Ofrecemos una
+              amplia gama de cruceros a destinos impresionantes. Ya sea que
+              estés buscando unas vacaciones relajantes o una aventura llena de
+              emoción, tenemos el paquete perfecto para ti. ¡Embárcate con
+              nosotros y crea recuerdos que durarán toda la vida!
+            </Typography>
+          </Box>
 
-        <Button
-          variant="contained"
-          type="submit"
-          style={{
-            backgroundColor: "#16537e",
-          }}
-          onClick={handleCleanBusqueda}
-        >
-          Limpiar búsqueda
-        </Button>
-      </Box>
+          <Typography
+            component="h1"
+            variant="subtitle6"
+            align="center"
+            gutterBottom
+            style={{
+              color: "white",
+              textShadow: "2px 2px 8px rgba(0, 0, 0, 1)",
+            }}
+          >
+            Abajo encontrarás nuestros cruceros disponibles
+          </Typography>
 
-      {/* Ordenamiento de búsqueda */}
-      <Box
-        sx={{
-          padding: 1.5,
-          borderRadius: 2,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: "2rem",
-          width: "80%",
-          gap: "1rem",
-          backgroundColor: "gray",
-          marginLeft: "auto", // Centrado horizontal
-          marginRight: "auto", // Centrado horizontal
-        }}
-      >
-        <Typography
-          component="subtitle"
-          variant="outlined"
-          align="center"
-          gutterBottom
-          style={{
-            color: "white",
-            textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
-          }} // Aquí se aplica la sombra al texto }}
-        >
-          Fecha:
-        </Typography>
+          {/* Búsquedas */}
+          <Box
+            sx={{
+              padding: 1.5,
+              borderRadius: 2,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "2rem",
+              width: "100%",
+              gap: "1rem",
+            }}
+          >
+            {/* Buscar crucero por destino (nombre) */}
+            <TextField
+              name="destino"
+              label="Buscar crucero por destino"
+              variant="outlined"
+              fullWidth
+              value={searchQuery.destino}
+              onChange={handleSearchChange}
+              sx={{
+                width: "40%",
+                maxWidth: "350px",
+                backgroundColor: "white",
+              }}
+            />
 
-        {/* Ordenamiento de búsqueda (por fecha) */}
-        <Select
-          options={ordenarBusquedaFecha.map((item) => ({
-            label: item,
-            value: item,
-          }))}
-          onChange={handleSelectFechaChange}
-          value={ordenarBusquedaFecha.ordenFecha}
-          placeholder="Seleccione una opción"
-          styles={customStyles}
-        />
+            {/* Buscar crucero por puerto de salida (nombre) */}
+            <TextField
+              name="puerto"
+              label="Buscar crucero por puerto de salida"
+              variant="outlined"
+              fullWidth
+              value={searchQuery.puerto}
+              onChange={handleSearchChange}
+              sx={{
+                width: "40%",
+                maxWidth: "350px",
+                backgroundColor: "white",
+              }}
+            />
 
-        <Typography
-          component="subtitle"
-          variant="outlined"
-          align="center"
-          gutterBottom
-          style={{
-            color: "white",
-            textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
-          }} // Aquí se aplica la sombra al texto }}
-        >
-          Precio:
-        </Typography>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Buscar crucero por fecha de salida"
+                variant="outlined"
+                format="DD/MM/YYYY"
+                fullWidth
+                value={searchQuery.fecha ? dayjs(searchQuery.fecha) : null}
+                onChange={handleDateChange}
+                sx={{
+                  width: "40%",
+                  maxWidth: "350px",
+                  backgroundColor: "white",
+                }}
+                minDate={dayjs().add(1, "day")}
+              />
+            </LocalizationProvider>
 
-        {/* Ordenamiento de búsqueda (por precio) */}
-        <Select
-          options={ordenarBusquedaPrecio.map((item) => ({
-            label: item,
-            value: item,
-          }))}
-          onChange={handleSelectPrecioChange}
-          value={ordenarBusquedaPrecio.ordenPrecio}
-          placeholder="Seleccione una opción"
-          styles={customStyles}
-        />
-      </Box>
+            <Button
+              variant="contained"
+              type="submit"
+              style={{
+                backgroundColor: "#16537e",
+              }}
+              onClick={handleCleanBusqueda}
+            >
+              Limpiar búsqueda
+            </Button>
+          </Box>
+
+          {/* Ordenamiento de búsqueda */}
+          <Box
+            sx={{
+              padding: 1.5,
+              borderRadius: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "2rem",
+              width: "80%",
+              gap: "1rem",
+              backgroundColor: "gray",
+              marginLeft: "auto", // Centrado horizontal
+              marginRight: "auto", // Centrado horizontal
+            }}
+          >
+            <Typography
+              component="subtitle"
+              variant="outlined"
+              align="center"
+              gutterBottom
+              style={{
+                color: "white",
+                textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
+              }} // Aquí se aplica la sombra al texto }}
+            >
+              Fecha:
+            </Typography>
+
+            {/* Ordenamiento de búsqueda (por fecha) */}
+            <Select
+              options={ordenarBusquedaFecha.map((item) => ({
+                label: item,
+                value: item,
+              }))}
+              onChange={handleSelectFechaChange}
+              value={ordenarBusquedaFecha.ordenFecha}
+              placeholder="Seleccione una opción"
+              styles={customStyles}
+            />
+
+            <Typography
+              component="subtitle"
+              variant="outlined"
+              align="center"
+              gutterBottom
+              style={{
+                color: "white",
+                textShadow: "2px 2px 8px rgba(0, 0, 0, 0.7)",
+              }} // Aquí se aplica la sombra al texto }}
+            >
+              Precio:
+            </Typography>
+
+            {/* Ordenamiento de búsqueda (por precio) */}
+            <Select
+              options={ordenarBusquedaPrecio.map((item) => ({
+                label: item,
+                value: item,
+              }))}
+              onChange={handleSelectPrecioChange}
+              value={ordenarBusquedaPrecio.ordenPrecio}
+              placeholder="Seleccione una opción"
+              styles={customStyles}
+            />
+          </Box>
+        </Box>
+      </motion.div>
+
       <br></br>
 
       {/* animacion de los cards del crucero */}
@@ -369,7 +382,6 @@ export function Home() {
           }}
           botonCrearActivo={botonCrearActivo}
           tituloActivo={tituloActivo}
-          
         />
       </motion.div>
     </Container>
