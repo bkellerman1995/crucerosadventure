@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Modal, Box, Typography, Button} from "@mui/material";
+import { Modal, Box,Button} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import PropTypes from "prop-types";
 import { format, addDays } from "date-fns";
