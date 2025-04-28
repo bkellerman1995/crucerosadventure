@@ -21,10 +21,11 @@ import {ModalInfoReservas} from "./ModalInfoReservas";
 ListCardCruceros.propTypes = {
   data: PropTypes.array,
   botonCrearActivo: PropTypes.bool.isRequired,
-  tituloActivo: PropTypes.bool.isRequired
+  tituloActivo: PropTypes.bool.isRequired,
+  botonVerReservas: PropTypes.bool.isRequired,
 };
 
-export function ListCardCruceros({ data, botonCrearActivo, tituloActivo }) {
+export function ListCardCruceros({ data, botonCrearActivo, tituloActivo, botonVerReservas }) {
   // Usar el contexto para acceder al usuario
   const { usuario } = useUsuarioContext();
 
@@ -191,6 +192,12 @@ export function ListCardCruceros({ data, botonCrearActivo, tituloActivo }) {
                   type="submit"
                   style={{
                     backgroundColor: "#16537e",
+                    display:
+                    usuario.tipo === "admin" &&
+                    botonCrearActivo === true &&
+                    tituloActivo === true
+                      ? "flex"
+                      : "none",
                   }}
                   onClick={() => {
                     setIdCrucero(item.idCrucero);

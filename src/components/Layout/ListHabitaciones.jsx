@@ -197,7 +197,7 @@ function TableHabitacionesToolbar(props) {
           variant="subtitle1"
           component="div"
         >
-          {numSelected} selected
+          {numSelected} seleccionado(s)
         </Typography>
       ) : (
         <Typography

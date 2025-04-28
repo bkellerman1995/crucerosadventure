@@ -10,11 +10,12 @@ import PropTypes from "prop-types";
 ListCruceros.propTypes = {
   searchQuery: PropTypes.object, 
   botonCrearActivo: PropTypes.bool.isRequired,
-  tituloActivo: PropTypes.bool.isRequired
+  tituloActivo: PropTypes.bool.isRequired,
+  botonVerReservas: PropTypes.bool.isRequired,
 };
 
 // Cuando no se envía el prop searchQuery, se establece un valor vacio ({}) por defecto
-export function ListCruceros({searchQuery = {}, botonCrearActivo = false, tituloActivo = false}) {
+export function ListCruceros({searchQuery = {}, botonCrearActivo = false, tituloActivo = false, botonVerReservas = false}) {
 
   //Resultado de consumo del API, respuesta
   const [data, setData] = useState(null);
@@ -149,6 +150,7 @@ export function ListCruceros({searchQuery = {}, botonCrearActivo = false, titulo
       data={filteredCruceros.length > 0 ? filteredCruceros : data}
       botonCrearActivo={botonCrearActivo}
       tituloActivo={tituloActivo}
+      botonVerReservas={botonVerReservas}
     />
   );
 

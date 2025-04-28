@@ -42,10 +42,16 @@ class ComplementoModel
         try {
 
             //Consulta para obtener complemento por ID
-            $vSql = "SELECT * FROM complemento where estado = 1 and idComplemento=$id";
+            // $vSql = "SELECT * FROM complemento where estado = 1 and idComplemento=$id";
+
+            $vSql = "SELECT * FROM complemento where idComplemento=$id";
 
             //Ejecutar la consulta sql
             $vResultado = $this->enlace->executeSQL($vSql);
+
+            if (!empty($vResultado)) {
+                $vResultado = $vResultado[0];
+            }
 
             //Retornar la respuesta
             return $vResultado;
@@ -73,15 +79,15 @@ class ComplementoModel
     {
         try {
 
-            {
-                $sql = "UPDATE complemento 
+
+            $sql = "UPDATE complemento 
                 SET nombre = '$objeto->nombre',
                     descripcion = '$objeto->descripcion',
                     precio = '$objeto->precio',
                     precioAplicado = '$objeto->precioAplicado',
                     estado = '$objeto->estado'
                 WHERE idComplemento = '$objeto->idComplemento'";
-            }
+
             // Consulta SQL para actualizar un complemento
 
             // Ejecutar la consulta

@@ -55,7 +55,7 @@ export function UpdateBarco() {
     resolver: yupResolver(barcoSchema),
   });
 
-  // ✅ Obtener barco por ID (query param)
+  // Obtener barco por ID (query param)
   useEffect(() => {
     if (!id) {
       toast.error("No se proporcionó ID de barco");

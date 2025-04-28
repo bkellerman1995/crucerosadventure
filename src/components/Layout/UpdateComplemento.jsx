@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Box from "@mui/material/Box";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -29,7 +29,7 @@ export function UpdateComplemento() {
     descripcion: yup.string().required("La descripción es requerida"),
     precio: yup
       .number()
-      .typeError("Debe ser un número")
+      .typeError("Ingrese un número")
       .required("El precio es requerido")
       .positive("Debe ser un número positivo"),
     estado: yup.number().required("El estado es requerido"),
@@ -51,7 +51,7 @@ export function UpdateComplemento() {
     resolver: yupResolver(complementoSchema),
   });
 
-  // ✅ Obtener complemento por ID (query param)
+  // Obtener complemento por ID (query param)
   useEffect(() => {
     if (!id) {
       toast.error("No se proporcionó ID de complemento");
@@ -62,12 +62,13 @@ export function UpdateComplemento() {
     ComplementoService.getComplementobyId(id)
       .then((res) => {
         const complemento = res.data;
+        console.log("Complemento recibido",complemento);
         setValue("nombre", complemento.nombre);
         setValue("descripcion", complemento.descripcion);
         setValue("precio", complemento.precio);
-        const estadoValue =
-          complemento.estado === 1 || complemento.estado === null ? 1 : 0;
-        setValue("estado", estadoValue);
+        // const estadoValue =
+        //   complemento.estado === 1 || complemento.estado === null ? 1 : 0;
+        // setValue("estado", estadoValue);
       })
       .catch((err) => {
         setError(err);
@@ -77,7 +78,14 @@ export function UpdateComplemento() {
 
   const onSubmit = async (dataForm) => {
     try {
-      const response = await ComplementoService.updateComplemento(dataForm);
+
+      const dataConIdComplemento ={
+        ...dataForm,
+        idComplemento: parseInt(id),
+      };
+
+      console.log("Datos a enviar",dataConIdComplemento);
+      const response = await ComplementoService.update(dataConIdComplemento);
 
       if (response.data) {
         toast.success(`Complemento actualizado: ${response.data.nombre}`, {
@@ -102,7 +110,7 @@ export function UpdateComplemento() {
       >
         <Grid item>
           <Typography variant="h5" gutterBottom>
-            Crear Complemento
+            Actualizar Complemento
           </Typography>
         </Grid>
 
@@ -143,36 +151,77 @@ export function UpdateComplemento() {
         </Grid>
 
         {/* Precio */}
-        <Grid item>
+        <Grid item size={4}>
           <FormControl fullWidth>
             <Controller
               name="precio"
               control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Precio en dólares"
-                  error={Boolean(errors.precio)}
-                  helperText={errors.precio?.message}
-                />
-              )}
+              render={({ field }) => {
+                const handleKeyPress = (e) => {
+                  // Prevenir la entrada del signo "-"
+                  if (e.key === "-") {
+                    e.preventDefault();
+                  }
+                };
+                return (
+                  <>
+                    <TextField
+                      label="$"
+                      {...field} // Asocia el input con el estado del formulario
+                      placeholder="0"
+                      style={{
+                        backgroundColor: "white",
+                        width: "100%",
+                        fontSize: "16px",
+                      }}
+                      type="number" // Asegura que solo se puedan ingresar números
+                      //Quitar los controles de incremento y decremento
+                      slotProps={{
+                        input: {
+                          type: "number",
+                          sx: {
+                            "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                              {
+                                display: "none",
+                              },
+                            "& input[type=number]": {
+                              MozAppearance: "textfield",
+                            },
+                          },
+                        },
+                      }}
+                      min="500" // Valor mínimo
+                      max="999" // Valor máximo
+                      onKeyPress={handleKeyPress} // Prevenir ingreso de "-"
+                      onInput={(e) => {
+                        // Prevenir ingreso de números negativos
+                        if (e.target.value < 0) {
+                          e.target.value = 0;
+                        }
+                        // Limitar la longitud a 3 caracteres
+                        if (e.target.value.length > 3) {
+                          e.target.value = e.target.value.slice(0, 3);
+                        }
+                      }}
+                      error={Boolean(errors.precio)}
+                      helperText={errors.precio?.message}
+                    />
+                  </>
+                );
+              }}
             />
           </FormControl>
         </Grid>
 
         {/* Estado */}
         <Grid item>
-          <FormControl fullWidth disabled>
-            <Controller
-              name="estado"
-              control={control}
-              render={({ field }) => (
-                <Select {...field} label="Estado">
-                  <MenuItem value={1}>Activo</MenuItem>
-                </Select>
-              )}
-            />
-          </FormControl>
+          <Box
+            sx={{ width: "30%", backgroundColor: "#D3D3D3", borderRadius: 2 }}
+          >
+            <Typography>
+              <MenuItem value={0}>Activo</MenuItem>
+            </Typography>
+          </Box>
         </Grid>
 
         {/* Botón */}
