@@ -18,9 +18,16 @@ export function ModalDisponibilidadHabitaciones({ open, handleClose,idCrucero,fe
 
   //Use Effect para renderizar las habitaciones disponibles
   useEffect(() => {
+
+    // Reiniciar la data cada vez que idCrucero cambie o se abra el modal de nuevo
+    setData([]);
+
     if (idCrucero && fechaSeleccionada) {
       console.log("idCrucero recibido en el modal:", idCrucero);
-      console.log("fechaSeleccionada recibida en el modal:", fechaSeleccionada.value);
+      console.log(
+        "fechaSeleccionada recibida en el modal:",
+        fechaSeleccionada.value
+      );
       HabitacionDisponibleFechaService.getDisponibilidadHabitacionPorFechaByCrucero(
         idCrucero,
         fechaSeleccionada.value
@@ -44,7 +51,7 @@ export function ModalDisponibilidadHabitaciones({ open, handleClose,idCrucero,fe
           toast.error("Hubo un error al obtener las habitaciones disponibles.");
         });
     }
-  }, [idCrucero, fechaSeleccionada]);
+  }, [open, idCrucero, fechaSeleccionada]);
 
   // Función para cerrar el modal
   const handleModalClose = (event, reason) => {
