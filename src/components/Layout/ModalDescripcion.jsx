@@ -97,12 +97,15 @@ export function ModalDescripcion({ open, handleClose, resetSelect, puertoSelecci
   };
 
   // Función para cerrar el modal y resetear valores del select
-  const handleModalClose = () => {
+  const handleModalClose = (event, reason) => {
     if (resetSelect && diaIndex !== null) {
       resetSelect(diaIndex - 1); // Llama a la función para resetear el select
     }
-    handleClose(); // Cierra el modal
+    if (reason !== "backdropClick") {
+      handleClose(); // Solo cerrar si no es un clic en el backdrop
+    }
   };
+
 
   return (
     <>

@@ -137,6 +137,8 @@ function TableHabitacionesHead(props) {
           <TableCell
             key={headCell.id}
             padding={headCell.disablePadding ? "none" : "normal"}
+            align= "center"
+            sx = {{paddingLeft: "2%", fontWeight: "bold"}}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
@@ -205,7 +207,7 @@ function TableHabitacionesToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Lista de reservas
+          <b>Lista de reservas</b>
           <br></br>
         </Typography>
 
@@ -382,14 +384,14 @@ export function ListReservas() {
                           >
                             {row.title}
                           </TableCell>
-                          <TableCell align="left">{row.idReserva}</TableCell>
-                          <TableCell align="left">
+                          <TableCell align="center">{row.idReserva}</TableCell>
+                          <TableCell align="center">
                             {usuario
                               ? `${usuario.nombre} (${usuario.correoElectronico})`
                               : ""}
                           </TableCell>
-                          <TableCell align="left">{row.crucero}</TableCell>
-                          <TableCell align="left">
+                          <TableCell align="center">{row.crucero}</TableCell>
+                          <TableCell align="center">
                             {new Date(row.fechaInicio).toLocaleDateString(
                               "es-CR",
                               {
@@ -399,7 +401,7 @@ export function ListReservas() {
                               }
                             )}
                           </TableCell>
-                          <TableCell align="left">
+                          <TableCell align="center">
                             {new Date(row.fechaFinal).toLocaleDateString(
                               "es-CR",
                               {

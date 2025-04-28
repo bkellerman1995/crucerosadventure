@@ -53,8 +53,10 @@ export function ModalGestionPuertos({ open, handleClose, cantDias, control, setC
 
   //Abrir confirm Dialog en caso de que
   //se quiera cerrar el modal
-  const handleModalClose = () => {
-    setOpenConfirmDialog(true);
+  const handleModalClose = (event, reason) => {
+    if (reason !== "backdropClick") {
+      setOpenConfirmDialog(true);
+    }
   };
 
   //Confirmar que al menos dos puertos 

@@ -108,6 +108,8 @@ function TableHabitacionesHead(props) {
           <TableCell
             key={headCell.id}
             padding={headCell.disablePadding ? "none" : "normal"}
+            align= "center"
+            sx = {{paddingLeft: "2%", fontWeight: "bold"}}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
@@ -178,7 +180,7 @@ function TableHabitacionesToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Lista de Barcos
+          <b>Lista de barcos</b>
         </Typography>
       )}
       <Button
@@ -363,12 +365,13 @@ export function ListBarcos({
                         id={labelId}
                         scope="data"
                         padding="none"
+                        align ="center"
                       >
                         {row.idbarco}
                       </TableCell>
-                      <TableCell align="left">{row.nombre}</TableCell>
-                      <TableCell align="left">{row.capacidadHuesped}</TableCell>
-                      <TableCell align="left">{row.cantHabitaciones}</TableCell>
+                      <TableCell align="center">{row.nombre}</TableCell>
+                      <TableCell align="center">{row.capacidadHuesped}</TableCell>
+                      <TableCell align="center">{row.cantHabitaciones}</TableCell>
                       <TableCell>
                         <IconButton
                           component={Link}

@@ -135,6 +135,8 @@ function TableHabitacionesHead(props) {
           <TableCell
             key={headCell.id}
             padding={headCell.disablePadding ? "none" : "normal"}
+            align= "center"
+            sx = {{paddingLeft: "2%", fontWeight: "bold"}}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
@@ -206,7 +208,7 @@ function TableHabitacionesToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Lista de habitaciones
+          <b>Lista de habitaciones</b>
         </Typography>
       )}
       <Button
@@ -409,19 +411,18 @@ export function ListHabitaciones({botonCrearActivo = false, botonEditarActivo = 
                                 <EditIcon />
                               </IconButton>
                             </TableCell>
-                            {row.title}
                           </TableCell>
-                          <TableCell align="left">{row.nombre}</TableCell>
-                          <TableCell align="left">
+                          <TableCell align="center">{row.nombre}</TableCell>
+
+                          <TableCell align="center">
                             {row.categoriaHabitacion}
                           </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {row.maxHuesped}
-                          </TableCell>
+
+                          <TableCell align="center">{row.maxHuesped}</TableCell>
 
                           {/*<sup> para los metros cuadrados</sup> */}
 
-                          <TableCell align="left">
+                          <TableCell align="center">
                             {row.tamanno} m<sup>2</sup>
                           </TableCell>
                           {/* Contenido de la tabla */}

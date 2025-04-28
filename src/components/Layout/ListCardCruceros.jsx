@@ -54,7 +54,7 @@ export function ListCardCruceros({ data, botonCrearActivo, tituloActivo, botonVe
               : "hidden"
           }
         >
-          Cruceros disponibles
+          <b>Lista de cruceros</b>
         </Typography>
 
         <Tooltip title="Crear">

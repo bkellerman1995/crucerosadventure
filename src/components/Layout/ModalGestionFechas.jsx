@@ -237,9 +237,16 @@ export function ModalGestionFechas({
     }
   };
 
+  // Función para cerrar el modal
+  const handleModalClose = (event, reason) => {
+    if (reason !== "backdropClick") {
+      handleClose(); // Solo cerrar si no es un clic en el backdrop
+    }
+  };
+
   return (
     <>
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open} onClose={handleModalClose}>
         <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
           <Box
             sx={{
