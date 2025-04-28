@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemButton from "@mui/material/ListItemButton";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import { MdBedroomParent } from "react-icons/md";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Card from "@mui/material/Card";
@@ -89,44 +89,59 @@ export function DetailBarco() {
               gutterBottom
               sx={{ fontWeight: "bold", color: "#00304E" }}
             >
-              {data.Nombre}
+              {data.nombre}
             </Typography>
 
             <Divider sx={{ my: 2 }} />
+
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              <b>Descripción:</b>
+            </Typography>
 
             <Typography variant="body1" sx={{ mb: 2 }}>
               {data.descripcion}
             </Typography>
 
             <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-                Información del Barco:
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: "bold", mb: 1 }}
+              >
               </Typography>
               <List>
                 <ListItemButton>
                   <ListItemIcon>
                     <StarIcon color="primary" />
                   </ListItemIcon>
-                  <ListItemText primary={`Nombre: ${data.nombre}`} />
-                </ListItemButton>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <StarIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText primary={`Capacidad de Huéspedes: ${data.capacidadHuesped}`} />
+                  <ListItemText
+                    primary={
+                      <>
+                        <Typography
+                          variant="body1"
+                          sx={{ fontWeight: "bold", display: "inline" }}
+                        >
+                          Capacidad de Huéspedes:
+                        </Typography>
+                        {data.capacidadHuesped}
+                      </>
+                    }
+                  />
                 </ListItemButton>
               </List>
             </Box>
 
             <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: "bold", mb: 1 }}
+              >
                 Habitaciones:
               </Typography>
               <List>
                 {data.habitaciones.map((item) => (
                   <ListItemButton key={item.idHabitacion}>
                     <ListItemIcon>
-                      <ArrowRightIcon />
+                      <MdBedroomParent color="black"/>
                     </ListItemIcon>
                     <ListItemText primary={item.nombre} />
                   </ListItemButton>
@@ -134,8 +149,8 @@ export function DetailBarco() {
               </List>
             </Box>
 
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-              Cantidad de Habitaciones: {data.cantHabitaciones}
+            <Typography variant="subtitle1">
+              <b>Cantidad de Habitaciones:</b> {data.cantHabitaciones}
             </Typography>
           </Grid>
         </Grid>

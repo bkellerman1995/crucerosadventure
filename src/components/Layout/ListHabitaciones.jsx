@@ -429,7 +429,7 @@ export function ListHabitaciones({botonCrearActivo = false, botonEditarActivo = 
                           <TableCell>
                             <IconButton
                               component={Link}
-                              to={`/reserva/${row.idReserva}`}
+                              to={`/habitacion/${row.idHabitacion}`}
                               aria-label="Detalle"
                               sx={{
                                 ml: "auto",
