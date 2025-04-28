@@ -139,7 +139,7 @@ export function CreateComplemento() {
           </FormControl>
         </Grid>
 
-        {/* Capacidad de Huéspedes */}
+        {/* Precio */}
         <Grid item>
           <FormControl fullWidth>
             <Controller
