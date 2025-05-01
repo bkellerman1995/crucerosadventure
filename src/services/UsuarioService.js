@@ -12,6 +12,14 @@ class UsuarioService {
   loginUsuario (usuario) {
     return axios.post(BASE_URL + '/login/', JSON.stringify(usuario));
   }
+  createUser(usuario) {
+    return axios.post(BASE_URL, JSON.stringify(usuario));
+  }
+  loginUser(usuario) {
+    return axios.post(BASE_URL + '/login/', JSON.stringify(usuario));
+  }
 }
+
+
 
 export default new UsuarioService();

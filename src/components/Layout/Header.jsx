@@ -65,9 +65,9 @@ export default function Header() {
 
   //Lista enlaces menu usuario
   const userItems = [
-    { name: "Login", link: "/user/login", login: false },
-    { name: "Registrarse", link: "/user/create", login: false },
-    { name: "Logout", link: "/user/logout", login: true },
+    { name: "Iniciar sesión", link: "/usuario/login", login: false },
+    { name: "Registrarse", link: "/usuario/crear", login: false },
+    { name: "Cerrar sesión", link: "/user/logout", login: true },
   ];
 
   //Filtrar el navbar segun el tipo de usuario
