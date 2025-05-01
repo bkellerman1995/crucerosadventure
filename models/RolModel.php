@@ -30,7 +30,7 @@ class RolModel{
     public function get($id){
         try {
             //Consulta sql
-			$vSql = "SELECT * FROM rol where id=$id";
+			$vSql = "SELECT * FROM rol where idRol=$id";
 			
             //Ejecutar la consulta
 			$vResultado = $this->enlace->ExecuteSQL ( $vSql);

@@ -1,4 +1,7 @@
 <?php
+
+use Firebase\JWT\JWT;
+
 class UsuarioModel
 {
     //Conectarse a la BD
