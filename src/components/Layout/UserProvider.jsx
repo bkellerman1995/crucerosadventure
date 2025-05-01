@@ -2,7 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { UserContext } from '../../context/UserContext';
-
+import React from 'react';
 
 
 export default function UserProvider({ children }) {
