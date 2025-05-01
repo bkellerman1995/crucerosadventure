@@ -1,7 +1,10 @@
 <?php
 //localhost:81/crucerosadventure/reserva
+
+use Firebase\JWT\JWT;
 class usuario
 {
+    private $secret_key = 'e0d17975bc9bd57eee132eecb6da6f11048e8a88506cc3bffc7249078cf2a77a';
     //GET listar
     public function index()
     {
@@ -34,5 +37,30 @@ class usuario
         } catch (Exception $e) {
             handleException($e);
         }
+    }
+    public function login()
+    {
+        $response = new Response();
+        $request = new Request();
+        //Obtener json enviado
+        $inputJSON = $request->getJSON();
+        $usuario = new UsuarioModel();
+        $result = $usuario->login($inputJSON);
+        if (isset($result) && !empty($result) && $result != false) {
+            $response->toJSON($result);
+        } else {
+            $response->toJSON($response, "Usuario no valido");
+        }
+    }
+    public function create()
+    {
+        $response = new Response();
+        $request = new Request();
+        //Obtener json enviado
+        $inputJSON = $request->getJSON();
+        $usuario = new UsuarioModel();
+        $result = $usuario->create($inputJSON);
+        //Dar respuesta
+        $response->toJSON($result);
     }
 }
