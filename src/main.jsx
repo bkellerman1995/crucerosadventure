@@ -158,11 +158,11 @@ const rutas = createBrowserRouter([
         element: <Login />
       },
       {
-        path:'/Usuario/logout',
+        path:'/usuario/logout',
         element: <Logout />
       },
       {
-        path: '/Uusuario/crear',
+        path: '/usuario/crear',
         element: <Signup />
       }
     ],
