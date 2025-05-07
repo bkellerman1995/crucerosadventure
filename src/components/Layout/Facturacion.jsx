@@ -201,7 +201,7 @@ export function Facturacion() {
       ), // Validar que el valor no sea null
     numero: yup
       .string()
-      .required("El número de tarjeta es requerido")
+      // .required("El número de tarjeta es requerido")
       .min(16, "El número de tarjeta no puede tener menos de 16 dígitos"),
     cvv: yup
       .string()

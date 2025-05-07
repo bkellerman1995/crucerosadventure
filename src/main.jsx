@@ -25,13 +25,13 @@ import { UpdateHabitacion } from "./components/Layout/UpdateHabitacion";
 import { UpdateComplemento } from "./components/Layout/UpdateComplemento";
 import { CreateReserva } from "./components/Layout/CreateReserva";
 import { Facturacion} from "./components/Layout/Facturacion";
-//import UserProvider from "./context/usuarioContext";
+import UserProvider from "./context/usuarioContext";
 import { DetailComplemento } from "./components/Layout/DetailComplemento";
 import { Login } from "./components/Layout/Login";
 import { Logout } from "./components/Layout/Logout";
 import { Signup } from "./components/Layout/Signup";
 // import "bootstrap/dist/css/bootstrap.min.css";
-import UserProvider from "./components/Layout/UserProvider";
+// import UserProvider from "./components/Layout/UserProvider";
 
 const rutas = createBrowserRouter([
   {
